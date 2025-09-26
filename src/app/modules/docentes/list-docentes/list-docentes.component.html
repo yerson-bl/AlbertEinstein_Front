@@ -1,0 +1,367 @@
+<!-- Listado de Docentes -->
+<div class="min-h-screen bg-gray-50 dark:bg-[#060818]">
+  <main class="mx-auto max-w-7xl p-4 md:p-6 space-y-6">
+
+    <!-- Header / acciones -->
+    <section class="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
+      <div>
+        <h1 class="text-xl md:text-2xl font-semibold text-gray-800 dark:text-white">Docentes</h1>
+        <p class="text-sm text-gray-500 dark:text-white-dark">Gestión y consulta de docentes.</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <button (click)="fetch()"
+                class="px-3 py-2 rounded-lg border border-gray-300 dark:border-white/10 text-gray-700 dark:text-white hover:bg-gray-50 dark:hover:bg-white/10">
+          Refrescar
+        </button>
+      </div>
+    </section>
+
+    <!-- Filtros -->
+    <section class="bg-white dark:bg-[#1b2e4b] rounded-xl shadow-sm p-4">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+        <!-- Búsqueda -->
+        <div class="md:col-span-2">
+          <div class="relative">
+            <input type="text"
+                   (input)="onSearch($any($event.target).value)"
+                   placeholder="Buscar por nombre, apellido, correo, usuario, grado o sección…"
+                   class="w-full rounded-lg border border-gray-300 dark:border-white/10 bg-white dark:bg-transparent px-10 py-2 text-sm text-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-blue-500/50" />
+            <svg class="absolute left-3 top-2.5 h-5 w-5 text-gray-400 dark:text-white/50" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 105.5 5.5a7.5 7.5 0 0011.15 11.15z" />
+            </svg>
+          </div>
+        </div>
+
+        <!-- Grado -->
+        <select class="form-select w-full rounded-lg border border-gray-300 dark:border-white/10
+                       bg-white dark:bg-[#0b1220] text-gray-800 dark:text-white
+                       px-3 py-2 text-sm dark:[color-scheme:dark]"
+                [ngModel]="filtroGrado()"
+                (ngModelChange)="setFilter('grado', $event)">
+          <option [ngValue]="''">Todos los grados</option>
+          <option *ngFor="let g of grados()" [ngValue]="g">Grado {{ g }}</option>
+        </select>
+
+        <!-- Sección -->
+        <select class="form-select w-full rounded-lg border border-gray-300 dark:border-white/10
+                       bg-white dark:bg-[#0b1220] text-gray-800 dark:text-white
+                       px-3 py-2 text-sm dark:[color-scheme:dark]"
+                [ngModel]="filtroSeccion()"
+                (ngModelChange)="setFilter('seccion', $event)">
+          <option [ngValue]="''">Todas las secciones</option>
+          <option *ngFor="let s of secciones()" [ngValue]="s">Sección {{ s }}</option>
+        </select>
+
+        <!-- Estado -->
+        <select class="form-select w-full rounded-lg border border-gray-300 dark:border-white/10
+                       bg-white dark:bg-[#0b1220] text-gray-800 dark:text-white
+                       px-3 py-2 text-sm dark:[color-scheme:dark]"
+                [ngModel]="filtroEstado()"
+                (ngModelChange)="setFilter('estado', $event)">
+          <option [ngValue]="''">Todos los estados</option>
+          <option *ngFor="let e of estados()" [ngValue]="e">{{ e | titlecase }}</option>
+        </select>
+      </div>
+
+      <!-- Resumen / limpiar -->
+      <div class="mt-3 flex flex-wrap items-center gap-2">
+        <span class="text-xs text-gray-500 dark:text-white-dark">
+          Mostrando {{ totalFiltered() }} resultado(s)
+        </span>
+        <button (click)="clearFilters()"
+                class="ml-auto text-xs px-2 py-1 rounded-md border border-gray-300 dark:border-white/10 text-gray-700 dark:text-white hover:bg-gray-50 dark:hover:bg-white/10">
+          Limpiar filtros
+        </button>
+      </div>
+    </section>
+
+    <!-- Tabla -->
+    <section class="bg-white dark:bg-[#1b2e4b] rounded-xl shadow-sm overflow-hidden">
+
+      <!-- loading -->
+      <div *ngIf="loading()" class="p-6">
+        <div class="animate-pulse space-y-3">
+          <div class="h-4 w-1/3 bg-gray-200 dark:bg-white/10 rounded"></div>
+          <div class="h-4 w-2/3 bg-gray-200 dark:bg-white/10 rounded"></div>
+          <div class="h-4 w-full bg-gray-200 dark:bg-white/10 rounded"></div>
+        </div>
+      </div>
+
+      <!-- error -->
+      <div *ngIf="!loading() && error()" class="p-6">
+        <div class="rounded-lg border border-red-200 dark:border-red-500/30 bg-red-50 dark:bg-red-500/10 p-4 text-sm text-red-700 dark:text-red-200">
+          {{ error() }}
+        </div>
+      </div>
+
+      <!-- contenido -->
+      <div *ngIf="!loading() && !error()">
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead class="bg-gray-50 dark:bg-white/5">
+              <tr class="text-left">
+                <th class="px-4 py-3 cursor-pointer" (click)="sortBy('apellido')">
+                  Apellidos y nombres
+                  <span class="ml-1 text-xs opacity-60" *ngIf="sortKey()==='apellido'">{{ sortDir()==='asc' ? '▲' : '▼' }}</span>
+                </th>
+                <th class="px-4 py-3 cursor-pointer" (click)="sortBy('grado')">
+                  Grados / Secciones
+                  <span class="ml-1 text-xs opacity-60" *ngIf="sortKey()==='grado'">{{ sortDir()==='asc' ? '▲' : '▼' }}</span>
+                </th>
+                <th class="px-4 py-3">Usuario</th>
+                <th class="px-4 py-3 cursor-pointer" (click)="sortBy('correo')">
+                  Correo
+                  <span class="ml-1 text-xs opacity-60" *ngIf="sortKey()==='correo'">{{ sortDir()==='asc' ? '▲' : '▼' }}</span>
+                </th>
+                <th class="px-4 py-3 cursor-pointer" (click)="sortBy('fecha_creacion')">
+                  Fecha creación
+                  <span class="ml-1 text-xs opacity-60" *ngIf="sortKey()==='fecha_creacion'">{{ sortDir()==='asc' ? '▲' : '▼' }}</span>
+                </th>
+                <th class="px-4 py-3">Estado</th>
+                <th class="px-4 py-3">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let d of pageSlice(); trackBy: trackById"
+                  class="border-t border-gray-100 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/5">
+                <td class="px-4 py-3">
+                  <div class="font-medium text-gray-800 dark:text-white-light">{{ d.apellido }}, {{ d.nombre }}</div>
+                  <div class="text-xs text-gray-500 dark:text-white-dark">{{ d.rol }}</div>
+                </td>
+                <td class="px-4 py-3 text-gray-800 dark:text-white-light">
+                  <div class="flex flex-wrap gap-1">
+                    <span class="text-xs text-gray-500 dark:text-white-dark">Grados:</span>
+                    <ng-container *ngFor="let g of d.grado">
+                      <span class="px-2 py-0.5 rounded-full bg-gray-100 dark:bg-white/10 text-xs">{{ g }}</span>
+                    </ng-container>
+                  </div>
+                  <div class="flex flex-wrap gap-1 mt-1">
+                    <span class="text-xs text-gray-500 dark:text-white-dark">Secciones:</span>
+                    <ng-container *ngFor="let s of d.seccion">
+                      <span class="px-2 py-0.5 rounded-full bg-gray-100 dark:bg-white/10 text-xs">{{ s }}</span>
+                    </ng-container>
+                  </div>
+                </td>
+                <td class="px-4 py-3 text-gray-800 dark:text-white-light">{{ d.usuario_id }}</td>
+                <td class="px-4 py-3">
+                  <a class="text-blue-600 dark:text-blue-300 hover:underline" [href]="'mailto:'+d.correo">{{ d.correo }}</a>
+                </td>
+                <td class="px-4 py-3 text-gray-800 dark:text-white-light">{{ formatDate(d.fecha_creacion) }}</td>
+                <td class="px-4 py-3">
+                  <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium" [ngClass]="estadoPill(d.estado)">
+                    {{ d.estado | titlecase }}
+                  </span>
+                </td>
+                <td class="px-4 py-3">
+                  <div class="relative inline-block" (click)="$event.stopPropagation()">
+                    <button type="button"
+                            (click)="toggleMenu(d._id, $event)"
+                            class="h-8 w-8 inline-flex items-center justify-center rounded-md
+                                   border border-gray-300 dark:border-white/10
+                                   text-gray-700 dark:text-white hover:bg-gray-50 dark:hover:bg-white/10">
+                      <span class="sr-only">Abrir acciones</span>
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zm6 0a2 2 0 11-4 0 2 2 0 014 0zm6 0a2 2 0 11-4 0 2 2 0 014 0z" />
+                      </svg>
+                    </button>
+
+                    <div *ngIf="openedId() === d._id"
+                         class="absolute right-0 mt-2 z-30 w-44 rounded-xl bg-white dark:bg-[#0b1220]
+                                border border-gray-200 dark:border-white/10 shadow-lg py-2">
+                      <button (click)="openActions(d, 'view')"
+                              class="w-full flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-gray-50 dark:hover:bg-white/10 text-gray-800 dark:text-white">
+                        <!-- ojo -->
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 5 12 5c4.642 0 8.58 2.51 9.964 6.683.07.213.07.425 0 .639C20.577 16.49 16.64 19 12 19c-4.642 0-8.58-2.51-9.964-6.678z" />
+                          <circle cx="12" cy="12" r="3" />
+                        </svg>
+                        Ver detalles
+                      </button>
+
+                      <button (click)="openActions(d, 'edit')"
+                              class="w-full flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-gray-50 dark:hover:bg-white/10 text-gray-800 dark:text-white">
+                        <!-- lápiz -->
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M11 5h2m-8 14h14M7 19l10-10a2.828 2.828 0 10-4-4L3 15l-1 5 5-1z" />
+                        </svg>
+                        Editar
+                      </button>
+
+                      <div class="my-1 border-t border-gray-100 dark:border-white/10"></div>
+
+                      <button (click)="openActions(d, 'delete')"
+                              class="w-full flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-gray-50 dark:hover:bg-white/10 text-red-600 dark:text-red-400">
+                        <!-- papelera -->
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7h6m-1-2H10a1 1 0 00-1 1v1h8V6a1 1 0 00-1-1z" />
+                        </svg>
+                        Eliminar
+                      </button>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- vacío -->
+              <tr *ngIf="pageSlice().length === 0">
+                <td colspan="7" class="px-4 py-12 text-center">
+                  <div class="text-gray-500 dark:text-white-dark">No hay resultados con los filtros actuales.</div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- paginación -->
+        <div class="flex flex-col sm:flex-row items-center gap-3 p-4 border-t border-gray-100 dark:border-white/10">
+          <div class="text-xs text-gray-500 dark:text-white-dark">
+            Página {{ page() }} de {{ totalPages() }} • {{ totalFiltered() }} docente(s)
+          </div>
+          <div class="flex items-center gap-2 sm:ml-auto">
+            <select class="rounded-md border border-gray-300 dark:border-white/10 bg-white dark:bg-transparent px-2 py-1 text-sm text-gray-800 dark:text-white"
+                    [ngModel]="pageSize()"
+                    (ngModelChange)="pageSize.set(+$event); page.set(1)">
+              <option *ngFor="let s of pageSizes" [ngValue]="s">{{ s }} / pág.</option>
+            </select>
+            <button (click)="goPage(-1)" [disabled]="page()===1"
+                    class="px-2 py-1 rounded-md border border-gray-300 dark:border-white/10 text-gray-700 dark:text-white disabled:opacity-40">
+              Anterior
+            </button>
+            <input type="number" min="1" [max]="totalPages()" [ngModel]="page()"
+                   (ngModelChange)="goto(+$event)"
+                   class="w-16 rounded-md border border-gray-300 dark:border-white/10 bg-white dark:bg-transparent px-2 py-1 text-sm text-gray-800 dark:text-white text-center" />
+            <button (click)="goPage(1)" [disabled]="page()===totalPages()"
+                    class="px-2 py-1 rounded-md border border-gray-300 dark:border-white/10 text-gray-700 dark:text-white disabled:opacity-40">
+              Siguiente
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================== MODALS ======================== -->
+
+    <!-- Ver Detalles -->
+    <div *ngIf="showView()" class="fixed inset-0 z-40 flex items-center justify-center">
+      <div class="absolute inset-0 bg-black/50" (click)="closeModals()"></div>
+      <div class="relative z-50 w-full max-w-lg rounded-xl bg-white dark:bg-[#1b2e4b]
+                  border border-gray-200 dark:border-white/10 p-5">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Detalles del docente</h3>
+          <button (click)="closeModals()" class="text-gray-500 hover:text-gray-800 dark:text-white/60">✕</button>
+        </div>
+        <ng-container *ngIf="actionRow() as r">
+          <div class="space-y-2 text-sm text-gray-700 dark:text-white-light">
+            <div><span class="font-medium">Usuario:</span> {{ r.usuario_id }}</div>
+            <div><span class="font-medium">Nombre:</span> {{ r.nombre }} {{ r.apellido }}</div>
+            <div><span class="font-medium">Correo:</span> {{ r.correo }}</div>
+            <div><span class="font-medium">Grados:</span> {{ r.grado.join(', ') }}</div>
+            <div><span class="font-medium">Secciones:</span> {{ r.seccion.join(', ') }}</div>
+            <div><span class="font-medium">Estado:</span>
+              <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium"
+                    [ngClass]="estadoPill(r.estado)">{{ r.estado | titlecase }}</span>
+            </div>
+            <div><span class="font-medium">Creado:</span> {{ formatDate(r.fecha_creacion) }}</div>
+          </div>
+        </ng-container>
+        <div class="mt-5 text-right">
+          <button (click)="closeModals()"
+                  class="px-3 py-2 rounded-md border border-gray-300 dark:border-white/10
+                         text-gray-700 dark:text-white hover:bg-gray-50 dark:hover:bg-white/10">
+            Cerrar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Editar -->
+    <div *ngIf="showEdit()" class="fixed inset-0 z-40 flex items-center justify-center">
+      <div class="absolute inset-0 bg-black/50" (click)="closeModals()"></div>
+      <div class="relative z-50 w-full max-w-xl rounded-xl bg-white dark:bg-[#1b2e4b]
+                  border border-gray-200 dark:border-white/10 p-5">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Editar docente</h3>
+          <button (click)="closeModals()" class="text-gray-500 hover:text-gray-800 dark:text-white/60">✕</button>
+        </div>
+
+        <form (ngSubmit)="saveEdit()" #editForm="ngForm" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div>
+            <label class="text-xs text-gray-500 dark:text-white-dark">Nombre</label>
+            <input class="form-input w-full" [(ngModel)]="editModel().nombre" name="nombre" required />
+          </div>
+          <div>
+            <label class="text-xs text-gray-500 dark:text-white-dark">Apellido</label>
+            <input class="form-input w-full" [(ngModel)]="editModel().apellido" name="apellido" required />
+          </div>
+          <div class="md:col-span-2">
+            <label class="text-xs text-gray-500 dark:text-white-dark">Correo</label>
+            <input type="email" class="form-input w-full" [(ngModel)]="editModel().correo" name="correo" required />
+          </div>
+
+          <!-- Grados / Secciones como CSV -->
+          <div>
+            <label class="text-xs text-gray-500 dark:text-white-dark">Grados (coma-separados)</label>
+            <input class="form-input w-full" [(ngModel)]="gradoCsv" name="gradoCsv" placeholder="4,5" />
+          </div>
+          <div>
+            <label class="text-xs text-gray-500 dark:text-white-dark">Secciones (coma-separadas)</label>
+            <input class="form-input w-full" [(ngModel)]="seccionCsv" name="seccionCsv" placeholder="A,B" />
+          </div>
+
+          <!-- Contraseña (opcional) -->
+          <div class="md:col-span-2">
+            <label class="text-xs text-gray-500 dark:text-white-dark">Contraseña (opcional)</label>
+            <input type="password" class="form-input w-full"
+                   [(ngModel)]="editModel()['contraseña']" name="contrasena" />
+          </div>
+
+          <div class="md:col-span-2 mt-2 flex justify-end gap-2">
+            <button type="button" (click)="closeModals()"
+                    class="px-3 py-2 rounded-md border border-gray-300 dark:border-white/10
+                           text-gray-700 dark:text-white hover:bg-gray-50 dark:hover:bg-white/10">
+              Cancelar
+            </button>
+            <button type="submit" [disabled]="saving() || !editForm.form.valid"
+                    class="px-3 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50">
+              {{ saving() ? 'Guardando…' : 'Guardar cambios' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Eliminar -->
+    <div *ngIf="showDelete()" class="fixed inset-0 z-40 flex items-center justify-center">
+      <div class="absolute inset-0 bg-black/50" (click)="closeModals()"></div>
+      <div class="relative z-50 w-full max-w-md rounded-xl bg-white dark:bg-[#1b2e4b]
+                  border border-gray-200 dark:border-white/10 p-5">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Eliminar docente</h3>
+          <button (click)="closeModals()" class="text-gray-500 hover:text-gray-800 dark:text-white/60">✕</button>
+        </div>
+
+        <p class="text-sm text-gray-700 dark:text-white-light">
+          ¿Seguro que deseas eliminar a
+          <strong *ngIf="actionRow() as r">{{ r.apellido }}, {{ r.nombre }}</strong>?
+        </p>
+
+        <div class="mt-4 flex justify-end gap-2">
+          <button (click)="closeModals()"
+                  class="px-3 py-2 rounded-md border border-gray-300 dark:border-white/10
+                         text-gray-700 dark:text-white hover:bg-gray-50 dark:hover:bg-white/10">
+            Cancelar
+          </button>
+          <button (click)="confirmDelete()" [disabled]="deleting()"
+                  class="px-3 py-2 rounded-md bg-red-600 text-white hover:bg-red-700 disabled:opacity-50">
+            {{ deleting() ? 'Eliminando…' : 'Eliminar' }}
+          </button>
+        </div>
+      </div>
+    </div>
+    <!-- ======================== /MODALS ======================== -->
+
+  </main>
+</div>

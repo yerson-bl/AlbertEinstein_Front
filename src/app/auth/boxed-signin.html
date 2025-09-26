@@ -1,0 +1,148 @@
+<!-- Layout raíz -->
+<div
+    class="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100 dark:from-slate-950 dark:to-slate-900 flex items-center justify-center p-4">
+
+    <!-- Contenedor principal -->
+    <div class="w-full max-w-6xl">
+        <div
+            class="grid grid-cols-1 md:grid-cols-2 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl rounded-2xl shadow-2xl ring-1 ring-slate-200 dark:ring-slate-800 overflow-hidden">
+
+            <!-- Panel de marca (izquierda) -->
+            <aside class="relative hidden md:flex flex-col p-10 text-slate-900 dark:text-white
+         bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl">
+                <!-- Logo centrado -->
+                <div class="flex-1 grid place-items-center">
+                    <img src="assets/images/pruebas/colegio-logo.png" alt="Logo Colegio Albert Einstein"
+                        class="max-w-[100%] max-h-[100%] object-contain drop-shadow-xl" />
+                </div>
+
+                <!-- Footer -->
+                <div class="flex items-center justify-between pt-6 border-t border-slate-300 dark:border-slate-700">
+                    <span class="text-xs text-slate-600 dark:text-slate-300">© {{ currentYear }} Colegio Albert
+                        Einstein</span>
+                    <span
+                        class="text-xs inline-flex items-center gap-2 px-1 py-1 rounded-full bg-slate-200/60 dark:bg-slate-700/60">
+                        v{{ version }}
+                    </span>
+                </div>
+            </aside>
+
+            <!-- Panel de formulario (derecha) -->
+            <section class="p-6 sm:p-10">
+                <div class="mx-auto w-full max-w-md">
+                    <header class="mb-8">
+                        <h2 class="text-2xl font-semibold text-slate-900 dark:text-white">Iniciar sesión</h2>
+                        <p class="mt-1 text-sm text-slate-600 dark:text-slate-400">Ingresa tus credenciales
+                            institucionales.</p>
+                    </header>
+
+                    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="space-y-6" novalidate>
+                        <!-- Email -->
+                        <div>
+                            <label for="email"
+                                class="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-200">
+                                Correo institucional
+                            </label>
+                            <div class="relative">
+                                <span
+                                    class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                        aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M16 12a4 4 0 1 0-8 0 4 4 0 0 0 8 0Zm0 0v1.5a2.5 2.5 0 0 0 5 0V12a9 9 0 1 0-9 9m4.5-1.206A8.96 8.96 0 0 1 12 21" />
+                                    </svg>
+                                </span>
+                                <input id="email" type="email" formControlName="email" autocomplete="username"
+                                    [attr.aria-invalid]="emailCtrl.invalid && emailCtrl.touched ? 'true' : null"
+                                    class="w-full rounded-lg border border-slate-300 bg-white px-10 py-3 text-slate-900 placeholder-slate-400 shadow-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/40 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:placeholder-slate-500 dark:focus:border-blue-400 dark:focus:ring-blue-400/30"
+                                    [ngClass]="{ 'border-red-500 ring-2 ring-red-500/30 dark:border-red-500 dark:ring-red-500/30': emailCtrl.invalid && emailCtrl.touched }"
+                                    placeholder="usuario@alberteinstein.edu.pe" />
+                            </div>
+                            <div *ngIf="emailCtrl.invalid && emailCtrl.touched"
+                                class="mt-2 space-y-1 text-sm text-red-600 dark:text-red-400" aria-live="polite">
+                                <p *ngIf="emailCtrl.errors?.['required']">El correo electrónico es requerido.</p>
+                                <p *ngIf="emailCtrl.errors?.['email']">Ingrese un correo electrónico válido.</p>
+                            </div>
+                        </div>
+
+                        <!-- Password -->
+                        <div>
+                            <label for="password"
+                                class="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-200">Contraseña</label>
+                            <div class="relative">
+                                <span
+                                    class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                                        aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 11c.942 0 1.706.764 1.706 1.706v.588A1.706 1.706 0 0 1 12 15c-.942 0-1.706-.764-1.706-1.706v-.588C10.294 11.764 11.058 11 12 11Z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M4.5 10.5A7.5 7.5 0 0 1 12 3a7.5 7.5 0 0 1 7.5 7.5v3A7.5 7.5 0 0 1 12 21a7.5 7.5 0 0 1-7.5-7.5v-3Z" />
+                                    </svg>
+                                </span>
+
+                                <input id="password" [type]="passMode" formControlName="password"
+                                    autocomplete="current-password" (keydown)="handleCapsLock($event)"
+                                    (keyup)="handleCapsLock($event)"
+                                    class="w-full rounded-lg border border-slate-300 bg-white px-10 py-3 pr-12 text-slate-900 placeholder-slate-400 shadow-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/40 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:placeholder-slate-500 dark:focus:border-blue-400 dark:focus:ring-blue-400/30"
+                                    [ngClass]="{ 'border-red-500 ring-2 ring-red-500/30 dark:border-red-500 dark:ring-red-500/30': passwordCtrl.invalid && passwordCtrl.touched }"
+                                    placeholder="••••••••" />
+
+                                <button type="button" (click)="togglePasswordMode()"
+                                    class="absolute inset-y-0 right-0 mr-2 flex items-center rounded-md p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500/40 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
+                                    [attr.aria-label]="passMode === 'password' ? 'Mostrar contraseña' : 'Ocultar contraseña'">
+                                    <svg *ngIf="passMode === 'password'" class="h-5 w-5" fill="none"
+                                        stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M2.46 12C3.73 7.94 7.52 5 12 5s8.27 2.94 9.54 7c-1.27 4.06-5.07 7-9.54 7S3.73 16.06 2.46 12Z" />
+                                    </svg>
+                                    <svg *ngIf="passMode === 'text'" class="h-5 w-5" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="m3 3 18 18M9.88 9.88A3 3 0 0 1 14.12 14.1M9.88 9.88L3 3m6.88 6.88L21 21" />
+                                    </svg>
+                                </button>
+                            </div>
+
+                            <div *ngIf="passwordCtrl.invalid && passwordCtrl.touched"
+                                class="mt-2 space-y-1 text-sm text-red-600 dark:text-red-400" aria-live="polite">
+                                <p *ngIf="passwordCtrl.errors?.['required']">La contraseña es requerida.</p>
+                                <p *ngIf="passwordCtrl.errors?.['minlength']">Debe tener al menos 6 caracteres.</p>
+                            </div>
+                        </div>
+
+                        <!-- Recordar -->
+                        <label class="inline-flex items-center gap-2">
+                            <input type="checkbox" formControlName="rememberMe"
+                                class="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-900" />
+                            <span class="text-sm text-slate-700 dark:text-slate-300">Recordar mis credenciales</span>
+                        </label>
+
+                        <!-- Enviar -->
+                        <button type="submit" 
+                            class="group relative inline-flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-3 text-sm font-medium text-white shadow-lg shadow-blue-600/20 transition hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-500/40 disabled:cursor-not-allowed disabled:opacity-60 dark:from-blue-500 dark:to-indigo-500 dark:hover:from-blue-600 dark:hover:to-indigo-600">
+                            <svg *ngIf="isSubmitting" class="h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24"
+                                aria-hidden="true">
+                                <circle class="opacity-30" cx="12" cy="12" r="10" stroke="currentColor"
+                                    stroke-width="4"></circle>
+                                <path class="opacity-80" fill="currentColor"
+                                    d="M4 12a8 8 0 0 1 8-8v4A4 4 0 0 0 8 12H4Z"></path>
+                            </svg>
+                            <span>{{ isSubmitting ? 'Verificando credenciales...' : 'Iniciar sesión' }}</span>
+                        </button>
+                    </form>
+
+                    <footer class="mt-8 text-center text-xs text-slate-500 dark:text-slate-400">
+                        ¿Necesitas ayuda?
+                        <a href="mailto:soporte@alberteinstein.edu.pe"
+                            class="font-medium text-blue-700 hover:underline dark:text-blue-400">
+                            Contacta a soporte
+                        </a>
+                    </footer>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>

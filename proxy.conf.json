@@ -1,0 +1,28 @@
+{
+  "/usuarios": {
+    "target": "http://127.0.0.1:5000",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  },
+  "/evaluaciones": {
+    "target": "http://127.0.0.1:5000",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/intentos": {
+    "target": "http://127.0.0.1:5000",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/reportes": {
+    "target": "http://127.0.0.1:5000",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/notificaciones": {
+    "target": "http://127.0.0.1:5000",
+    "secure": false,
+    "changeOrigin": true
+  }
+}

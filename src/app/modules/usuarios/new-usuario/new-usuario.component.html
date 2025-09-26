@@ -1,0 +1,110 @@
+<!-- src/app/pages/usuarios/new-usuario/new-usuario.component.html -->
+<div class="min-h-screen bg-gray-50 dark:bg-[#060818]">
+  <main class="mx-auto max-w-3xl p-4 md:p-6 space-y-6">
+    <!-- Header -->
+    <section class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+      <div>
+        <h1 class="text-xl md:text-2xl font-semibold text-gray-900 dark:text-white">Registrar Usuario</h1>
+        <p class="text-xs text-gray-500 dark:text-white-dark">Completa la información para crear un nuevo usuario.</p>
+      </div>
+    </section>
+
+    <!-- Form -->
+    <section class="bg-white dark:bg-[#1b2e4b] rounded-xl shadow-sm p-5">
+      <form id="frm-usuario" [formGroup]="form" (ngSubmit)="guardar()" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="md:col-span-1">
+          <label class="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-300">ID de usuario</label>
+          <input type="text" formControlName="usuario_id" placeholder="alumno_01"
+                 class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 placeholder-slate-400 shadow-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/40 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:placeholder-slate-500 dark:focus:border-blue-400 dark:focus:ring-blue-400/30">
+          <p *ngIf="form.get('usuario_id')?.invalid && form.get('usuario_id')?.touched"
+             class="mt-1 text-xs text-red-600 dark:text-red-400">Campo requerido.</p>
+        </div>
+
+        <div class="md:col-span-1">
+          <label class="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-300">Rol</label>
+          <select formControlName="rol"
+                  class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 shadow-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/40 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:focus:border-blue-400 dark:focus:ring-blue-400/30">
+            <option *ngFor="let r of roles" [value]="r">{{ r }}</option>
+          </select>
+        </div>
+
+        <div class="md:col-span-1">
+          <label class="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-300">Nombre</label>
+          <input type="text" formControlName="nombre" placeholder="Juan"
+                 class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 placeholder-slate-400 shadow-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/40 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:placeholder-slate-500 dark:focus:border-blue-400 dark:focus:ring-blue-400/30">
+          <p *ngIf="form.get('nombre')?.invalid && form.get('nombre')?.touched"
+             class="mt-1 text-xs text-red-600 dark:text-red-400">Campo requerido.</p>
+        </div>
+
+        <div class="md:col-span-1">
+          <label class="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-300">Apellido</label>
+          <input type="text" formControlName="apellido" placeholder="Perez"
+                 class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 placeholder-slate-400 shadow-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/40 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:placeholder-slate-500 dark:focus:border-blue-400 dark:focus:ring-blue-400/30">
+          <p *ngIf="form.get('apellido')?.invalid && form.get('apellido')?.touched"
+             class="mt-1 text-xs text-red-600 dark:text-red-400">Campo requerido.</p>
+        </div>
+
+        <div class="md:col-span-1">
+          <label class="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-300">Correo</label>
+          <input type="email" formControlName="correo" placeholder="juan.perez@email.com"
+                 class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 placeholder-slate-400 shadow-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/40 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:placeholder-slate-500 dark:focus:border-blue-400 dark:focus:ring-blue-400/30">
+          <p *ngIf="form.get('correo')?.invalid && form.get('correo')?.touched"
+             class="mt-1 text-xs text-red-600 dark:text-red-400">
+            {{ form.get('correo')?.errors?.['required'] ? 'Campo requerido.' : 'Correo inválido.' }}
+          </p>
+        </div>
+
+        <div class="md:col-span-1">
+          <label class="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-300">Contraseña</label>
+          <input type="password" formControlName="contrasena" placeholder="••••••••"
+                 class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 placeholder-slate-400 shadow-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/40 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:placeholder-slate-500 dark:focus:border-blue-400 dark:focus:ring-blue-400/30">
+          <p *ngIf="form.get('contrasena')?.invalid && form.get('contrasena')?.touched"
+             class="mt-1 text-xs text-red-600 dark:text-red-400">
+            {{ form.get('contrasena')?.errors?.['required'] ? 'Campo requerido.' : 'Mínimo 6 caracteres.' }}
+          </p>
+        </div>
+
+        <!-- Campos solo si es Alumno -->
+        <div class="md:col-span-1" *ngIf="isAlumno">
+          <label class="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-300">Grado</label>
+          <select formControlName="grado"
+                  class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 shadow-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/40 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:focus:border-blue-400 dark:focus:ring-blue-400/30">
+            <option value="" disabled>Selecciona...</option>
+            <option *ngFor="let g of grados" [value]="g">{{ g }}</option>
+          </select>
+          <p *ngIf="form.get('grado')?.invalid && form.get('grado')?.touched"
+             class="mt-1 text-xs text-red-600 dark:text-red-400">Campo requerido.</p>
+        </div>
+
+        <div class="md:col-span-1" *ngIf="isAlumno">
+          <label class="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-300">Sección</label>
+          <select formControlName="seccion"
+                  class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 shadow-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/40 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:focus:border-blue-400 dark:focus:ring-blue-400/30">
+            <option value="" disabled>Selecciona...</option>
+            <option *ngFor="let s of secciones" [value]="s">{{ s }}</option>
+          </select>
+          <p *ngIf="form.get('seccion')?.invalid && form.get('seccion')?.touched"
+             class="mt-1 text-xs text-red-600 dark:text-red-400">Campo requerido.</p>
+        </div>
+
+        <!-- Footer del form -->
+        <div class="md:col-span-2 flex justify-end gap-2 pt-2">
+          <button type="submit"
+            class="inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-lg shadow-blue-600/20 transition hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
+            [disabled]="isLoading">
+            <svg *ngIf="isLoading" class="h-4 w-4 mr-2 animate-spin" viewBox="0 0 24 24">
+              <circle class="opacity-30" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-80" fill="currentColor" d="M4 12a8 8 0 0 1 8-8v4A4 4 0 0 0 8 12H4Z"></path>
+            </svg>
+            Guardar
+          </button>
+          <button type="button"
+            class="inline-flex items-center justify-center rounded-lg border border-gray-300 dark:border-white/10 bg-white dark:bg-[#1b2e4b] px-4 py-2 text-sm font-medium text-gray-700 dark:text-white-light hover:bg-gray-50 dark:hover:bg-white/5"
+            (click)="form.reset({ rol: 'Alumno', grado: '', seccion: '' })">
+            Limpiar
+          </button>
+        </div>
+      </form>
+    </section>
+  </main>
+</div>

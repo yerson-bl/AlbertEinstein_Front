@@ -1,0 +1,310 @@
+<div
+  class="min-h-screen bg-gradient-to-b from-indigo-50/60 via-white to-white dark:from-[#0b1020] dark:via-[#0b1020] dark:to-[#0b1020]">
+
+  <main class="mx-auto max-w-6xl px-4 py-6 md:py-8 space-y-6">
+    <!-- Progress / Stats -->
+    <section class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#0e1426] p-4">
+        <div class="text-xs text-gray-500 dark:text-white/60">Total de preguntas</div>
+        <div class="mt-1 text-2xl font-semibold text-gray-900 dark:text-white">
+          {{ preguntasFA.length || 0 }}
+        </div>
+      </div>
+
+      <div class="rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#0e1426] p-4">
+        <div class="text-xs text-gray-500 dark:text-white/60">Intentos permitidos</div>
+        <div class="mt-1 text-2xl font-semibold text-gray-900 dark:text-white">
+          {{ form.get('intentos_permitidos')?.value || 1 }}
+        </div>
+        <div class="mt-2 text-xs text-gray-500 dark:text-white/60">Configurable en “Información general”</div>
+      </div>
+
+      <div class="rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#0e1426] p-4">
+        <div class="text-xs text-gray-500 dark:text-white/60">Estado</div>
+        <div
+          class="mt-1 inline-flex items-center gap-2 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 px-3 py-1 text-sm">
+          <span class="h-2 w-2 rounded-full bg-emerald-500"></span> Borrador
+        </div>
+      </div>
+    </section>
+
+    <!-- Form principal -->
+    <section class="rounded-3xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#0e1426] shadow-sm">
+      <form [formGroup]="form" class="grid grid-cols-1 lg:grid-cols-5 gap-0">
+        <!-- Columna izquierda -->
+        <div
+          class="lg:col-span-2 border-b lg:border-b-0 lg:border-r border-gray-200 dark:border-white/10 p-5 md:p-6 space-y-5">
+          <div>
+            <h2 class="text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-white/60">Información
+              general</h2>
+            <p class="mt-1 text-xs text-gray-500 dark:text-white/50">Estos datos ayudan a identificar la evaluación.</p>
+          </div>
+
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-white">Título <span
+                  class="text-red-500">*</span></label>
+              <input type="text" formControlName="titulo"
+                class="mt-1 w-full rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-white/5 px-3 py-2 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                placeholder="Ej. Examen de Matemáticas - 1er Trimestre" />
+              <p *ngIf="f.titulo.touched && f.titulo.invalid" class="mt-1 text-xs text-red-500">Requerido.</p>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-white">Materia <span
+                  class="text-red-500">*</span></label>
+              <input type="text" formControlName="materia"
+                class="mt-1 w-full rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-white/5 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                placeholder="Ej. Matemáticas" />
+              <p *ngIf="f.materia.touched && f.materia.invalid" class="mt-1 text-xs text-red-500">Requerido.</p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-white">Grado <span
+                    class="text-red-500">*</span></label>
+                <input type="text" formControlName="grado"
+                  class="mt-1 w-full rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-white/5 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  placeholder="Ej. 5" />
+                <p *ngIf="f.grado.touched && f.grado.invalid" class="mt-1 text-xs text-red-500">Requerido.</p>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-white">Sección <span
+                    class="text-red-500">*</span></label>
+                <input type="text" formControlName="seccion"
+                  class="mt-1 w-full rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-white/5 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  placeholder="Ej. A" />
+                <p *ngIf="f.seccion.touched && f.seccion.invalid" class="mt-1 text-xs text-red-500">Requerido.</p>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-white">Docente ID <span
+                  class="text-red-500">*</span></label>
+              <input type="text" formControlName="docente_id"
+                class="mt-1 w-full rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-white/5 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                placeholder="Ej. docente_01" />
+              <p *ngIf="f.docente_id.touched && f.docente_id.invalid" class="mt-1 text-xs text-red-500">Requerido.</p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-white">Fecha de entrega <span
+                    class="text-red-500">*</span></label>
+                <input type="datetime-local" formControlName="fecha_entrega_local"
+                  class="mt-1 w-full rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-white/5 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                <p *ngIf="f.fecha_entrega_local.touched && f.fecha_entrega_local.invalid"
+                  class="mt-1 text-xs text-red-500">Requerido.</p>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-white">Intentos permitidos <span
+                    class="text-red-500">*</span></label>
+                <div
+                  class="mt-1 flex items-center rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-white/5">
+                  <input type="number" min="1" formControlName="intentos_permitidos"
+                    class="w-full rounded-xl bg-transparent px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none"
+                    placeholder="1" />
+                </div>
+                <p *ngIf="f.intentos_permitidos.touched && f.intentos_permitidos.invalid"
+                  class="mt-1 text-xs text-red-500">Mínimo 1.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Columna derecha: Preguntas -->
+        <div class="lg:col-span-3 p-5 md:p-6 space-y-5">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-white/60">Preguntas</h2>
+              <p class="mt-1 text-xs text-gray-500 dark:text-white/50">Crea preguntas de opción múltiple (OM) o
+                verdadero/falso (VF).</p>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <button type="button" (click)="agregarPregunta('OM')"
+                class="inline-flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-medium bg-emerald-600 text-white hover:bg-emerald-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M11 11V5h2v6h6v2h-6v6h-2v-6H5v-2z" />
+                </svg>
+                Añadir OM
+              </button>
+              <button type="button" (click)="agregarPregunta('VF')"
+                class="inline-flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-medium bg-sky-600 text-white hover:bg-sky-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M9 16.2 4.8 12l1.4-1.4L9 13.4l8.8-8.8L19.2 6z" />
+                </svg>
+                Añadir VF
+              </button>
+            </div>
+          </div>
+
+          <div formArrayName="preguntas" class="space-y-4">
+            <ng-container *ngFor="let p of preguntasFA.controls; let i = index; trackBy: trackByIndex">
+              <div [formGroupName]="i"
+                class="group relative rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-white/5 p-4">
+                <!-- Card header -->
+                <div class="flex items-center justify-between gap-3 mb-3">
+                  <div class="flex items-center gap-2">
+                    <span
+                      class="inline-flex h-7 w-7 items-center justify-center rounded-xl bg-indigo-600/10 text-indigo-600 dark:text-indigo-400 dark:bg-indigo-400/10 text-xs font-semibold">#{{
+                      i + 1 }}</span>
+                    <span class="text-xs uppercase tracking-wide text-gray-500 dark:text-white/60">
+                      {{ preguntasFA.at(i).get('tipo')?.value }}
+                    </span>
+                  </div>
+                  <button type="button" (click)="eliminarPregunta(i)"
+                    class="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs text-red-600 hover:bg-red-500/10">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M6 7h12v2H6zm2 3h8l-1 9H9zM9 4h6v2H9z" />
+                    </svg>
+                    Eliminar
+                  </button>
+                </div>
+
+                <!-- Enunciado -->
+                <div class="mb-3">
+                  <label class="block text-sm font-medium text-gray-700 dark:text-white">Enunciado <span
+                      class="text-red-500">*</span></label>
+                  <textarea formControlName="enunciado" rows="2"
+                    class="mt-1 w-full rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-white/5 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    placeholder="Escribe el enunciado de la pregunta"></textarea>
+                  <p *ngIf="pregInval(i,'enunciado')" class="mt-1 text-xs text-red-500">Requerido.</p>
+                </div>
+
+                <!-- OM -->
+                <div class="space-y-2" *ngIf="preguntasFA.at(i).get('tipo')?.value === 'OM'; else vfTemplate">
+                  <div formArrayName="opciones" class="space-y-2">
+                    <ng-container *ngFor="let o of opcionesFA(i).controls; let j = index; trackBy: trackByIndex">
+                      <div [formGroupName]="j" class="flex items-center gap-2">
+                        <div class="flex-1">
+                          <input type="text" formControlName="valor"
+                            class="w-full rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-white/5 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            placeholder="Opción" />
+                        </div>
+                        <button type="button" (click)="removeOpcion(i,j)"
+                          class="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs text-gray-600 hover:bg-gray-100 dark:text-white/70 dark:hover:bg-white/10">
+                          <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24"
+                            fill="currentColor">
+                            <path d="M6 7h12v2H6zm2 3h8l-1 9H9z" />
+                          </svg>
+                          Quitar
+                        </button>
+                      </div>
+                    </ng-container>
+                  </div>
+
+                  <div class="flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-3">
+                      <button type="button" (click)="addOpcion(i)"
+                        class="rounded-xl px-3 py-2 text-xs font-medium bg-gray-100 hover:bg-gray-200 text-gray-700 dark:bg-white/10 dark:hover:bg-white/15 dark:text-white">
+                        + Añadir opción
+                      </button>
+                      <span class="text-xs text-gray-500 dark:text-white/60">Mínimo 2 opciones</span>
+                    </div>
+                  </div>
+
+                  <div class="mt-3">
+                    <label class="block text-sm font-medium text-gray-700 dark:text-white">Respuesta correcta <span
+                        class="text-red-500">*</span></label>
+                    <select formControlName="respuesta_correcta" class="w-full rounded-xl border border-gray-200 dark:border-white/10
+               bg-white dark:bg-[#0b1220]
+               text-gray-900 dark:text-white
+               px-3 py-2 text-sm
+               focus:outline-none focus:ring-2 focus:ring-indigo-500
+               dark:[color-scheme:dark]">
+                      <option [ngValue]="null" disabled>Selecciona...</option>
+                      <option *ngFor="let opt of opcionesValores(i)" [value]="opt">{{ opt }}</option>
+                    </select>
+
+                    <p *ngIf="pregInval(i,'respuesta_correcta')" class="mt-1 text-xs text-red-500">Selecciona una
+                      opción.</p>
+                  </div>
+                </div>
+
+                <!-- VF -->
+                <ng-template #vfTemplate>
+                  <div class="mt-2">
+                    <div class="text-xs text-gray-500 dark:text-white/60 mb-2">Opciones fijas: Verdadero / Falso</div>
+                    <div class="grid grid-cols-2 gap-2">
+                      <div
+                        class="rounded-xl border border-gray-200 dark:border-white/10 p-2 text-sm text-gray-700 dark:text-white bg-white dark:bg-white/5">
+                        Verdadero</div>
+                      <div
+                        class="rounded-xl border border-gray-200 dark:border-white/10 p-2 text-sm text-gray-700 dark:text-white bg-white dark:bg-white/5">
+                        Falso</div>
+                    </div>
+                    <div class="mt-3">
+                      <label class="block text-sm font-medium text-gray-700 dark:text-white">Respuesta correcta <span
+                          class="text-red-500">*</span></label>
+                      <select formControlName="respuesta_correcta" class="w-full rounded-xl border border-gray-200 dark:border-white/10
+               bg-white dark:bg-[#0b1220]
+               text-gray-900 dark:text-white
+               px-3 py-2 text-sm
+               focus:outline-none focus:ring-2 focus:ring-indigo-500
+               dark:[color-scheme:dark]">
+                        <option [ngValue]="null" disabled>Selecciona...</option>
+                        <option value="Verdadero">Verdadero</option>
+                        <option value="Falso">Falso</option>
+                      </select>
+
+                      <p *ngIf="pregInval(i,'respuesta_correcta')" class="mt-1 text-xs text-red-500">Selecciona una
+                        opción.</p>
+                    </div>
+                  </div>
+                </ng-template>
+              </div>
+            </ng-container>
+
+            <div *ngIf="preguntasFA.length === 0"
+              class="rounded-2xl border border-dashed border-gray-300 dark:border-white/10 p-8 text-center">
+              <p class="text-sm text-gray-500 dark:text-white/60">Aún no has agregado preguntas.</p>
+              <div class="mt-3 flex items-center justify-center gap-2">
+                <button type="button" (click)="agregarPregunta('OM')"
+                  class="rounded-xl px-3 py-2 text-xs font-medium bg-emerald-600 text-white hover:bg-emerald-500">+
+                  OM</button>
+                <button type="button" (click)="agregarPregunta('VF')"
+                  class="rounded-xl px-3 py-2 text-xs font-medium bg-sky-600 text-white hover:bg-sky-500">+ VF</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </section>
+
+    <!-- Sticky Footer Actions -->
+    <div class="sticky bottom-4 z-20">
+      <div class="mx-auto max-w-6xl">
+        <div
+          class="rounded-2xl border border-gray-200 dark:border-white/10 bg-white/90 dark:bg-[#0e1426]/90 backdrop-blur px-4 py-3 flex items-center justify-between">
+          <div class="text-xs text-gray-600 dark:text-white/70">
+            <span class="font-medium text-gray-900 dark:text-white">{{ preguntasFA.length || 0 }}</span> preguntas en
+            total •
+            Fecha de entrega: <span class="font-medium text-gray-900 dark:text-white">{{
+              form.get('fecha_entrega_local')?.value || '—' }}</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <button type="button"
+              class="rounded-xl px-4 py-2 text-sm font-medium border border-gray-200 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/10 text-gray-700 dark:text-white"
+              (click)="agregarPregunta('OM')">+ OM</button>
+            <button type="button"
+              class="rounded-xl px-4 py-2 text-sm font-medium border border-gray-200 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/10 text-gray-700 dark:text-white"
+              (click)="agregarPregunta('VF')">+ VF</button>
+            <button
+              class="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium shadow-sm bg-indigo-600 text-white hover:bg-indigo-500 disabled:opacity-50"
+              [disabled]="form.invalid || cargando" (click)="guardar()" type="button">
+              <svg *ngIf="!cargando" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 -ml-1" viewBox="0 0 24 24"
+                fill="currentColor">
+                <path d="M17 3H7a2 2 0 0 0-2 2v14l7-3 7 3V5a2 2 0 0 0-2-2z" />
+              </svg>
+              <svg *ngIf="cargando" class="h-4 w-4 -ml-1 animate-spin" viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" class="opacity-25" stroke-width="4" />
+                <path d="M4 12a 8 8 0 0 1 8-8" stroke="currentColor" stroke-width="4" class="opacity-75" />
+              </svg>
+              {{ cargando ? 'Guardando...' : 'Guardar evaluación' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>

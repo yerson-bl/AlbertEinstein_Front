@@ -1,0 +1,239 @@
+﻿<div [ngClass]="{ 'dark text-white-dark': store.semidark }">
+    <nav
+        class="sidebar fixed bottom-0 top-0 z-50 h-full min-h-screen w-[260px] shadow-[5px_0_25px_0_rgba(94,92,154,0.1)] transition-all duration-300">
+        <div class="h-full bg-white dark:bg-[#0e1726]">
+
+            <!-- Header del sidebar -->
+            <div class="flex items-center justify-between px-4 py-3 overflow-hidden">
+                <!-- Contenedor del logo -->
+                <a routerLink="/" class="main-logo flex items-center flex-1 min-w-0 pr-2">
+                    <!-- Logo: se ajusta al espacio disponible -->
+                    <img src="/assets/images/pruebas/colegio-logotipo.png" alt="Colegio Albert Einstein"
+                        class="block h-16 w-auto max-w-full object-contain" />
+                </a>
+
+                <!-- Botón colapsar -->
+                <button type="button"
+                    class="shrink-0 flex h-8 w-8 items-center justify-center rounded-full transition duration-300
+                 hover:bg-gray-500/10 hover:text-[#F24E07] dark:text-white-light dark:hover:bg-dark-light/10 rtl:rotate-180"
+                    (click)="storeData.dispatch({ type: 'toggleSidebar' })">
+                    <icon-carets-down class="m-auto rotate-90" />
+                </button>
+            </div>
+
+            <ng-scrollbar class="relative !h-[calc(100vh-80px)]" appearance="compact">
+                <ul class="relative space-y-0.5 p-4 py-0 font-semibold">
+                    <!-- Dashboard -->
+                    <li class="nav-item">
+                        <a routerLink="/dashboard" class="group" routerLinkActive="active" (click)="toggleMobileMenu()">
+                            <div class="flex items-center">
+                                <icon-menu-charts class="shrink-0" />
+                                <span
+                                    class="text-black dark:text-[#506690] dark:group-hover:text-white-dark ltr:pl-3 rtl:pr-3">
+                                    {{ 'Dashboard' | translate }}
+                                </span>
+                            </div>
+                        </a>
+                    </li>
+
+                    <!-- ALUMNOS -->
+                    <li class="accordion menu nav-item">
+                        <button type="button" class="nav-link group w-full"
+                            [ngClass]="{ active: activeDropdown.includes('alumnos') }"
+                            (click)="toggleAccordion('alumnos')">
+                            <div class="flex items-center">
+                                <icon-menu-users class="shrink-0" />
+                                <span
+                                    class="text-black dark:text-[#506690] dark:group-hover:text-white-dark ltr:pl-3 rtl:pr-3">
+                                    {{ 'Alumnos' | translate }}
+                                </span>
+                            </div>
+                            <div [ngClass]="{ 'rtl:rotate-90 -rotate-90': !activeDropdown.includes('alumnos') }">
+                                <icon-caret-down />
+                            </div>
+                        </button>
+
+                        <div [@slideDownUp]="!activeDropdown.includes('alumnos')" class="accordion-content">
+                            <ul class="sub-menu text-gray-500">
+                                <li>
+                                    <a routerLink="/alumnos/list-alumno" routerLinkActive="active"
+                                        (click)="toggleMobileMenu()"
+                                        class="flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-white/10">
+                                        <i-lucide name="list" [size]="22" [strokeWidth]="2"></i-lucide>
+                                        {{ 'Listado Alumnos' | translate }}
+                                    </a>
+                                </li>
+                                <li>
+                                    <a routerLink="/alumnos/new-alumno" routerLinkActive="active"
+                                        (click)="toggleMobileMenu()"
+                                        class="flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-white/10">
+                                        <i-lucide name="user-plus" [size]="22" [strokeWidth]="2"></i-lucide>
+                                        {{ 'Registrar Alumno' | translate }}
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+
+                    <!-- DOCENTES -->
+                    <li class="accordion menu nav-item">
+                        <button type="button" class="nav-link group w-full"
+                            [ngClass]="{ active: activeDropdown.includes('docentes') }"
+                            (click)="toggleAccordion('docentes')">
+                            <div class="flex items-center">
+                                <icon-menu-users class="shrink-0" />
+                                <span
+                                    class="text-black dark:text-[#506690] dark:group-hover:text-white-dark ltr:pl-3 rtl:pr-3">
+                                    {{ 'Docentes' | translate }}
+                                </span>
+                            </div>
+                            <div [ngClass]="{ 'rtl:rotate-90 -rotate-90': !activeDropdown.includes('docentes') }">
+                                <icon-caret-down />
+                            </div>
+                        </button>
+
+                        <div [@slideDownUp]="!activeDropdown.includes('docentes')" class="accordion-content">
+                            <ul class="sub-menu text-gray-500">
+                                <li>
+                                    <a routerLink="docentes/list-docentes" routerLinkActive="active"
+                                        (click)="toggleMobileMenu()"
+                                        class="flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-white/10">
+                                        <i-lucide name="list" [size]="22" [strokeWidth]="2"></i-lucide>
+                                        {{ 'Listado Docentes' | translate }}
+                                    </a>
+                                </li>
+                                <li>
+                                    <a routerLink="/docentes/new-docente" routerLinkActive="active"
+                                        (click)="toggleMobileMenu()"
+                                        class="flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-white/10">
+                                        <i-lucide name="user-plus" [size]="22" [strokeWidth]="2"></i-lucide>
+                                        {{ 'Registrar Docente' | translate }}
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+
+
+                    <!-- ADMIN -->
+                    <li class="accordion menu nav-item">
+                        <button type="button" class="nav-link group w-full"
+                            [ngClass]="{ active: activeDropdown.includes('admin') }" (click)="toggleAccordion('admin')">
+                            <div class="flex items-center">
+                                <icon-menu-users class="shrink-0" />
+                                <span
+                                    class="text-black dark:text-[#506690] dark:group-hover:text-white-dark ltr:pl-3 rtl:pr-3">
+                                    {{ 'Administrador' | translate }}
+                                </span>
+                            </div>
+                            <div [ngClass]="{ 'rtl:rotate-90 -rotate-90': !activeDropdown.includes('admin') }">
+                                <icon-caret-down />
+                            </div>
+                        </button>
+
+                        <div [@slideDownUp]="!activeDropdown.includes('admin')" class="accordion-content">
+                            <ul class="sub-menu text-gray-500">
+                                <li>
+                                    <a routerLink="/admin/list-admin" routerLinkActive="active"
+                                        (click)="toggleMobileMenu()"
+                                        class="flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-white/10">
+                                        <i-lucide name="list" [size]="22" [strokeWidth]="2"></i-lucide>
+                                        {{ 'Listado Administradores' | translate }}
+                                    </a>
+                                </li>
+                                <li>
+                                    <a routerLink="/admin/new-admin" routerLinkActive="active"
+                                        (click)="toggleMobileMenu()"
+                                        class="flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-white/10">
+                                        <i-lucide name="user-plus" [size]="22" [strokeWidth]="2"></i-lucide>
+                                        {{ 'Registrar Administrador' | translate }}
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+
+                    <!-- Evaluaciones -->
+                    <li class="accordion menu nav-item">
+                        <button type="button" class="nav-link group w-full"
+                            [ngClass]="{ active: activeDropdown.includes('evaluaciones') }"
+                            (click)="toggleAccordion('evaluaciones')">
+                            <div class="flex items-center">
+                                <icon-menu-forms class="shrink-0" />
+                                <span
+                                    class="text-black dark:text-[#506690] dark:group-hover:text-white-dark ltr:pl-3 rtl:pr-3">
+                                    {{ 'Evaluaciones' | translate }}
+                                </span>
+                            </div>
+                            <div [ngClass]="{ 'rtl:rotate-90 -rotate-90': !activeDropdown.includes('evaluaciones') }">
+                                <icon-caret-down />
+                            </div>
+                        </button>
+
+                        <div [@slideDownUp]="!activeDropdown.includes('evaluaciones')" class="accordion-content">
+                            <ul class="sub-menu text-gray-500">
+                                <li>
+                                    <a routerLink="/evaluaciones/list-evaluacion" routerLinkActive="active"
+                                        (click)="toggleMobileMenu()"
+                                        class="flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-white/10">
+                                        <i-lucide name="clipboard-list" [size]="22" [strokeWidth]="2"></i-lucide>
+                                        {{ 'Listado Evaluaciones' | translate }}
+                                    </a>
+                                </li>
+                                <li>
+                                    <a routerLink="/evaluaciones/new-evaluacion" routerLinkActive="active"
+                                        (click)="toggleMobileMenu()"
+                                        class="flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-white/10">
+                                        <i-lucide name="file-plus-2" [size]="22" [strokeWidth]="2"></i-lucide>
+                                        {{ 'Crear Evaluacion' | translate }}
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+
+                    <!-- Usuarios -->
+                    <li class="accordion menu nav-item">
+                        <button type="button" class="nav-link group w-full"
+                            [ngClass]="{ active: activeDropdown.includes('usuarios') }"
+                            (click)="toggleAccordion('usuarios')">
+                            <div class="flex items-center">
+                                <icon-menu-users class="shrink-0" />
+                                <span
+                                    class="text-black dark:text-[#506690] dark:group-hover:text-white-dark ltr:pl-3 rtl:pr-3">
+                                    {{ 'Usuarios' | translate }}
+                                </span>
+                            </div>
+                            <div [ngClass]="{ 'rtl:rotate-90 -rotate-90': !activeDropdown.includes('usuarios') }">
+                                <icon-caret-down />
+                            </div>
+                        </button>
+
+                        <div [@slideDownUp]="!activeDropdown.includes('usuarios')" class="accordion-content">
+                            <ul class="sub-menu text-gray-500">
+                                <li>
+                                    <a routerLink="/usuarios/list-usuario" routerLinkActive="active"
+                                        (click)="toggleMobileMenu()"
+                                        class="flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-white/10">
+                                        <i-lucide name="list" [size]="22" [strokeWidth]="2"></i-lucide>
+                                        {{ 'Listado Usuarios' | translate }}
+                                    </a>
+                                </li>
+                                <li>
+                                    <a routerLink="/usuarios/new-usuario" routerLinkActive="active"
+                                        (click)="toggleMobileMenu()"
+                                        class="flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-white/10">
+                                        <i-lucide name="user-plus" [size]="22" [strokeWidth]="2"></i-lucide>
+                                        {{ 'Registrar Usuario' | translate }}
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+
+
+                </ul>
+            </ng-scrollbar>
+        </div>
+    </nav>
+</div>

@@ -1,0 +1,144 @@
+<!-- src/app/pages/usuarios/list-usuario/list-usuario.component.html -->
+<div class="min-h-screen bg-gray-50 dark:bg-[#060818]">
+  <main class="mx-auto max-w-7xl p-4 md:p-6 space-y-6">
+
+    <!-- Header -->
+    <section class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+      <div>
+        <h1 class="text-xl md:text-2xl font-semibold text-gray-900 dark:text-white">Listado de Usuarios</h1>
+        <p class="text-xs text-gray-500 dark:text-white-dark">Consulta y filtra usuarios registrados en el sistema.</p>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <a [routerLink]="registrarRuta()"
+           class="inline-flex items-center justify-center rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-lg shadow-blue-600/20 transition hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-500/40">
+          + Registrar Usuario
+        </a>
+        <!-- <button type="button"
+                class="inline-flex items-center justify-center rounded-lg border border-gray-300 dark:border-white/10 bg-white dark:bg-[#1b2e4b] px-4 py-2 text-sm font-medium text-gray-700 dark:text-white-light hover:bg-gray-50 dark:hover:bg-white/5"
+                (click)="cargarUsuarios()">
+          Refrescar
+        </button> -->
+      </div>
+    </section>
+
+    
+
+    <!-- Filtros -->
+    <section class="bg-white dark:bg-[#1b2e4b] rounded-xl shadow-sm p-5">
+      <form [formGroup]="filtroForm" class="grid grid-cols-1 md:grid-cols-4 gap-3">
+        <div class="md:col-span-2">
+          <label class="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-300">Buscar</label>
+          <input type="text" formControlName="q" placeholder="Nombre, correo, ID..."
+                 class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 placeholder-slate-400 shadow-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/40 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:placeholder-slate-500 dark:focus:border-blue-400 dark:focus:ring-blue-400/30">
+        </div>
+        <div>
+          <label class="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-300">Rol</label>
+          <select formControlName="rol"
+                  class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 shadow-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/40 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:focus:border-blue-400 dark:focus:ring-blue-400/30">
+            <option value="">Todos</option>
+            <option *ngFor="let r of roles" [value]="r">{{ r }}</option>
+          </select>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-300">Grado</label>
+            <select formControlName="grado"
+                    class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 shadow-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/40 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:focus:border-blue-400 dark:focus:ring-blue-400/30">
+              <option value="">Todos</option>
+              <option *ngFor="let g of grados" [value]="g">{{ g }}</option>
+            </select>
+          </div>
+          <div>
+            <label class="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-300">Sección</label>
+            <select formControlName="seccion"
+                    class="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-slate-900 shadow-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/40 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:focus:border-blue-400 dark:focus:ring-blue-400/30">
+              <option value="">Todas</option>
+              <option *ngFor="let s of secciones" [value]="s">{{ s }}</option>
+            </select>
+          </div>
+        </div>
+      </form>
+    </section>
+
+    <!-- Tabla -->
+    <section class="bg-white dark:bg-[#1b2e4b] rounded-xl shadow-sm p-5">
+      <div class="flex items-center justify-between mb-3">
+        <p class="text-sm text-gray-600 dark:text-white-dark">
+          Mostrando
+          <span class="font-medium text-gray-900 dark:text-white">{{ pageSlice().length }}</span>
+          de
+          <span class="font-medium text-gray-900 dark:text-white">{{ filtered.length }}</span>
+          usuarios
+        </p>
+
+        <div class="flex items-center gap-2">
+          <label class="text-xs text-gray-600 dark:text-white-dark">Por página</label>
+          <select [(ngModel)]="pageSize" (ngModelChange)="page = 1"
+                  class="rounded-lg border border-slate-300 bg-white px-2 py-1 text-sm text-slate-900 shadow-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-500/40 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100">
+            <option [ngValue]="5">5</option>
+            <option [ngValue]="10">10</option>
+            <option [ngValue]="20">20</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="text-left border-b border-gray-200 dark:border-white/10">
+              <th class="py-2 pr-4 text-gray-600 dark:text-white-dark">ID</th>
+              <th class="py-2 pr-4 text-gray-600 dark:text-white-dark">Nombre</th>
+              <th class="py-2 pr-4 text-gray-600 dark:text-white-dark">Correo</th>
+              <th class="py-2 pr-4 text-gray-600 dark:text-white-dark">Rol</th>
+              <th class="py-2 pr-4 text-gray-600 dark:text-white-dark">Grado</th>
+              <th class="py-2 pr-4 text-gray-600 dark:text-white-dark">Sección</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngIf="isLoading">
+              <td colspan="6" class="py-6 text-center text-gray-500 dark:text-white-dark">
+                Cargando usuarios...
+              </td>
+            </tr>
+
+            <tr *ngIf="!isLoading && pageSlice().length === 0">
+              <td colspan="6" class="py-6 text-center text-gray-500 dark:text-white-dark">
+                No se encontraron resultados.
+              </td>
+            </tr>
+
+            <tr *ngFor="let u of pageSlice()" class="border-b border-gray-100 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/5">
+              <td class="py-2 pr-4 text-gray-800 dark:text-white-light">{{ u.usuario_id }}</td>
+              <td class="py-2 pr-4 text-gray-800 dark:text-white-light">{{ nombreCompleto(u) }}</td>
+              <td class="py-2 pr-4 text-gray-800 dark:text-white-light">{{ u.correo }}</td>
+              <td class="py-2 pr-4 text-gray-800 dark:text-white-light">{{ u.rol }}</td>
+              <td class="py-2 pr-4 text-gray-800 dark:text-white-light">{{ u.grado || '-' }}</td>
+              <td class="py-2 pr-4 text-gray-800 dark:text-white-light">{{ u.seccion || '-' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Paginación -->
+      <div class="mt-4 flex items-center justify-between">
+        <p class="text-xs text-gray-500 dark:text-white-dark">
+          Página <span class="font-medium text-gray-900 dark:text-white">{{ page }}</span> de
+          <span class="font-medium text-gray-900 dark:text-white">{{ totalPages() }}</span>
+        </p>
+        <div class="flex gap-2">
+          <button type="button" (click)="goPrev()" [disabled]="!canPrev()"
+                  class="rounded-lg border border-gray-300 dark:border-white/10 bg-white dark:bg-[#1b2e4b] px-3 py-1.5 text-xs text-gray-700 dark:text-white-light disabled:opacity-50">
+            Anterior
+          </button>
+          <button type="button" (click)="goNext()" [disabled]="!canNext()"
+                  class="rounded-lg border border-gray-300 dark:border-white/10 bg-white dark:bg-[#1b2e4b] px-3 py-1.5 text-xs text-gray-700 dark:text-white-light disabled:opacity-50">
+            Siguiente
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
