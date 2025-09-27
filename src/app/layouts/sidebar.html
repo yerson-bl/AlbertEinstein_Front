@@ -192,39 +192,39 @@
                         </div>
                     </li>
 
-                    <!-- Usuarios -->
+                    <!-- Evaluaciones PARA ALUMNOS -->
                     <li class="accordion menu nav-item">
                         <button type="button" class="nav-link group w-full"
-                            [ngClass]="{ active: activeDropdown.includes('usuarios') }"
-                            (click)="toggleAccordion('usuarios')">
+                            [ngClass]="{ active: activeDropdown.includes('evaluaciones-alumno') }"
+                            (click)="toggleAccordion('evaluaciones-alumno')">
                             <div class="flex items-center">
-                                <icon-menu-users class="shrink-0" />
+                                <icon-menu-forms class="shrink-0" />
                                 <span
                                     class="text-black dark:text-[#506690] dark:group-hover:text-white-dark ltr:pl-3 rtl:pr-3">
-                                    {{ 'Usuarios' | translate }}
+                                    {{ 'Evaluaciones (Alumnos)' | translate }}
                                 </span>
                             </div>
-                            <div [ngClass]="{ 'rtl:rotate-90 -rotate-90': !activeDropdown.includes('usuarios') }">
+                            <div [ngClass]="{ 'rtl:rotate-90 -rotate-90': !activeDropdown.includes('evaluaciones-alumno') }">
                                 <icon-caret-down />
                             </div>
                         </button>
 
-                        <div [@slideDownUp]="!activeDropdown.includes('usuarios')" class="accordion-content">
+                        <div [@slideDownUp]="!activeDropdown.includes('evaluaciones-alumno')" class="accordion-content">
                             <ul class="sub-menu text-gray-500">
                                 <li>
-                                    <a routerLink="/usuarios/list-usuario" routerLinkActive="active"
+                                    <a routerLink="/alumno/lista-evaluaciones" routerLinkActive="active"
                                         (click)="toggleMobileMenu()"
                                         class="flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-white/10">
-                                        <i-lucide name="list" [size]="22" [strokeWidth]="2"></i-lucide>
-                                        {{ 'Listado Usuarios' | translate }}
+                                        <i-lucide name="clipboard-list" [size]="22" [strokeWidth]="2"></i-lucide>
+                                        {{ 'Evaluaciones' | translate }}
                                     </a>
                                 </li>
                                 <li>
-                                    <a routerLink="/usuarios/new-usuario" routerLinkActive="active"
+                                    <a routerLink="/alumno/iniciar-intento" routerLinkActive="active"
                                         (click)="toggleMobileMenu()"
                                         class="flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-white/10">
-                                        <i-lucide name="user-plus" [size]="22" [strokeWidth]="2"></i-lucide>
-                                        {{ 'Registrar Usuario' | translate }}
+                                        <i-lucide name="file-plus-2" [size]="22" [strokeWidth]="2"></i-lucide>
+                                        {{ 'Reportes' | translate }}
                                     </a>
                                 </li>
                             </ul>

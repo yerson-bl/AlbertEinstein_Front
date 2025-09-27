@@ -1,0 +1,119 @@
+<div class="min-h-screen bg-white dark:bg-[#0b1020]">
+    <main class="mx-auto max-w-5xl px-4 py-6 md:py-8 space-y-5">
+
+        <!-- Header -->
+        <section
+            class="rounded-3xl border border-gray-200 dark:border-white/10 bg-gradient-to-r from-indigo-600 via-indigo-500 to-violet-600 text-white p-5 md:p-6">
+            <div class="flex items-start justify-between gap-4">
+                <div class="min-w-0">
+                    <div class="text-xs opacity-80">Intento #{{ intentoId || '—' }}</div>
+                    <h1 class="mt-1 text-xl md:text-2xl font-semibold truncate">
+                        {{ evaluacion.titulo || 'Evaluación' }}
+                    </h1>
+                    <div class="mt-1 text-sm opacity-90 flex flex-wrap gap-2">
+                        <span class="inline-flex items-center rounded-full bg-white/15 px-2.5 py-0.5 text-xs">
+                            {{ evaluacion.materia || '—' }}
+                        </span>
+                        <span class="inline-flex items-center rounded-full bg-white/15 px-2.5 py-0.5 text-xs">
+                            Docente: {{ evaluacion.docente_id || '—' }}
+                        </span>
+                        <span class="inline-flex items-center rounded-full bg-white/15 px-2.5 py-0.5 text-xs">
+                            Entrega: {{ fmtFecha(evaluacion.fecha_entrega) }}
+                        </span>
+                        <span class="inline-flex items-center rounded-full bg-white/15 px-2.5 py-0.5 text-xs">
+                            Preguntas: {{ evaluacion.preguntas.length || 0 }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="text-right shrink-0">
+                    <div class="text-3xl font-bold">{{ respondidas() }}</div>
+                    <div class="text-xs opacity-80 -mt-1">respondidas</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Mensajes -->
+        <section *ngIf="errorMsg"
+            class="rounded-2xl border border-red-200 bg-red-50 text-red-700 dark:border-red-400/30 dark:bg-red-950/30 dark:text-red-200 p-4">
+            {{ errorMsg }}
+        </section>
+        <section *ngIf="okMsg"
+            class="rounded-2xl border border-emerald-300 bg-emerald-50 text-emerald-800 dark:border-emerald-400/30 dark:bg-emerald-900/20 dark:text-emerald-200 p-4">
+            {{ okMsg }}
+        </section>
+
+        <!-- Cargando -->
+        <section *ngIf="cargando"
+            class="rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#0e1426] p-5">
+            Cargando intento…
+        </section>
+
+        <!-- Preguntas -->
+        <section *ngIf="!cargando && evaluacion?.preguntas?.length" class="space-y-4">
+            <div *ngFor="let p of evaluacion.preguntas; let i = index"
+                class="rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#0e1426] p-4 md:p-5">
+                <div class="text-xs text-gray-500 dark:text-white/60 mb-1">Pregunta #{{ i + 1 }} — {{ p.tipo }}</div>
+                <div class="text-base md:text-lg font-medium text-gray-900 dark:text-white">{{ p.enunciado }}</div>
+
+                <!-- Opciones (OM) -->
+                <div *ngIf="p.tipo === 'OM'" class="mt-3 space-y-2">
+                    <label *ngFor="let op of (p.opciones || []); let j = index"
+                        class="flex items-center gap-2 rounded-xl border border-gray-200 dark:border-white/10 p-3 cursor-pointer">
+                        <input type="radio" class="h-4 w-4" [name]="p.pregunta_id" [value]="op"
+                            [checked]="seleccion[p.pregunta_id] === op" (change)="marcar(p, op)" />
+                        <span class="text-sm text-gray-800 dark:text-white/80">{{ op }}</span>
+                    </label>
+                </div>
+
+                <!-- Verdadero/Falso (VF) -->
+                <div *ngIf="p.tipo === 'VF'" class="mt-3 grid grid-cols-2 gap-2">
+                    <label
+                        class="flex items-center gap-2 rounded-xl border border-gray-200 dark:border-white/10 p-3 cursor-pointer">
+                        <input type="radio" class="h-4 w-4" [name]="p.pregunta_id" value="Verdadero"
+                            [checked]="seleccion[p.pregunta_id] === 'Verdadero'" (change)="marcar(p, 'Verdadero')" />
+                        <span class="text-sm text-gray-800 dark:text-white/80">Verdadero</span>
+                    </label>
+                    <label
+                        class="flex items-center gap-2 rounded-xl border border-gray-200 dark:border-white/10 p-3 cursor-pointer">
+                        <input type="radio" class="h-4 w-4" [name]="p.pregunta_id" value="Falso"
+                            [checked]="seleccion[p.pregunta_id] === 'Falso'" (change)="marcar(p, 'Falso')" />
+                        <span class="text-sm text-gray-800 dark:text-white/80">Falso</span>
+                    </label>
+                </div>
+
+                <!-- Genérico (fallback) -->
+                <div *ngIf="p.tipo !== 'OM' && p.tipo !== 'VF'" class="mt-3">
+                    <input type="text"
+                        class="w-full rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-white/5 px-3 py-2 text-sm text-gray-900 dark:text-white"
+                        placeholder="Respuesta…" [value]="$any(seleccion)[p.pregunta_id]"
+                        (input)="marcar(p, $any($event.target).value)" />
+                </div>
+            </div>
+        </section>
+
+        <!-- Barra de acciones -->
+        <section class="sticky bottom-3">
+            <div
+                class="rounded-2xl border border-gray-200 dark:border-white/10 bg-white/90 dark:bg-[#0e1426]/90 backdrop-blur p-3 flex items-center justify-between">
+                <button (click)="cancelar()"
+                    class="px-4 py-2 rounded-xl border border-gray-200 dark:border-white/10 text-gray-700 dark:text-white hover:bg-gray-50 dark:hover:bg-white/10">
+                    Cancelar
+                </button>
+                <button (click)="enviar()" [disabled]="!puedeEnviar()"
+                    class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-500 disabled:opacity-50">
+                    <svg *ngIf="!enviando" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24"
+                        fill="currentColor">
+                        <path d="M5 12h14M12 5l7 7-7 7" />
+                    </svg>
+                    <svg *ngIf="enviando" class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" class="opacity-25" stroke-width="4" />
+                        <path d="M4 12a8 8 0 0 1 8-8" stroke="currentColor" stroke-width="4" class="opacity-75" />
+                    </svg>
+                    {{ enviando ? 'Enviando…' : 'Finalizar intento' }}
+                </button>
+            </div>
+        </section>
+
+    </main>
+</div>

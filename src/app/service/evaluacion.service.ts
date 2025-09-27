@@ -6,9 +6,21 @@ import type { EvaluacionCreate } from '../models/backend.models'; // 👈 usa el
 
 export type EvaluacionUpdate = Partial<EvaluacionCreate>;
 
+// --- Tipos para intentos (opcionales pero útiles) ---
+export interface IntentoCreatePayload {
+  evaluacion_id: string;   // ID de la evaluación seleccionada
+  alumno_id: string;       // por ahora "3"
+}
+
+export interface RespuestaIntento {
+  pregunta_id: string;
+  opcion_marcada: string | number; // "4", "Falso", etc.
+}
+
 @Injectable({ providedIn: 'root' })
 export class EvaluacionService {
   private baseUrl = `${environment.apiUrl}/evaluaciones`;
+  private intentosUrl = `${environment.apiUrl}/intentos`;
 
   constructor(private http: HttpClient) { }
 
@@ -35,5 +47,30 @@ export class EvaluacionService {
 
   deleteEvaluacion(id: string) {
     return this.http.delete<any>(`${this.baseUrl}/${encodeURIComponent(id)}`, { headers: this.headers() });
+  }
+  // ----------------- Intentos -----------------
+
+  /** POST /intentos  -> crea (inicia) un intento */
+  iniciarIntento(payload: IntentoCreatePayload) {
+    // Ejemplo body esperado por tu API:
+    // { "evaluacion_id": "<ID_EVAL>", "alumno_id": "3" }
+    return this.http.post<any>(`${this.intentosUrl}`, payload, { headers: this.headers() });
+  }
+
+  /** GET /intentos/:id  (si necesitas consultar el intento) */
+  getIntentoById(intentoId: string) {
+    return this.http.get<any>(`${this.intentosUrl}/${encodeURIComponent(intentoId)}`, { headers: this.headers() });
+  }
+
+  /** PUT /intentos/:id/finalizar  -> envía respuestas y cierra el intento */
+  finalizarIntento(intentoId: string, respuestas: RespuestaIntento[]) {
+    // Body según tu captura:
+    // { "respuestas": [ { "pregunta_id": "...", "opcion_marcada": "4" }, ... ] }
+    const body = { respuestas };
+    return this.http.put<any>(
+      `${this.intentosUrl}/${encodeURIComponent(intentoId)}/finalizar`,
+      body,
+      { headers: this.headers() }
+    );
   }
 }

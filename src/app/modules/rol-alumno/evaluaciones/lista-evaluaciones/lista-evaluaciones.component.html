@@ -1,0 +1,267 @@
+<div class="min-h-screen bg-gradient-to-b from-white to-indigo-50/40 dark:from-[#0b1020] dark:to-[#0b1020]">
+    <main class="mx-auto max-w-7xl px-4 py-6 md:py-8 space-y-6">
+
+        <!-- HEADER (solo HTML con utilidades Tailwind) -->
+        <section class="rounded-3xl p-6 md:p-8 shadow-sm
+         text-white
+         bg-gradient-to-r from-[#0b1f3a] via-[#1a3a78] to-[#254a9a]">
+            <div class="flex items-start justify-between gap-6">
+                <!-- Título + Aula -->
+                <div class="min-w-0">
+                    <div class="flex items-center gap-3">
+                        <span class="inline-flex h-10 w-10 items-center justify-center rounded-2xl
+                 bg-white/15 backdrop-blur">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24"
+                                fill="currentColor">
+                                <path d="M3 5h18v2H3zm0 6h12v2H3zm0 6h18v2H3z" />
+                            </svg>
+                        </span>
+
+                        <div class="pl-2">
+                            <h1 class="text-xl md:text-2xl font-extrabold">Mis evaluaciones</h1>
+                            <!-- ENFASIS EN AULA -->
+                            <div class="mt-1">
+                                <span class="text-lg md:text-2xl font-bold tracking-wide">
+                                    Aula asignada: 5° A
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- KPIs -->
+                <div class="shrink-0">
+                    <div class="px-4 py-3 md:px-6 md:py-4 flex items-center gap-6
+               bg-white/10 border border-white/20 rounded-2xl backdrop-blur">
+                        <div class="text-center">
+                            <div class="text-[11px] uppercase tracking-wide text-white/80">Total</div>
+                            <div class="text-2xl font-semibold">{{ totalEvaluaciones }}</div>
+                        </div>
+
+                        <div class="w-px h-10 bg-white/25"></div>
+
+                        <div class="text-center">
+                            <div class="text-[11px] uppercase tracking-wide text-white/80">Activas</div>
+                            <div class="text-2xl font-semibold">{{ totalActivas }}</div>
+                        </div>
+
+                        <div class="w-px h-10 bg-white/25"></div>
+
+                        <div class="text-center">
+                            <div class="text-[11px] uppercase tracking-wide text-white/80">Promedio preg.</div>
+                            <div class="text-2xl font-semibold">{{ promedioPreguntas | number:'1.0-1' }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+
+        <!-- ACCIONES -->
+        <section
+            class="rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#0e1426] shadow-sm p-4 md:p-5">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+
+                <!-- Buscador (ocupa la mitad) -->
+                <div class="md:col-span-6">
+                    <label class="block text-xs font-medium text-gray-600 dark:text-white/70">Buscar</label>
+                    <div class="mt-1 relative">
+                        <input type="text" [(ngModel)]="q" (ngModelChange)="refrescarVista()"
+                            placeholder="Título, materia o docente…" class="w-full rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-white/5
+                 px-3 py-2 pl-9 text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500" />
+                        <svg class="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400" viewBox="0 0 24 24"
+                            fill="currentColor">
+                            <path d="M10 18a8 8 0 1 1 5.293-14.293l4 4-1.414 1.414-4-4A8 8 0 0 1 10 18z" />
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Estado (un cuarto) -->
+                <div class="md:col-span-3">
+                    <label class="block text-xs font-medium text-gray-600 dark:text-white/70">Estado</label>
+                    <div class="relative mt-1">
+                        <select [(ngModel)]="estadoFilter" (change)="refrescarVista()" class="w-full appearance-none pr-10 rounded-xl border border-gray-200 dark:border-white/10
+             bg-white text-gray-900 dark:bg-slate-800 dark:text-white
+             px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <option value="all">Todas</option>
+                            <option value="activa">Activas</option>
+                            <option value="vencida">Vencidas</option>
+                        </select>
+                        <!-- caret -->
+                        <svg class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-300"
+                            viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd"
+                                d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z"
+                                clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Ordenar (un cuarto) -->
+                <div class="md:col-span-3">
+                    <label class="block text-xs font-medium text-gray-600 dark:text-white/70">Ordenar</label>
+                    <div class="relative mt-1">
+                        <select [(ngModel)]="sortBy" (change)="refrescarVista()" class="w-full appearance-none pr-10 rounded-xl border border-gray-200 dark:border-white/10
+             bg-white text-gray-900 dark:bg-slate-800 dark:text-white
+             px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <option value="creacion_desc">Más recientes</option>
+                            <option value="entrega_asc">Entrega más próxima</option>
+                            <option value="preguntas_desc">Más preguntas</option>
+                        </select>
+                        <!-- caret -->
+                        <svg class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-300"
+                            viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd"
+                                d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z"
+                                clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+
+        <!-- ERROR -->
+        <section *ngIf="errorMsg"
+            class="rounded-2xl border border-red-200 bg-red-50 text-red-700 dark:border-red-400/30 dark:bg-red-950/30 dark:text-red-200 p-4">
+            {{ errorMsg }}
+        </section>
+
+        <!-- EMPTY -->
+        <section *ngIf="!cargando && !errorMsg && filtered.length === 0"
+            class="rounded-2xl border border-dashed border-gray-300 dark:border-white/10 p-10 text-center bg-white dark:bg-[#0e1426]">
+            <div
+                class="mx-auto w-14 h-14 rounded-2xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-300 flex items-center justify-center mb-3">
+                <svg class="h-6 w-6" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M3 5h18v2H3zm0 6h12v2H3zm0 6h18v2H3z" />
+                </svg>
+            </div>
+            <h3 class="font-semibold text-gray-900 dark:text-white">Sin evaluaciones coincidentes</h3>
+            <p class="text-sm text-gray-500 dark:text-white/60 mt-1">Ajusta la búsqueda o los filtros.</p>
+        </section>
+
+        <!-- LISTA -->
+        <section *ngIf="filtered.length > 0" class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+            <article *ngFor="let e of filtered; trackBy: trackById" class="group relative overflow-hidden rounded-2xl border border-gray-200 dark:border-white/10
+                      bg-white/90 dark:bg-[#0e1426]/80 backdrop-blur shadow-sm hover:shadow-md transition">
+                <div class="p-5 md:p-6">
+                    <div class="flex items-start justify-between gap-4">
+                        <div class="min-w-0">
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <span
+                                    class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-medium"
+                                    [ngClass]="estadoBadgeClasses(e.estado, e.fecha_entrega)">
+                                    <span class="h-1.5 w-1.5 rounded-full bg-current/80"></span>
+                                    {{ labelEstado(e) }}
+                                </span>
+                                <span
+                                    class="inline-flex items-center gap-2 rounded-full bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 px-2.5 py-1 text-[11px]">
+                                    {{ e.materia }}
+                                </span>
+                            </div>
+                            <h3 class="mt-2 text-base md:text-lg font-semibold text-gray-900 dark:text-white truncate"
+                                [title]="e.titulo">
+                                {{ e.titulo }}
+                            </h3>
+                            <p class="mt-1 text-xs text-gray-500 dark:text-white/60">
+                                Docente: <span class="font-medium">{{ e.docente_id }}</span>
+                            </p>
+                        </div>
+                        <div class="text-right shrink-0">
+                            <div class="text-[11px] text-gray-500 dark:text-white/60">Preguntas</div>
+                            <div class="text-xl font-semibold text-gray-900 dark:text-white">{{ e.preguntas.length || 0
+                                }}</div>
+                        </div>
+                    </div>
+
+                    <!-- timeline fechas -->
+                    <div class="mt-4 grid grid-cols-2 gap-3">
+                        <div class="rounded-xl border border-gray-200 dark:border-white/10 p-3">
+                            <div class="text-[10px] uppercase tracking-wide text-gray-500 dark:text-white/50">Creación
+                            </div>
+                            <div class="mt-0.5 text-sm text-gray-900 dark:text-white">{{ fmtFecha(e.fecha_creacion) }}
+                            </div>
+                        </div>
+                        <div class="rounded-xl border border-gray-200 dark:border-white/10 p-3">
+                            <div class="text-[10px] uppercase tracking-wide text-gray-500 dark:text-white/50">Entrega
+                            </div>
+                            <div class="mt-0.5 text-sm text-gray-900 dark:text-white">{{ fmtFecha(e.fecha_entrega) }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 flex items-center justify-between">
+                        <button type="button" class="rounded-xl px-3 py-1.5 text-xs font-medium border border-gray-200 dark:border-white/10
+                           text-gray-700 dark:text-white hover:bg-gray-50 dark:hover:bg-white/10"
+                            (click)="verDetalles(e)">
+                            Detalles
+                        </button>
+
+                        <button type="button" (click)="iniciarIntento(e)"
+                            [disabled]="starting[e._id] || !puedeIniciar(e)" class="inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium
+                           text-white bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50">
+                            <svg *ngIf="!starting[e._id]" class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M8 5v14l11-7z" />
+                            </svg>
+                            <svg *ngIf="starting[e._id]" class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                                <circle cx="12" cy="12" r="10" stroke="currentColor" class="opacity-25"
+                                    stroke-width="4"></circle>
+                                <path d="M4 12a8 8 0 0 1 8-8" stroke="currentColor" stroke-width="4" class="opacity-75">
+                                </path>
+                            </svg>
+                            {{ starting[e._id] ? 'Creando intento…' : 'Iniciar intento' }}
+                        </button>
+                    </div>
+                </div>
+            </article>
+        </section>
+
+        <!-- SKELETON -->
+        <section *ngIf="cargando" class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+            <div *ngFor="let i of [0,1,2,3]"
+                class="rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#0e1426] p-5">
+                <div class="animate-pulse space-y-3">
+                    <div class="h-5 w-2/3 rounded bg-gray-200 dark:bg-white/10"></div>
+                    <div class="h-3 w-1/2 rounded bg-gray-200 dark:bg-white/10"></div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="h-14 rounded bg-gray-200 dark:bg-white/10"></div>
+                        <div class="h-14 rounded bg-gray-200 dark:bg-white/10"></div>
+                    </div>
+                    <div class="h-9 w-40 rounded bg-gray-200 dark:bg-white/10 ml-auto"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- MODAL DETALLES -->
+        <div *ngIf="showView" class="fixed inset-0 z-40 flex items-center justify-center">
+            <div class="absolute inset-0 bg-black/50" (click)="closeModals()"></div>
+            <div
+                class="relative z-50 w-full max-w-2xl rounded-2xl bg-white dark:bg-[#0e1426] border border-gray-200 dark:border-white/10 p-5">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Detalles de la evaluación</h3>
+                    <button (click)="closeModals()"
+                        class="text-gray-500 hover:text-gray-800 dark:text-white/60">✕</button>
+                </div>
+                <ng-container *ngIf="selected as e">
+                    <div class="space-y-2 text-sm text-gray-700 dark:text-white/80">
+                        <div><span class="font-medium">Título:</span> {{ e.titulo }}</div>
+                        <div><span class="font-medium">Materia:</span> {{ e.materia }}</div>
+                        <div><span class="font-medium">Docente:</span> {{ e.docente_id }}</div>
+                        <div><span class="font-medium">Estado:</span> {{ labelEstado(e) }}</div>
+                        <div><span class="font-medium">Entrega:</span> {{ fmtFecha(e.fecha_entrega) }}</div>
+                        <div><span class="font-medium">Preguntas:</span> {{ e.preguntas.length || 0 }}</div>
+                    </div>
+                </ng-container>
+                <div class="mt-5 text-right">
+                    <button (click)="closeModals()"
+                        class="px-3 py-2 rounded-md border border-gray-300 dark:border-white/10 text-gray-700 dark:text-white hover:bg-gray-50 dark:hover:bg-white/10">
+                        Cerrar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>
