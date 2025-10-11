@@ -37,9 +37,6 @@ export class EvaluacionService {
     return this.http.get<any[]>(`${this.baseUrl}/listado`, { params, headers: this.headers() });
   }
 
-  getEvaluacionById(id: string) {
-    return this.http.get<any>(`${this.baseUrl}/${encodeURIComponent(id)}`, { headers: this.headers() });
-  }
 
   updateEvaluacion(id: string, data: EvaluacionUpdate) {
     return this.http.put<any>(`${this.baseUrl}/${encodeURIComponent(id)}`, data, { headers: this.headers() });
@@ -50,27 +47,38 @@ export class EvaluacionService {
   }
   // ----------------- Intentos -----------------
 
-  /** POST /intentos  -> crea (inicia) un intento */
-  iniciarIntento(payload: IntentoCreatePayload) {
-    // Ejemplo body esperado por tu API:
-    // { "evaluacion_id": "<ID_EVAL>", "alumno_id": "3" }
-    return this.http.post<any>(`${this.intentosUrl}`, payload, { headers: this.headers() });
+  iniciarIntento(payload: { evaluacion_id: string; alumno_id: string }) {
+    return this.http.post<any>(`${this.intentosUrl}`, payload, {
+      headers: this.headers(),
+    });
   }
+
 
   /** GET /intentos/:id  (si necesitas consultar el intento) */
   getIntentoById(intentoId: string) {
     return this.http.get<any>(`${this.intentosUrl}/${encodeURIComponent(intentoId)}`, { headers: this.headers() });
   }
 
-  /** PUT /intentos/:id/finalizar  -> envía respuestas y cierra el intento */
-  finalizarIntento(intentoId: string, respuestas: RespuestaIntento[]) {
-    // Body según tu captura:
-    // { "respuestas": [ { "pregunta_id": "...", "opcion_marcada": "4" }, ... ] }
-    const body = { respuestas };
+  /** PUT /intentos/:id/finalizar */
+  finalizarIntento(intentoId: string, body: any) {
     return this.http.put<any>(
       `${this.intentosUrl}/${encodeURIComponent(intentoId)}/finalizar`,
       body,
       { headers: this.headers() }
     );
   }
+
+
+
+
+  /** Extra: obtener evaluación por id */
+  getEvaluacionById(id: string) {
+    return this.http.get<any>(`${this.baseUrl}/${encodeURIComponent(id)}`, {
+      headers: this.headers(),
+    });
+  }
+
+
+
+
 }

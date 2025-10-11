@@ -184,25 +184,26 @@ export class ListaEvaluacionesComponent implements OnInit, OnDestroy {
   }
 
   iniciarIntento(e: EvaluacionItem): void {
-    const evalId = e._id;
+    // 👇 Usa SIEMPRE el evaluacion_id (uuid público) para la API
+    const evalId = (e as any).evaluacion_id ?? e._id;
     if (!evalId) return;
 
-    this.starting[evalId] = true;
+    this.starting[e._id] = true;
     const payload = { evaluacion_id: evalId, alumno_id: this.ALUMNO_ID };
 
     const sub = this.evaluacionSrv
       .iniciarIntento(payload)
-      .pipe(finalize(() => (this.starting[evalId] = false)))
+      .pipe(finalize(() => (this.starting[e._id] = false)))
       .subscribe({
         next: (resp: any) => {
-          const intentoId = resp?.intento_id || resp?.id || resp?._id || null;
+          const intentoId = resp?.intento_id;
 
-          // 👉 navega a /alumno/iniciar-intento y manda todo por state
           this.router.navigate(['alumno/iniciar-intento'], {
             state: {
-              intentoId,
+              intentoId,                 // <-- intento_id correcto para el PUT
               intento: resp,
-              evaluacion: e
+              evaluacion_id: evalId,     // <-- pásalo por si necesitas recargar
+              evaluacion: e              // opcional: ya llevas la evaluación cargada
             }
           });
         },
@@ -214,6 +215,7 @@ export class ListaEvaluacionesComponent implements OnInit, OnDestroy {
 
     this.subs.push(sub);
   }
+
 
 
   verDetalles(e: EvaluacionItem): void {

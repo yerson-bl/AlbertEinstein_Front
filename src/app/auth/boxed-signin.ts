@@ -8,6 +8,8 @@ import { environment } from 'src/environments/environment.prod';
 import Swal from 'sweetalert2';
 import { Subject, timer } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { LoginService } from 'src/app/service/login.service';
+
 
 type Lang = { code: string; label: string; name?: string };
 
@@ -36,7 +38,7 @@ export class BoxedSigninComponent implements OnInit, OnDestroy {
   readonly version = environment.version;
   readonly currentYear = new Date().getFullYear();
 
- 
+
 
   constructor(
     private readonly translate: TranslateService,
@@ -44,10 +46,11 @@ export class BoxedSigninComponent implements OnInit, OnDestroy {
     private readonly router: Router,
     private readonly appSetting: AppService,
     private readonly fb: FormBuilder,
-  ) {}
+    private readonly loginSrv: LoginService
+  ) { }
 
   // Getters de control (evita acceder por string en template)
-  get emailCtrl()    { return this.loginForm.get('email')!; }
+  get emailCtrl() { return this.loginForm.get('email')!; }
   get passwordCtrl() { return this.loginForm.get('password')!; }
 
   ngOnInit(): void {
@@ -101,21 +104,40 @@ export class BoxedSigninComponent implements OnInit, OnDestroy {
     this.isSubmitting = true;
     this.loginForm.disable();
 
-    // Simulación de autenticación: uso timer + finalize (implícito con enable)
-    timer(1200).pipe(takeUntil(this.destroy$)).subscribe(() => {
-      const { email, rememberMe } = this.loginForm.getRawValue();
-      if (rememberMe) localStorage.setItem(this.STORAGE_KEY, email);
-      else localStorage.removeItem(this.STORAGE_KEY);
+    const { email, password } = this.loginForm.value;
 
-      this.toast('Inicio de sesión exitoso', 'success');
-      this.router.navigate(['/dashboard']);
+    this.loginSrv.login({ correo: email, contraseña: password }).subscribe({
+      next: (resp) => {
+        this.loginSrv.guardarSesion(resp.rol, resp.token);
+        this.toast('Inicio de sesión exitoso', 'success');
 
-      this.isSubmitting = false;
-      this.loginForm.enable();
+        // Redirige según el rol
+        switch (resp.rol) {
+          case 'Admin':
+            this.router.navigate(['/dashboard']);
+            break;
+          case 'Docente':
+            this.router.navigate(['/evaluaciones/new-evaluacion']);
+            break;
+          case 'Alumno':
+            this.router.navigate(['/alumno/lista-evaluaciones']);
+            break;
+          
+        }
+
+        this.isSubmitting = false;
+        this.loginForm.enable();
+      },
+      error: (err) => {
+        console.error(err);
+        this.toast('Credenciales inválidas', 'error');
+        this.isSubmitting = false;
+        this.loginForm.enable();
+      },
     });
   }
 
-  private toast(msg: string, icon: 'success'|'error'|'warning'|'info' = 'success'): void {
+  private toast(msg: string, icon: 'success' | 'error' | 'warning' | 'info' = 'success'): void {
     const t = Swal.mixin({
       toast: true, position: 'top-end', showConfirmButton: false,
       timer: 3000, timerProgressBar: true,

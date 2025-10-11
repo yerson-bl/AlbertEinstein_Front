@@ -75,6 +75,8 @@ import { ListAdminComponent } from './modules/admin/list-admin/list-admin.compon
 import { NewAdminComponent } from './modules/admin/new-admin/new-admin.component';
 import { ListaEvaluacionesComponent } from './modules/rol-alumno/evaluaciones/lista-evaluaciones/lista-evaluaciones.component';
 import { IniciarIntentoComponent } from './modules/rol-alumno/evaluaciones/iniciar-intento/iniciar-intento.component';
+import { ListSeccionComponent } from './modules/secciones/list-seccion/list-seccion.component';
+import { NewSeccionComponent } from './modules/secciones/new-seccion/new-seccion.component';
 
 @NgModule({
     imports: [
@@ -132,7 +134,10 @@ import { IniciarIntentoComponent } from './modules/rol-alumno/evaluaciones/inici
         NewAdminComponent,
 
         ListaEvaluacionesComponent,
-        IniciarIntentoComponent
+        IniciarIntentoComponent,
+
+        ListSeccionComponent,
+        NewSeccionComponent
 
 
     ],

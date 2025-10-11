@@ -42,6 +42,8 @@ import { ListAdminComponent } from './modules/admin/list-admin/list-admin.compon
 import { NewAdminComponent } from './modules/admin/new-admin/new-admin.component';
 import { ListaEvaluacionesComponent } from './modules/rol-alumno/evaluaciones/lista-evaluaciones/lista-evaluaciones.component';
 import { IniciarIntentoComponent } from './modules/rol-alumno/evaluaciones/iniciar-intento/iniciar-intento.component';
+import { NewSeccionComponent } from './modules/secciones/new-seccion/new-seccion.component';
+import { ListSeccionComponent } from './modules/secciones/list-seccion/list-seccion.component';
 
 
 export const routes: Routes = [
@@ -83,6 +85,10 @@ export const routes: Routes = [
             //intentos
             { path: 'alumno/lista-evaluaciones', component: ListaEvaluacionesComponent, data: { title: 'Lista de Evaluaciones | Albert Einstein' } },
             { path: 'alumno/iniciar-intento', component: IniciarIntentoComponent, data: { title: 'Nuevo Intento | Albert Einstein' } },
+
+            //secciones
+            { path: 'secciones/list-seccion', component: ListSeccionComponent, data: { title: 'Lista de Secciones | Albert Einstein' } },
+            { path: 'secciones/new-seccion', component: NewSeccionComponent, data: { title: 'Nueva Sección | Albert Einstein' } },
 
             // dashboard
             { path: '', component: IndexComponent, data: { title: 'Sales Admin' } },

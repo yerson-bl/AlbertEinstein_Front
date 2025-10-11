@@ -13,15 +13,15 @@ export class IntentoService {
     return new HttpHeaders({ 'Content-Type': 'application/json' });
   }
 
-  iniciarIntento(data: IntentoCreate) {
-    return this.http.post<any>(`${this.baseUrl}/`, data, { headers: this.headers() });
-  }
+  // iniciarIntento(data: IntentoCreate) {
+  //   return this.http.post<any>(`${this.baseUrl}/`, data, { headers: this.headers() });
+  // }
 
-  finalizarIntento(intentoId: string, body: FinalizarIntentoBody) {
-    return this.http.put<any>(`${this.baseUrl}/${intentoId}/finalizar`, body, { headers: this.headers() });
-  }
+  // finalizarIntento(intentoId: string, body: FinalizarIntentoBody) {
+  //   return this.http.put<any>(`${this.baseUrl}/${intentoId}/finalizar`, body, { headers: this.headers() });
+  // }
 
-  getIntentoById(intentoId: string) {
-    return this.http.get<any>(`${this.baseUrl}/${intentoId}`, { headers: this.headers() });
-  }
+  // getIntentoById(intentoId: string) {
+  //   return this.http.get<any>(`${this.baseUrl}/${intentoId}`, { headers: this.headers() });
+  // }
 }

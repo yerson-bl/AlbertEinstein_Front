@@ -1,8 +1,10 @@
-﻿import { Component } from '@angular/core';
+﻿import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { TranslateService } from '@ngx-translate/core';
 import { slideDownUp } from '../shared/animations';
+import { LoginService } from 'src/app/service/login.service';
+
 
 @Component({
     selector: 'sidebar',
@@ -14,10 +16,14 @@ export class SidebarComponent {
     store: any;
     activeDropdown: string[] = [];
     parentDropdown: string = '';
+    rolUsuario: string | null = null;
+
     constructor(
         public translate: TranslateService,
         public storeData: Store<any>,
         public router: Router,
+        private loginSrv: LoginService
+
     ) {
         this.initStore();
     }
@@ -30,6 +36,7 @@ export class SidebarComponent {
     }
 
     ngOnInit() {
+        this.rolUsuario = this.loginSrv.obtenerRol();
         this.setActiveDropdown();
     }
 
