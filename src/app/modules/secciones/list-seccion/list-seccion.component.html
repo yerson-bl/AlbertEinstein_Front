@@ -1,1 +1,239 @@
-<p>list-seccion works!</p>
+<div class="min-h-screen bg-gray-50 dark:bg-[#060818]">
+    <main class="mx-auto max-w-7xl p-4 md:p-6 space-y-6">
+
+        <!-- Header -->
+        <section class="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
+            <div>
+                <h1 class="text-xl md:text-2xl font-semibold text-gray-800 dark:text-white">Secciones</h1>
+                <p class="text-sm text-gray-500 dark:text-white-dark">Gestión de secciones por grado.</p>
+            </div>
+            <div class="flex items-center gap-2">
+                <button (click)="openCreate()" class="px-3 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700">
+                    Nueva Sección
+                </button>
+                <button (click)="fetch()"
+                    class="px-3 py-2 rounded-lg border border-gray-300 dark:border-white/10 text-gray-700 dark:text-white hover:bg-gray-50 dark:hover:bg-white/10">
+                    Refrescar
+                </button>
+            </div>
+        </section>
+
+        <!-- Filtros -->
+        <section class="bg-white dark:bg-[#1b2e4b] rounded-xl shadow-sm p-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div class="relative">
+                    <input type="text" (input)="onSearch($any($event.target).value)"
+                        placeholder="Buscar por nombre de sección"
+                        class="w-full rounded-lg border border-gray-300 dark:border-white/10 bg-white dark:bg-transparent px-10 py-2 text-sm text-gray-800 dark:text-white" />
+                    <svg class="absolute left-3 top-2.5 h-5 w-5 text-gray-400 dark:text-white/50"
+                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 105.5 5.5a7.5 7.5 0 0011.15 11.15z" />
+                    </svg>
+                </div>
+
+                <select
+                    class="form-select w-full rounded-lg border border-gray-300 dark:border-white/10 bg-white dark:bg-[#0b1220] text-gray-800 dark:text-white"
+                    [ngModel]="filtroGrado()" (ngModelChange)="setFilter('grado', $event)">
+                    <option [ngValue]="''">Todos los grados</option>
+                    <option *ngFor="let g of grados()" [ngValue]="g._id">{{ g.nombre }} - {{ g.descripcion }}</option>
+                </select>
+
+                <select
+                    class="form-select w-full rounded-lg border border-gray-300 dark:border-white/10 bg-white dark:bg-[#0b1220] text-gray-800 dark:text-white"
+                    [ngModel]="filtroEstado()" (ngModelChange)="setFilter('estado', $event)">
+                    <option [ngValue]="''">Todos los estados</option>
+                    <option *ngFor="let e of estados()" [ngValue]="e">{{ e | titlecase }}</option>
+                </select>
+            </div>
+
+            <div class="mt-3 flex flex-wrap items-center gap-2">
+                <span class="text-xs text-gray-500 dark:text-white-dark">Mostrando {{ totalFiltered() }}
+                    resultado(s)</span>
+                <button (click)="clearFilters()"
+                    class="ml-auto text-xs px-2 py-1 rounded-md border border-gray-300 dark:border-white/10 text-gray-700 dark:text-white hover:bg-gray-50 dark:hover:bg-white/10">
+                    Limpiar filtros
+                </button>
+            </div>
+        </section>
+
+        <!-- Tabla -->
+        <section class="bg-white dark:bg-[#1b2e4b] rounded-xl shadow-sm overflow-hidden">
+            <div *ngIf="loading()" class="p-6">Cargando secciones...</div>
+
+            <div *ngIf="!loading() && error()" class="p-6 text-red-600 dark:text-red-400">{{ error() }}</div>
+
+            <div *ngIf="!loading() && !error()">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead class="bg-gray-50 dark:bg-white/5">
+                            <tr class="text-left">
+                                <th class="px-4 py-3 cursor-pointer" (click)="sortBy('nombre')">
+                                    Nombre <span class="ml-1 text-xs opacity-60" *ngIf="sortKey()==='nombre'">{{
+                                        sortDir()==='asc' ? '▲' : '▼' }}</span>
+                                </th>
+                                <th class="px-4 py-3">Grado</th>
+                                <th class="px-4 py-3">Estado</th>
+                                <th class="px-4 py-3">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let s of pageSlice(); trackBy: trackById"
+                                class="border-t border-gray-100 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/5">
+                                <td class="px-4 py-3 text-gray-800 dark:text-white-light font-medium">{{ s.nombre }}
+                                </td>
+                                <td class="px-4 py-3 text-gray-800 dark:text-white-light">
+                                    {{ getNombreGrado(s.grado_id) }}
+                                </td>
+
+                                <td class="px-4 py-3">
+                                    <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium"
+                                        [ngClass]="estadoPill(s.estado)">
+                                        {{ formatEstado(s.estado) }}
+                                    </span>
+                                </td>
+                                <td class="px-4 py-3">
+                                    <div class="relative inline-block" (click)="$event.stopPropagation()">
+                                        <!-- Botón kebab (tres puntos) -->
+                                        <button type="button" (click)="toggleMenu(s._id, $event)" class="h-8 w-8 inline-flex items-center justify-center rounded-md
+      border border-gray-300 dark:border-white/10
+      text-gray-700 dark:text-white hover:bg-gray-50 dark:hover:bg-white/10">
+                                            <span class="sr-only">Abrir acciones</span>
+                                            <!-- ícono tres puntos -->
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="currentColor"
+                                                viewBox="0 0 20 20">
+                                                <path
+                                                    d="M6 10a2 2 0 11-4 0 2 2 0 014 0zm6 0a2 2 0 11-4 0 2 2 0 014 0zm6 0a2 2 0 11-4 0 2 2 0 014 0z" />
+                                            </svg>
+                                        </button>
+
+                                        <!-- Menú flotante -->
+                                        <div *ngIf="openedId() === s._id" class="absolute right-0 mt-2 z-30 w-44 rounded-xl bg-white dark:bg-[#0b1220]
+      border border-gray-200 dark:border-white/10 shadow-lg py-2">
+
+                                            <!-- Editar -->
+                                            <button (click)="openActions(s, 'edit')" class="w-full flex items-center gap-3 px-4 py-2.5 text-sm
+        hover:bg-gray-50 dark:hover:bg-white/10 text-gray-800 dark:text-white">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-4.5" fill="none"
+                                                    viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="1.5"
+                                                        d="M11 5h2m-8 14h14M7 19l10-10a2.828 2.828 0 10-4-4L3 15l-1 5 5-1z" />
+                                                </svg>
+                                                Editar
+                                            </button>
+
+                                            <div class="my-1 border-t border-gray-100 dark:border-white/10"></div>
+
+                                            <!-- Eliminar -->
+                                            <button (click)="openActions(s, 'delete')" class="w-full flex items-center gap-3 px-4 py-2.5 text-sm
+        hover:bg-gray-50 dark:hover:bg-white/10 text-red-600 dark:text-red-400">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-4.5" fill="none"
+                                                    viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="1.5"
+                                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7h6m-1-2H10a1 1 0 00-1 1v1h8V6a1 1 0 00-1-1z" />
+                                                </svg>
+                                                Eliminar
+                                            </button>
+                                        </div>
+                                    </div>
+                                </td>
+
+                            </tr>
+
+                            <tr *ngIf="pageSlice().length === 0">
+                                <td colspan="4" class="px-4 py-12 text-center text-gray-500 dark:text-white-dark">
+                                    No hay resultados con los filtros actuales.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Modal Crear -->
+        <div *ngIf="showCreate()" class="fixed inset-0 z-40 flex items-center justify-center">
+            <div class="absolute inset-0 bg-black/50" (click)="closeModals()"></div>
+            <div class="relative z-50 w-full max-w-md bg-white dark:bg-[#1b2e4b] rounded-xl p-5">
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-3">Nueva Sección</h3>
+                <form (ngSubmit)="saveCreate()">
+                    <label class="text-xs text-gray-500 dark:text-white-dark">Nombre</label>
+                    <input class="form-input w-full mb-3 uppercase" maxlength="1" pattern="[A-Za-z]"
+                        [(ngModel)]="createModel().nombre" name="nombre" placeholder="Ej: A" required />
+
+                    <label class="text-xs text-gray-500 dark:text-white-dark">Grado</label>
+                    <select class="form-select w-full mb-4" [(ngModel)]="createModel().grado_id" name="grado_id"
+                        required>
+                        <option [ngValue]="''">Seleccionar grado</option>
+                        <option *ngFor="let g of grados()" [ngValue]="g._id">{{ g.nombre }} - {{ g.descripcion }}
+                        </option>
+                    </select>
+
+                    <div class="flex justify-end gap-2">
+                        <button type="button" (click)="closeModals()"
+                            class="px-3 py-2 rounded-md border text-gray-700 dark:text-white">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="px-3 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700"
+                            [disabled]="saving()">
+                            {{ saving() ? 'Guardando…' : 'Guardar' }}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Modal Editar -->
+        <div *ngIf="showEdit()" class="fixed inset-0 z-40 flex items-center justify-center">
+            <div class="absolute inset-0 bg-black/50" (click)="closeModals()"></div>
+            <div class="relative z-50 w-full max-w-md bg-white dark:bg-[#1b2e4b] rounded-xl p-5">
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-3">Editar Sección</h3>
+                <form (ngSubmit)="saveEdit()">
+                    <label class="text-xs text-gray-500 dark:text-white-dark">Nombre</label>
+                    <input class="form-input w-full mb-3" [(ngModel)]="editModel().nombre" name="nombre" required />
+
+                    <label class="text-xs text-gray-500 dark:text-white-dark">Grado</label>
+                    <select class="form-select w-full mb-4" [(ngModel)]="editModel().grado_id" name="grado_id" required>
+                        <option [ngValue]="''">Seleccionar grado</option>
+                        <option *ngFor="let g of grados()" [ngValue]="g._id">{{ g.nombre }} - {{ g.descripcion }}
+                        </option>
+                    </select>
+
+                    <div class="flex justify-end gap-2">
+                        <button type="button" (click)="closeModals()"
+                            class="px-3 py-2 rounded-md border text-gray-700 dark:text-white">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="px-3 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700"
+                            [disabled]="saving()">
+                            {{ saving() ? 'Guardando…' : 'Guardar cambios' }}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Modal Eliminar -->
+        <div *ngIf="showDelete()" class="fixed inset-0 z-40 flex items-center justify-center">
+            <div class="absolute inset-0 bg-black/50" (click)="closeModals()"></div>
+            <div class="relative z-50 w-full max-w-sm bg-white dark:bg-[#1b2e4b] rounded-xl p-5">
+                <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-3">Eliminar Sección</h3>
+                <p class="text-sm text-gray-700 dark:text-white-light">
+                    ¿Seguro que deseas eliminar la sección <strong>{{ actionRow()?.nombre }}</strong>?
+                </p>
+                <div class="mt-4 flex justify-end gap-2">
+                    <button (click)="closeModals()" class="px-3 py-2 rounded-md border text-gray-700 dark:text-white">
+                        Cancelar
+                    </button>
+                    <button (click)="confirmDelete()" [disabled]="deleting()"
+                        class="px-3 py-2 rounded-md bg-red-600 text-white hover:bg-red-700 disabled:opacity-50">
+                        {{ deleting() ? 'Eliminando…' : 'Eliminar' }}
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>

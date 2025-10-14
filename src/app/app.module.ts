@@ -137,7 +137,7 @@ import { NewSeccionComponent } from './modules/secciones/new-seccion/new-seccion
         IniciarIntentoComponent,
 
         ListSeccionComponent,
-        NewSeccionComponent
+        NewSeccionComponent,
 
 
     ],
