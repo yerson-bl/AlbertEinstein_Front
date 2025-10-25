@@ -46,7 +46,7 @@
                   class="text-red-500">*</span></label>
               <input type="text" formControlName="titulo"
                 class="mt-1 w-full rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-white/5 px-3 py-2 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                placeholder="Ej. Examen de Matemáticas - 1er Trimestre" />
+                placeholder="Titulo de la Evaluacion" />
               <p *ngIf="f.titulo.touched && f.titulo.invalid" class="mt-1 text-xs text-red-500">Requerido.</p>
             </div>
 
@@ -55,7 +55,7 @@
                   class="text-red-500">*</span></label>
               <input type="text" formControlName="materia"
                 class="mt-1 w-full rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-white/5 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                placeholder="Ej. Matemáticas" />
+                placeholder="Materia de la Evaluacion" />
               <p *ngIf="f.materia.touched && f.materia.invalid" class="mt-1 text-xs text-red-500">Requerido.</p>
             </div>
 
@@ -65,7 +65,7 @@
                     class="text-red-500">*</span></label>
                 <input type="text" formControlName="grado"
                   class="mt-1 w-full rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-white/5 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  placeholder="Ej. 5" />
+                  placeholder="Grado del Alumno" />
                 <p *ngIf="f.grado.touched && f.grado.invalid" class="mt-1 text-xs text-red-500">Requerido.</p>
               </div>
               <div>
@@ -73,23 +73,23 @@
                     class="text-red-500">*</span></label>
                 <input type="text" formControlName="seccion"
                   class="mt-1 w-full rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-white/5 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  placeholder="Ej. A" />
+                  placeholder="Seccion del Alumno" />
                 <p *ngIf="f.seccion.touched && f.seccion.invalid" class="mt-1 text-xs text-red-500">Requerido.</p>
               </div>
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700 dark:text-white">Docente ID <span
+              <label class="block text-sm font-medium text-gray-700 dark:text-white">Docente<span
                   class="text-red-500">*</span></label>
               <input type="text" formControlName="docente_id"
                 class="mt-1 w-full rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-white/5 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                placeholder="Ej. docente_01" />
+                placeholder="Docente Encargado" />
               <p *ngIf="f.docente_id.touched && f.docente_id.invalid" class="mt-1 text-xs text-red-500">Requerido.</p>
             </div>
 
             <div class="grid grid-cols-2 gap-3">
               <div>
-                <label class="block text-sm font-medium text-gray-700 dark:text-white">Fecha de entrega <span
+                <label class="block text-sm font-medium text-gray-700 dark:text-white">Fecha/Hora de entrega <span
                     class="text-red-500">*</span></label>
                 <input type="datetime-local" formControlName="fecha_entrega_local"
                   class="mt-1 w-full rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-white/5 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500" />

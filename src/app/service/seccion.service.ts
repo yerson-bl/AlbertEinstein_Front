@@ -31,23 +31,35 @@ export class SeccionService {
 
     constructor(private http: HttpClient) { }
 
+
+    //SECCIONES
     listarSecciones(): Observable<Seccion[]> {
         return this.http.get<Seccion[]>(`${this.apiUrl}/secciones`);
     }
+    crearSeccion(payload: SeccionCreatePayload): Observable<any> {
+        return this.http.post(`${this.apiUrl}/secciones`, payload);
+    }
+    actualizarSeccion(id: string, payload: SeccionCreatePayload): Observable<any> {
+        return this.http.put(`${this.apiUrl}/secciones/${id}`, payload);
+    }
+    eliminarSeccion(id: string): Observable<any> {
+        return this.http.delete(`${this.apiUrl}/secciones/${id}`);
+    }
+    
+    seccionPorGrado(gradoId: string): Observable<Seccion[]> {
+        return this.http.get<Seccion[]>(`${this.apiUrl}/secciones/grado/${gradoId}`);
+    }
+    
 
+
+    //GRADOS
     listarGrados(): Observable<Grado[]> {
         return this.http.get<Grado[]>(`${this.apiUrl}/grados`);
     }
 
-    crearSeccion(payload: SeccionCreatePayload): Observable<any> {
-        return this.http.post(`${this.apiUrl}/secciones`, payload);
-    }
+    
 
-    actualizarSeccion(id: string, payload: SeccionCreatePayload): Observable<any> {
-        return this.http.put(`${this.apiUrl}/secciones/${id}`, payload);
-    }
+    
 
-    eliminarSeccion(id: string): Observable<any> {
-        return this.http.delete(`${this.apiUrl}/secciones/${id}`);
-    }
+    
 }

@@ -44,7 +44,7 @@ export class IniciarIntentoComponent implements OnInit, OnDestroy {
   constructor(
     private router: Router,
     private evalSrv: EvaluacionService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     const nav = this.router.getCurrentNavigation();
@@ -149,16 +149,51 @@ export class IniciarIntentoComponent implements OnInit, OnDestroy {
 
   mostrarResultado(resp: any) {
     const nota = resp?.calificacion ?? 0;
+    const feedback = resp?.feedback_alumno ?? '';
     const msg = resp?.msg ?? 'Intento finalizado exitosamente';
 
+    // Desactivar loading antes del Swal
+    this.enviando = false;
+
     Swal.fire({
-      title: 'Evaluación finalizada',
-      html: `<p><b>${msg}</b></p><p>Tu calificación es <b>${nota}/20</b></p>`,
+      title:
+        '<h2 style="color:#4f46e5; font-weight:700; margin-bottom:10px;">🎓 Evaluación finalizada</h2>',
+      html: `
+      <div style="text-align:left; font-size:15px; color:#444; line-height:1.6;">
+        <p style="font-size:16px; color:#111; font-weight:600;">
+          ✅ Intento finalizado y corregido con IA exitosamente
+        </p>
+        <p style="margin-top:8px;">
+          <b>Tu calificación:</b> 
+          <span style="font-size:18px; color:#4f46e5; font-weight:700;">${nota}/20</span>
+        </p>
+        <div style="background:#f9fafb; border-radius:10px; padding:15px; margin-top:12px;">
+          <p style="margin:0; font-weight:600; color:#111;">🗒️ Comentarios de la evaluacion:</p>
+          <p style="margin-top:6px; color:#333;">${feedback}</p>
+        </div>
+        <p style="margin-top:15px; color:#666; font-size:14px;">
+          ¡Gracias por tu esfuerzo! Recuerda seguir practicando para seguir mejorando 💪
+        </p>
+      </div>
+    `,
+      background: '#fff',
       icon: 'success',
+      iconColor: '#4f46e5',
       confirmButtonText: 'Aceptar',
       confirmButtonColor: '#4f46e5',
-    }).then(() => this.router.navigate(['/mis-evaluaciones']));
+      width: 500,
+      showClass: {
+        popup: 'animate__animated animate__fadeInDown',
+      },
+      hideClass: {
+        popup: 'animate__animated animate__fadeOutUp',
+      },
+    }).then(() => {
+      // Redirección elegante al nuevo componente
+      this.router.navigate(['/alumno/lista-evaluaciones']);
+    });
   }
+
 
   cancelar(): void {
     this.router.navigate(['/mis-evaluaciones']);

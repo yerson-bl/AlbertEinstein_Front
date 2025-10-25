@@ -1,6 +1,7 @@
 import { Component, OnInit, signal, computed, HostListener } from '@angular/core';
 import { Subject, debounceTime, takeUntil } from 'rxjs';
 import { DocenteService } from 'src/app/service/docente.service';
+import { SeccionService } from 'src/app/service/seccion.service';
 
 type EstadoDocente = 'activo' | 'inactivo' | string;
 
@@ -138,15 +139,61 @@ export class ListDocentesComponent implements OnInit {
   totalFiltered = computed(() => this.filteredSorted().length);
   totalPages = computed(() => Math.max(1, Math.ceil(this.totalFiltered() / this.pageSize())));
 
-  constructor(private docenteService: DocenteService) { }
+  constructor(private docenteService: DocenteService, private seccionService: SeccionService) { }
+
+  gradosMap = new Map<string, string>();    // id → nombre o descripción
+  seccionesMap = new Map<string, string>(); // id → nombre
+
 
   ngOnInit(): void {
     this.search$
       .pipe(debounceTime(250), takeUntil(this.destroy$))
       .subscribe(v => { this.search.set(v); this.page.set(1); });
 
-    this.fetch();
+    // primero cargar grados y secciones
+    this.cargarReferencias();
   }
+
+  private cargarReferencias(): void {
+    this.seccionService.listarGrados()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (grados) => {
+          grados.forEach(g => this.gradosMap.set(g._id, g.nombre || g.descripcion));
+          this.cargarSecciones(); // luego de grados, carga secciones
+        },
+        error: (e) => {
+          console.error('Error cargando grados', e);
+          this.fetch(); // continuar aunque falle
+        }
+      });
+  }
+
+  private cargarSecciones(): void {
+    this.seccionService.listarSecciones()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (secciones) => {
+          secciones.forEach(s => this.seccionesMap.set(s._id, s.nombre));
+          this.fetch(); // ahora sí carga docentes
+        },
+        error: (e) => {
+          console.error('Error cargando secciones', e);
+          this.fetch();
+        }
+      });
+  }
+
+  getNombreGrado(id: string): string {
+    return this.gradosMap.get(id) || id;
+  }
+
+  getNombreSeccion(id: string): string {
+    return this.seccionesMap.get(id) || id;
+  }
+
+
+
 
   fetch(): void {
     this.loading.set(true);

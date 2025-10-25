@@ -8,12 +8,12 @@ import {
 } from '@angular/forms';
 import { Subscription, finalize } from 'rxjs';
 import { EvaluacionService } from 'src/app/service/evaluacion.service';
-
-
+import Swal from 'sweetalert2';
 
 type TipoPregunta = 'OM' | 'VF';
+
 type PreguntaCreate = {
-  tipo: 'OM' | 'VF';              // 👈 sin string adicional
+  tipo: 'OM' | 'VF';
   enunciado: string;
   opciones: string[];
   respuesta_correcta: string;
@@ -22,15 +22,13 @@ type PreguntaCreate = {
 type EvaluacionCreate = {
   titulo: string;
   materia: string;
-  grado: string;                  // si en tu backend es string|number, igual sirve
+  grado: string;
   seccion: string;
   docente_id: string;
-  fecha_entrega: string;          // ISO
+  fecha_entrega: string;
   intentos_permitidos: number;
   preguntas: PreguntaCreate[];
 };
-
-
 
 @Component({
   selector: 'app-new-evaluacion',
@@ -45,35 +43,39 @@ export class NewEvaluacionComponent implements OnInit, OnDestroy {
   constructor(
     private fb: FormBuilder,
     private evaluacionSrv: EvaluacionService
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     this.form = this.fb.group({
       titulo: ['', Validators.required],
       materia: ['', Validators.required],
-      grado: ['', Validators.required],          // string según service
+      grado: ['', Validators.required],
       seccion: ['', Validators.required],
       docente_id: ['', Validators.required],
-      fecha_entrega_local: ['', Validators.required], // se convierte a ISO al guardar
+      fecha_entrega_local: ['', Validators.required],
       intentos_permitidos: [1, [Validators.required, Validators.min(1)]],
       preguntas: this.fb.array([]),
     });
 
-    // 1 pregunta inicial (opcional)
+    // pregunta inicial
     this.agregarPregunta('OM');
   }
 
-  // Atajos
+  // === Getters visibles desde el template ===
   get f() { return this.form.controls as any; }
-  get preguntasFA(): FormArray { return this.form.get('preguntas') as FormArray; }
+
+  get preguntasFA(): FormArray {
+    return this.form.get('preguntas') as FormArray;
+  }
 
   opcionesFA(idxPregunta: number): FormArray {
     return this.preguntasFA.at(idxPregunta).get('opciones') as FormArray;
   }
 
-  // UI helpers
+  // usado en *ngFor="let ...; trackBy: trackByIndex"
   trackByIndex = (i: number) => i;
 
+  // 👇 ESTA función es la que tu template ya usa: pregInval(i,'campo')
   pregInval(i: number, controlName: string): boolean {
     const c = (this.preguntasFA.at(i) as FormGroup).get(controlName);
     return !!(c && c.touched && c.invalid);
@@ -81,37 +83,46 @@ export class NewEvaluacionComponent implements OnInit, OnDestroy {
 
   // ---- builders ----
   private buildOpcion(valor = ''): FormGroup {
-    return this.fb.group({ valor: [valor, Validators.required] });
+    return this.fb.group({
+      valor: [valor, Validators.required],
+    });
   }
 
   private buildPregunta(tipo: TipoPregunta): FormGroup {
     const fg = this.fb.group({
-      tipo: this.fb.control<TipoPregunta>(tipo, { nonNullable: true, validators: [Validators.required] }),
+      tipo: this.fb.control<TipoPregunta>(tipo, {
+        nonNullable: true,
+        validators: [Validators.required],
+      }),
       enunciado: ['', Validators.required],
       opciones: this.fb.array([]),
-      respuesta_correcta: this.fb.control<string | null>(null, { validators: [Validators.required] }),
+      respuesta_correcta: this.fb.control<string | null>(null, {
+        validators: [Validators.required],
+      }),
     });
 
     if (tipo === 'OM') {
       const opts = fg.get('opciones') as FormArray;
+      // mínimo 2 opciones
       opts.push(this.buildOpcion(''));
       opts.push(this.buildOpcion(''));
       this.attachRespuestaSync(fg);
     } else {
-      // VF: opciones fijas, solo elegimos la respuesta
-      fg.get('respuesta_correcta')?.setValidators([Validators.required]);
+      // VF: opciones fijas Verdadero/Falso, no se agregan al array
+      // pero igual se valida respuesta_correcta
     }
 
     return fg;
   }
 
-  // Mantiene respuesta_correcta ∈ opciones (OM)
+  // Mantiene respuesta_correcta ∈ opciones (para OM)
   private attachRespuestaSync(preguntaFG: FormGroup) {
     const opcionesFA = preguntaFG.get('opciones') as FormArray;
     const sub = opcionesFA.valueChanges.subscribe(() => {
       const valores = (opcionesFA.value as Array<{ valor: string }>)
         .map(v => v?.valor ?? '')
         .filter(Boolean);
+
       const rcCtrl = preguntaFG.get('respuesta_correcta') as FormControl;
       if (!valores.includes(rcCtrl.value)) {
         rcCtrl.setValue(null, { emitEvent: false });
@@ -142,14 +153,16 @@ export class NewEvaluacionComponent implements OnInit, OnDestroy {
   removeOpcion(idxPregunta: number, idxOpcion: number) {
     const arr = this.opcionesFA(idxPregunta);
     arr.removeAt(idxOpcion);
-    // mínimo 2 opciones
+    // seguimos garantizando mínimo 2
     while (arr.length < 2) arr.push(this.buildOpcion(''));
   }
 
   // ---- guardar ----
   guardar() {
+    // Validación frontend antes de llamar API
     if (this.form.invalid) {
       this.form.markAllAsTouched();
+      this.toast('Completa todos los campos requeridos', 'warning');
       return;
     }
 
@@ -157,36 +170,42 @@ export class NewEvaluacionComponent implements OnInit, OnDestroy {
     if (!fechaLocal) {
       this.f.fecha_entrega_local.setErrors({ required: true });
       this.form.markAllAsTouched();
+      this.toast('La fecha de entrega es obligatoria', 'warning');
       return;
     }
 
     const payload: EvaluacionCreate = this.toApiPayload();
-
     this.cargando = true;
+
     this.evaluacionSrv.crearEvaluacion(payload)
-      .pipe(finalize(() => this.cargando = false))
+      .pipe(finalize(() => (this.cargando = false)))
       .subscribe({
         next: (resp) => {
           console.log('Evaluación creada', resp);
-          // Reset suave
+
+          // ✅ TOAST EXITO (arriba derecha, igual login)
+          this.toast('Evaluación creada correctamente', 'success');
+
+          // limpiar form luego de crear
           this.form.reset();
           this.form.patchValue({ intentos_permitidos: 1 });
           this.preguntasFA.clear();
         },
         error: (err) => {
           console.error('Error creando evaluación', err);
-        }
+
+          // ❌ TOAST ERROR
+          this.toast('Error al crear la evaluación', 'error');
+        },
       });
   }
 
   private toApiPayload(): EvaluacionCreate {
     const v = this.form.value;
 
-    // fecha_entrega: ISO (string)
+    // convertir fecha local a ISO string
     const d = new Date(String(v.fecha_entrega_local));
-    if (isNaN(d.getTime())) throw new Error('Fecha de entrega inválida');
 
-    // preguntas según contrato del service
     const preguntas = (v.preguntas as any[]).map((p) => {
       if (p.tipo === 'VF') {
         return {
@@ -196,9 +215,11 @@ export class NewEvaluacionComponent implements OnInit, OnDestroy {
           respuesta_correcta: String(p.respuesta_correcta ?? ''),
         };
       }
+
       const opciones = (p.opciones || [])
         .map((o: any) => String(o?.valor ?? ''))
         .filter((x: string) => x);
+
       return {
         tipo: 'OM' as const,
         enunciado: String(p.enunciado ?? ''),
@@ -210,13 +231,34 @@ export class NewEvaluacionComponent implements OnInit, OnDestroy {
     return {
       titulo: String(v.titulo),
       materia: String(v.materia),
-      grado: String(v.grado),              // ← el service define string
+      grado: String(v.grado),
       seccion: String(v.seccion),
       docente_id: String(v.docente_id),
-      fecha_entrega: d.toISOString(),      // ← string ISO
+      fecha_entrega: d.toISOString(),
       intentos_permitidos: Number(v.intentos_permitidos) || 1,
       preguntas,
     };
+  }
+
+  // === Toast idéntico al del login ===
+  private toast(
+    msg: string,
+    icon: 'success' | 'error' | 'warning' | 'info' = 'success'
+  ): void {
+    const t = Swal.mixin({
+      toast: true,
+      position: 'top-end',
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true,
+      customClass: { popup: 'colored-toast' },
+      didOpen: (toastEl) => {
+        toastEl.addEventListener('mouseenter', Swal.stopTimer);
+        toastEl.addEventListener('mouseleave', Swal.resumeTimer);
+      },
+    });
+
+    t.fire({ icon, title: msg });
   }
 
   ngOnDestroy(): void {

@@ -132,9 +132,13 @@
                                     <div class="text-xs text-gray-500 dark:text-white-dark">{{ a.rol }}</div>
                                 </td>
                                 <td class="px-4 py-3 text-gray-800 dark:text-white-light">
-                                    <div class="font-medium">Grado {{ a.grado }}</div>
-                                    <div class="text-xs text-gray-500 dark:text-white-dark">Sección {{ a.seccion }}
+                                    <div class="font-medium">
+                                        Grado {{ getNombreGrado(a.grado) }}
                                     </div>
+                                    <div class="text-xs text-gray-500 dark:text-white-dark">
+                                        Sección {{ getNombreSeccion(a.seccion) }}
+                                    </div>
+
                                 </td>
                                 <td class="px-4 py-3 text-gray-800 dark:text-white-light">{{ a.usuario_id }}</td>
                                 <td class="px-4 py-3">
@@ -267,7 +271,10 @@
                         <div><span class="font-medium">Usuario:</span> {{ r.usuario_id }}</div>
                         <div><span class="font-medium">Nombre:</span> {{ r.nombre }} {{ r.apellido }}</div>
                         <div><span class="font-medium">Correo:</span> {{ r.correo }}</div>
-                        <div><span class="font-medium">Grado/Sección:</span> {{ r.grado }} / {{ r.seccion }}</div>
+                        <div>
+                            <span class="font-medium">Grado/Sección:</span>
+                            {{ getNombreGrado(r.grado) }} / {{ getNombreSeccion(r.seccion) }}
+                        </div>
                         <div><span class="font-medium">Estado:</span>
                             <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium"
                                 [ngClass]="estadoPill(r.estado)">{{ r.estado | titlecase }}</span>
@@ -288,7 +295,7 @@
         <div *ngIf="showEdit()" class="fixed inset-0 z-40 flex items-center justify-center">
             <div class="absolute inset-0 bg-black/50" (click)="closeModals()"></div>
             <div class="relative z-50 w-full max-w-xl rounded-xl bg-white dark:bg-[#1b2e4b]
-              border border-gray-200 dark:border-white/10 p-5">
+    border border-gray-200 dark:border-white/10 p-5">
                 <div class="flex items-center justify-between mb-3">
                     <h3 class="text-lg font-semibold text-gray-800 dark:text-white">Editar alumno</h3>
                     <button (click)="closeModals()"
@@ -300,33 +307,54 @@
                         <label class="text-xs text-gray-500 dark:text-white-dark">Nombre</label>
                         <input class="form-input w-full" [(ngModel)]="editModel().nombre" name="nombre" required />
                     </div>
+
                     <div>
                         <label class="text-xs text-gray-500 dark:text-white-dark">Apellido</label>
                         <input class="form-input w-full" [(ngModel)]="editModel().apellido" name="apellido" required />
                     </div>
+
                     <div class="md:col-span-2">
                         <label class="text-xs text-gray-500 dark:text-white-dark">Correo</label>
                         <input type="email" class="form-input w-full" [(ngModel)]="editModel().correo" name="correo"
                             required />
                     </div>
+
+                    <!-- Grado -->
                     <div>
                         <label class="text-xs text-gray-500 dark:text-white-dark">Grado</label>
-                        <input class="form-input w-full" [(ngModel)]="editModel().grado" name="grado" required />
+                        <select class="form-select w-full" [(ngModel)]="editModel().grado" name="grado" required
+                            (ngModelChange)="cargarSeccionesPorGrado($event)" 
+                            >
+                            <option [ngValue]="''" disabled>Seleccione un grado</option>
+                            <option *ngFor="let g of grados()" [ngValue]="g._id">{{ g.nombre }}</option>
+                        </select>
                     </div>
+
+                    <!-- Sección -->
                     <div>
                         <label class="text-xs text-gray-500 dark:text-white-dark">Sección</label>
-                        <input class="form-input w-full" [(ngModel)]="editModel().seccion" name="seccion" required />
+                        <select class="form-select w-full" [(ngModel)]="editModel().seccion" 
+                            name="seccion" 
+                            required
+                            [disabled]="loadingSeccionesEdit()" 
+                            >
+                            <option [ngValue]="''" disabled>
+                                {{ loadingSeccionesEdit() ? 'Cargando secciones…' : 'Seleccione una sección' }}
+                            </option>
+                            <option *ngFor="let s of seccionesEdit()" [ngValue]="s._id">{{ s.nombre }}</option>
+                        </select>
                     </div>
-                    <!-- Campo Contraseña (opcional) -->
+
+
                     <div class="md:col-span-2">
                         <label class="text-xs text-gray-500 dark:text-white-dark">Contraseña (opcional)</label>
-                        <!-- 👇 OJO: bracket notation y un name sin acento -->
                         <input type="password" class="form-input w-full" [(ngModel)]="editModel()['contraseña']"
                             name="contrasena" />
                     </div>
+
                     <div class="md:col-span-2 mt-2 flex justify-end gap-2">
-                        <button type="button" (click)="closeModals()" class="px-3 py-2 rounded-md border border-gray-300 dark:border-white/10
-                       text-gray-700 dark:text-white hover:bg-gray-50 dark:hover:bg-white/10">
+                        <button type="button" (click)="closeModals()"
+                            class="px-3 py-2 rounded-md border border-gray-300 dark:border-white/10 text-gray-700 dark:text-white hover:bg-gray-50 dark:hover:bg-white/10">
                             Cancelar
                         </button>
                         <button type="submit" [disabled]="saving() || !editForm.form.valid"
@@ -337,6 +365,8 @@
                 </form>
             </div>
         </div>
+
+
 
         <!-- Modal: Eliminar -->
         <div *ngIf="showDelete()" class="fixed inset-0 z-40 flex items-center justify-center">

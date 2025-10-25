@@ -187,7 +187,7 @@
                 <div hlMenu class="!block">
                     <button type="button" hlMenuButton class="group relative block">
                         <img class="h-9 w-9 rounded-full object-cover saturate-50 group-hover:saturate-100"
-                            src="/assets/images/user-profile.jpeg" alt="" />
+                            src="/assets/images/perfil.png" alt="" />
                     </button>
                     <ul *hlMenuItems @toggleAnimation
                         class="top-11 w-[230px] !py-0 font-semibold text-dark dark:text-white-dark dark:text-white-light/90 ltr:right-0 rtl:left-0">
@@ -195,7 +195,7 @@
                             <div class="flex items-center px-4 py-4">
                                 <div class="flex-none">
                                     <img class="h-10 w-10 rounded-md object-cover"
-                                        src="/assets/images/user-profile.jpeg" alt="" />
+                                        src="/assets/images/perfil.png" alt="" />
                                 </div>
                                 <div class="truncate ltr:pl-4 rtl:pr-4">
                                     <h4 class="text-base">
@@ -209,7 +209,7 @@
                                 </div>
                             </div>
                         </li>
-                        <li>
+                        <!-- <li>
                             <a routerLink="/users/profile" *hlMenuItem="let menuItem" class="dark:hover:text-white">
                                 <icon-user class="h-4.5 w-4.5 shrink-0 ltr:mr-2 rtl:ml-2" />
 
@@ -230,9 +230,9 @@
 
                                 Lock Screen
                             </a>
-                        </li>
+                        </li> -->
                         <li class="border-t border-white-light dark:border-white-light/10">
-                            <a routerLink="/auth/boxed-signin" *hlMenuItem="let menuItem" class="!py-3 text-danger">
+                            <a routerLink="/auth/login" *hlMenuItem="let menuItem" class="!py-3 text-danger">
                                 <icon-logout class="h-4.5 w-4.5 shrink-0 rotate-90 ltr:mr-2 rtl:ml-2" />
 
                                 Sign Out

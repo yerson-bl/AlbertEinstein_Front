@@ -2,10 +2,9 @@ import { Component, OnDestroy } from '@angular/core';
 import { AdminService } from 'src/app/service/admin.service';
 import { Subject, takeUntil } from 'rxjs';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-
+import Swal from 'sweetalert2'; // 👈 Importación del toast SweetAlert2
 
 type AdminCreatePayload = {
-  usuario_id: string | number;
   nombre: string;
   apellido: string;
   correo: string;
@@ -31,7 +30,6 @@ export class NewAdminComponent implements OnDestroy {
     private adminService: AdminService
   ) {
     this.form = this.fb.group({
-      usuario_id: ['', [Validators.required]],
       nombre: ['', [Validators.required, Validators.maxLength(60)]],
       apellido: ['', [Validators.required, Validators.maxLength(80)]],
       correo: ['', [Validators.required, Validators.email]],
@@ -40,7 +38,11 @@ export class NewAdminComponent implements OnDestroy {
   }
 
   get f() { return this.form.controls; }
-  isInvalid(ctrl: string) { const c = this.f[ctrl]; return c.invalid && (c.touched || c.dirty); }
+
+  isInvalid(ctrl: string) {
+    const c = this.f[ctrl];
+    return c.invalid && (c.touched || c.dirty);
+  }
 
   submit(): void {
     this.apiError = null;
@@ -48,13 +50,12 @@ export class NewAdminComponent implements OnDestroy {
 
     if (this.form.invalid) {
       this.form.markAllAsTouched();
+      this.toast('Completa todos los campos requeridos', 'warning');
       return;
     }
 
-    // La API acepta usuario_id como string o número (en Postman lo envías como string).
     const raw = this.form.value;
     const payload: AdminCreatePayload = {
-      usuario_id: String(raw.usuario_id).trim(),
       nombre: raw.nombre,
       apellido: raw.apellido,
       correo: raw.correo,
@@ -63,8 +64,6 @@ export class NewAdminComponent implements OnDestroy {
 
     this.saving = true;
 
-    // Si tu AdminService ya tiene crearAdmin, úsalo aquí.
-    // Asegúrate de que el método apunte a POST /usuarios/crear/admin
     this.adminService.crearAdmin(payload as any)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
@@ -72,11 +71,17 @@ export class NewAdminComponent implements OnDestroy {
           this.saving = false;
           this.apiOk = true;
           this.form.reset();
+
+          // ✅ Toast de éxito
+          this.toast(`Administrador ${raw.nombre} ${raw.apellido} creado correctamente`, 'success');
         },
         error: (err) => {
           console.error(err);
           this.saving = false;
-          this.apiError = 'No se pudo crear el admin. Intenta nuevamente.';
+          this.apiError = 'No se pudo crear el administrador. Intenta nuevamente.';
+
+          // ❌ Toast de error
+          this.toast('No se pudo crear el administrador', 'error');
         }
       });
   }
@@ -87,7 +92,28 @@ export class NewAdminComponent implements OnDestroy {
     this.apiOk = false;
   }
 
+  // 🔔 Toast reutilizable (idéntico a los otros componentes)
+  private toast(
+    msg: string,
+    icon: 'success' | 'error' | 'warning' | 'info' = 'success'
+  ): void {
+    const t = Swal.mixin({
+      toast: true,
+      position: 'top-end',
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true,
+      customClass: { popup: 'colored-toast' },
+      didOpen: (toastEl) => {
+        toastEl.addEventListener('mouseenter', Swal.stopTimer);
+        toastEl.addEventListener('mouseleave', Swal.resumeTimer);
+      },
+    });
+    t.fire({ icon, title: msg });
+  }
+
   ngOnDestroy(): void {
-    this.destroy$.next(); this.destroy$.complete();
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

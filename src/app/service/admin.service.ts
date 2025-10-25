@@ -6,7 +6,6 @@ import { Observable } from 'rxjs';
 
 // ===== Tipos =====
 export type AdminCreatePayload = {
-  usuario_id: string | number;   // la API acepta string o número
   nombre: string;
   apellido: string;
   correo: string;

@@ -59,7 +59,7 @@
         </section>
 
         <!-- Resumen -->
-        <section class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div class="rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#0e1426] p-4">
                 <div class="text-xs text-gray-500 dark:text-white/60">Total evaluaciones</div>
                 <div class="mt-1 text-2xl font-semibold text-gray-900 dark:text-white">{{ totalEvaluaciones }}</div>
@@ -67,12 +67,7 @@
             <div class="rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#0e1426] p-4">
                 <div class="text-xs text-gray-500 dark:text-white/60">Activas</div>
                 <div class="mt-1 text-2xl font-semibold text-gray-900 dark:text-white">{{ totalActivas }}</div>
-            </div>
-            <div class="rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#0e1426] p-4">
-                <div class="text-xs text-gray-500 dark:text-white/60">Promedio de preguntas</div>
-                <div class="mt-1 text-2xl font-semibold text-gray-900 dark:text-white">{{ promedioPreguntas |
-                    number:'1.0-1' }}</div>
-            </div>
+            </div>         
         </section>
 
         <!-- Error -->

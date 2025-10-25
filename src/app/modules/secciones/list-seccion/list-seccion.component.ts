@@ -1,6 +1,7 @@
 import { Component, OnInit, signal, computed, HostListener } from '@angular/core';
 import { SeccionService, Seccion, SeccionCreatePayload, Grado } from 'src/app/service/seccion.service';
 import { debounceTime, Subject, takeUntil } from 'rxjs';
+import Swal from 'sweetalert2';
 
 type SortDir = 'asc' | 'desc';
 type SortKey = keyof Pick<Seccion, '_id' | 'nombre' | 'grado_id' | 'estado'>;
@@ -22,8 +23,8 @@ export class ListSeccionComponent implements OnInit {
   // --- Filtros ---
   search$ = new Subject<string>();
   search = signal<string>('');
-  filtroGrado = signal<string>(''); // '' = todos
-  filtroEstado = signal<string>(''); // '' = todos
+  filtroGrado = signal<string>('');
+  filtroEstado = signal<string>('');
 
   // --- Orden ---
   sortKey = signal<SortKey>('nombre');
@@ -45,7 +46,6 @@ export class ListSeccionComponent implements OnInit {
     Array.from(new Set(this.seccion().map(s => (s.estado ? 'activo' : 'inactivo'))))
   );
 
-  // --- Filtrado y orden ---
   filteredSorted = computed<Seccion[]>(() => {
     const q = this.search();
     const g = this.filtroGrado();
@@ -73,7 +73,7 @@ export class ListSeccionComponent implements OnInit {
     });
   });
 
-  // --- Paginación dinámica ---
+  // --- Paginación ---
   pageSlice = computed(() => {
     const p = this.page();
     const sz = this.pageSize();
@@ -89,7 +89,6 @@ export class ListSeccionComponent implements OnInit {
   ngOnInit(): void {
     this.search$.pipe(debounceTime(250), takeUntil(this.destroy$))
       .subscribe(v => { this.search.set(v); this.page.set(1); });
-
     this.fetch();
   }
 
@@ -103,8 +102,9 @@ export class ListSeccionComponent implements OnInit {
       },
       error: (err) => {
         console.error(err);
-        this.error.set('No se pudieron cargar las seccion.');
+        this.error.set('No se pudieron cargar las secciones.');
         this.loading.set(false);
+        this.toast('Error al cargar las secciones', 'error');
       }
     });
 
@@ -161,9 +161,7 @@ export class ListSeccionComponent implements OnInit {
   }
 
   trackById(_i: number, s: Seccion) { return s._id; }
-
   formatEstado(e: boolean) { return e ? 'Activo' : 'Inactivo'; }
-
   estadoPill(e: boolean) {
     return e
       ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300'
@@ -182,8 +180,7 @@ export class ListSeccionComponent implements OnInit {
     if (this.openedId()) this.openedId.set(null);
   }
 
-  // Modales
-  showView = signal<boolean>(false);  // ✅ <--- NUEVO
+  showView = signal<boolean>(false);
   showCreate = signal<boolean>(false);
   showEdit = signal<boolean>(false);
   showDelete = signal<boolean>(false);
@@ -191,12 +188,10 @@ export class ListSeccionComponent implements OnInit {
   saving = signal<boolean>(false);
   deleting = signal<boolean>(false);
 
-
-  // Modelos
   createModel = signal<SeccionCreatePayload>({ nombre: '', grado_id: '' });
   editModel = signal<SeccionCreatePayload>({ nombre: '', grado_id: '' });
 
-  // Crear
+  // === Crear ===
   openCreate() {
     this.createModel.set({ nombre: '', grado_id: '' });
     this.showCreate.set(true);
@@ -204,21 +199,17 @@ export class ListSeccionComponent implements OnInit {
 
   saveCreate() {
     const body = this.createModel();
-
-    // --- VALIDACIÓN ---
     const nombre = (body.nombre || '').trim();
 
-    // Solo una letra
     if (!/^[A-Za-z]$/.test(nombre)) {
-      alert('El nombre de la sección debe ser una sola letra (A-Z).');
+      this.toast('El nombre de la sección debe ser una sola letra (A-Z).', 'warning');
       return;
     }
 
-    // Convertir a mayúscula antes de enviarla
     body.nombre = nombre.toUpperCase();
 
     if (!body.grado_id) {
-      alert('Selecciona un grado.');
+      this.toast('Selecciona un grado.', 'warning');
       return;
     }
 
@@ -228,28 +219,25 @@ export class ListSeccionComponent implements OnInit {
         this.saving.set(false);
         this.showCreate.set(false);
         this.fetch();
+        this.toast(`Sección "${body.nombre}" creada correctamente.`, 'success');
       },
       error: (e) => {
         console.error(e);
         this.saving.set(false);
-        alert('No se pudo crear la sección.');
+        this.toast('No se pudo crear la sección.', 'error');
       }
     });
   }
 
-
-  // 👇 Añadir esto en list-seccion.component.ts
+  // === Editar ===
   openActions(s: Seccion, kind: 'view' | 'edit' | 'delete') {
     this.actionRow.set(s);
-    this.openedId.set(null); // Cierra el menú
-
+    this.openedId.set(null);
     if (kind === 'view') this.showView.set(true);
     if (kind === 'edit') this.openEdit(s);
     if (kind === 'delete') this.openDelete(s);
   }
 
-
-  // Editar
   openEdit(s: Seccion) {
     this.actionRow.set(s);
     this.editModel.set({ nombre: s.nombre, grado_id: s.grado_id });
@@ -268,16 +256,17 @@ export class ListSeccionComponent implements OnInit {
         this.saving.set(false);
         this.showEdit.set(false);
         this.fetch();
+        this.toast(`Sección "${body.nombre}" actualizada correctamente.`, 'success');
       },
       error: (e) => {
         console.error(e);
         this.saving.set(false);
-        alert('No se pudo actualizar la sección.');
+        this.toast('No se pudo actualizar la sección.', 'error');
       }
     });
   }
 
-  // Eliminar
+  // === Eliminar ===
   openDelete(s: Seccion) {
     this.actionRow.set(s);
     this.showDelete.set(true);
@@ -292,11 +281,12 @@ export class ListSeccionComponent implements OnInit {
         this.deleting.set(false);
         this.showDelete.set(false);
         this.fetch();
+        this.toast(`Sección "${s.nombre}" eliminada correctamente.`, 'success');
       },
       error: (e) => {
         console.error(e);
         this.deleting.set(false);
-        alert('No se pudo eliminar la sección.');
+        this.toast('No se pudo eliminar la sección.', 'error');
       }
     });
   }
@@ -313,6 +303,20 @@ export class ListSeccionComponent implements OnInit {
     return g ? `${g.nombre} - ${g.descripcion}` : '-';
   }
 
-
-
+  // === TOAST SweetAlert2 (mismo que en new-evaluacion) ===
+  private toast(msg: string, icon: 'success' | 'error' | 'warning' | 'info' = 'success'): void {
+    const t = Swal.mixin({
+      toast: true,
+      position: 'top-end',
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true,
+      customClass: { popup: 'colored-toast' },
+      didOpen: (toastEl) => {
+        toastEl.addEventListener('mouseenter', Swal.stopTimer);
+        toastEl.addEventListener('mouseleave', Swal.resumeTimer);
+      },
+    });
+    t.fire({ icon, title: msg });
+  }
 }
