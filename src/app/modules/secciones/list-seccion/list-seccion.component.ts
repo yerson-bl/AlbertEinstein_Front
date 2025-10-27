@@ -95,24 +95,35 @@ export class ListSeccionComponent implements OnInit {
   fetch(): void {
     this.loading.set(true);
     this.error.set(null);
+
     this.seccionService.listarSecciones().subscribe({
       next: (res: Seccion[]) => {
         this.seccion.set(res);
         this.loading.set(false);
+
+        // ✅ Toast de éxito
+        this.toast(`Se cargaron ${res.length} secciones correctamente.`, 'success');
       },
       error: (err) => {
         console.error(err);
         this.error.set('No se pudieron cargar las secciones.');
         this.loading.set(false);
-        this.toast('Error al cargar las secciones', 'error');
+
+        // ❌ Toast de error
+        this.toast('Error al cargar las secciones.', 'error');
       }
     });
 
     this.seccionService.listarGrados().subscribe({
       next: (res: Grado[]) => this.grados.set(res),
-      error: (err) => console.error('Error cargando grados', err)
+      error: (err) => {
+        console.error('Error cargando grados', err);
+        // ⚠️ opcional: notificar si falla también la carga de grados
+        this.toast('Error al cargar los grados.', 'warning');
+      }
     });
   }
+
 
   // --- Filtros ---
   onSearch(v: string) { this.search$.next(v); }

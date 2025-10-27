@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subscription, finalize } from 'rxjs';
 import { EvaluacionService } from 'src/app/service/evaluacion.service';
+import Swal from 'sweetalert2'; // 👈 Importamos SweetAlert2
 
 type EstadoEval = 'activa' | 'inactiva' | string;
 
@@ -47,7 +48,7 @@ export class ListEvaluacionComponent implements OnInit, OnDestroy {
 
   private subs: Subscription[] = [];
 
-  constructor(private fb: FormBuilder, private evaluacionSrv: EvaluacionService) {}
+  constructor(private fb: FormBuilder, private evaluacionSrv: EvaluacionService) { }
 
   ngOnInit(): void {
     this.filtros = this.fb.group({
@@ -58,10 +59,12 @@ export class ListEvaluacionComponent implements OnInit, OnDestroy {
   }
 
   get totalEvaluaciones(): number { return this.evaluaciones?.length ?? 0; }
+
   get totalActivas(): number {
     if (!this.evaluaciones?.length) return 0;
     return this.evaluaciones.filter(e => (e.estado || '').toLowerCase() === 'activa').length;
   }
+
   get promedioPreguntas(): number {
     if (!this.evaluaciones?.length) return 0;
     const suma = this.evaluaciones.reduce((acc, e) => acc + (e?.preguntas?.length ?? 0), 0);
@@ -71,7 +74,12 @@ export class ListEvaluacionComponent implements OnInit, OnDestroy {
   get f() { return this.filtros.controls as any; }
 
   buscar(): void {
-    if (this.filtros.invalid) { this.filtros.markAllAsTouched(); return; }
+    if (this.filtros.invalid) {
+      this.filtros.markAllAsTouched();
+      this.toast('Completa los campos requeridos', 'warning');
+      return;
+    }
+
     const grado = this.f.grado.value;
     const seccion = this.f.seccion.value;
 
@@ -84,24 +92,31 @@ export class ListEvaluacionComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (rows: any[]) => {
           const mapped = (rows || []) as EvaluacionItem[];
-          // orden: más reciente primero por fecha_creacion
           this.evaluaciones = [...mapped].sort((a, b) => {
             const da = new Date(a.fecha_creacion).getTime();
             const db = new Date(b.fecha_creacion).getTime();
             return db - da;
           });
+
+          // ✅ Toast de éxito
+          this.toast(`Se cargaron ${this.evaluaciones.length} evaluaciones correctamente.`, 'success');
         },
         error: (err) => {
           console.error('Error listando evaluaciones', err);
           this.errorMsg = 'No se pudo obtener la lista. Inténtalo nuevamente.';
           this.evaluaciones = [];
+
+          // ❌ Toast de error
+          this.toast('Error al cargar las evaluaciones.', 'error');
         },
       });
 
     this.subs.push(sub);
   }
 
-  refrescar(): void { this.buscar(); }
+  refrescar(): void {
+    this.buscar();
+  }
 
   // UI helpers
   trackById = (_: number, item: EvaluacionItem) => item._id ?? item.evaluacion_id ?? String(_);
@@ -120,8 +135,6 @@ export class ListEvaluacionComponent implements OnInit, OnDestroy {
 
   // Acciones
   verDetalles(e: EvaluacionItem): void {
-    // Si necesitas refrescar desde backend por ID:
-    // this.evaluacionSrv.getEvaluacionById(e._id).subscribe(...)
     this.selected = e;
     this.showView = true;
   }
@@ -138,14 +151,19 @@ export class ListEvaluacionComponent implements OnInit, OnDestroy {
       .pipe(finalize(() => (this.deleting = false)))
       .subscribe({
         next: () => {
-          // quita de la lista local
           const id = this.selected!._id;
           this.evaluaciones = this.evaluaciones.filter(x => x._id !== id);
           this.closeModals();
+
+          // ✅ Toast éxito eliminación
+          this.toast('Evaluación eliminada correctamente.', 'success');
         },
         error: (err) => {
           console.error('Error eliminando evaluación', err);
           this.errorMsg = 'No se pudo eliminar la evaluación.';
+
+          // ❌ Toast error
+          this.toast('No se pudo eliminar la evaluación.', 'error');
         }
       });
   }
@@ -158,5 +176,25 @@ export class ListEvaluacionComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subs.forEach(s => s.unsubscribe());
+  }
+
+  // 🔔 Método toast reutilizable
+  private toast(
+    msg: string,
+    icon: 'success' | 'error' | 'warning' | 'info' = 'success'
+  ): void {
+    const t = Swal.mixin({
+      toast: true,
+      position: 'top-end',
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true,
+      customClass: { popup: 'colored-toast' },
+      didOpen: (toastEl) => {
+        toastEl.addEventListener('mouseenter', Swal.stopTimer);
+        toastEl.addEventListener('mouseleave', Swal.resumeTimer);
+      },
+    });
+    t.fire({ icon, title: msg });
   }
 }

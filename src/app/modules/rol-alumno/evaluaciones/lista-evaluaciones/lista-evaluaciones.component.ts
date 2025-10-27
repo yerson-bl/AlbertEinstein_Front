@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Subscription, finalize } from 'rxjs';
 import { Router } from '@angular/router';
 import { EvaluacionService } from 'src/app/service/evaluacion.service';
+import Swal from 'sweetalert2'; // 👈 Importamos SweetAlert2
 
 type EstadoEval = 'activa' | 'inactiva' | string;
 
@@ -12,6 +13,7 @@ interface PreguntaItem {
   respuesta_correcta: string;
   tipo: 'OM' | 'VF' | string;
 }
+
 export interface EvaluacionItem {
   _id: string;
   docente_id: string;
@@ -41,7 +43,6 @@ export class ListaEvaluacionesComponent implements OnInit, OnDestroy {
   evaluaciones: EvaluacionItem[] = [];
   filtered: EvaluacionItem[] = [];
 
-  // UI state
   q = '';
   estadoFilter: 'all' | 'activa' | 'vencida' = 'all';
   sortBy: 'creacion_desc' | 'entrega_asc' | 'preguntas_desc' = 'creacion_desc';
@@ -61,7 +62,6 @@ export class ListaEvaluacionesComponent implements OnInit, OnDestroy {
     this.buscar();
   }
 
-  // ➜ util: está vencida si la fecha de entrega es menor que "ahora"
   private isVencida = (e: EvaluacionItem) =>
     new Date(e.fecha_entrega).getTime() < Date.now();
 
@@ -69,7 +69,6 @@ export class ListaEvaluacionesComponent implements OnInit, OnDestroy {
     return this.evaluaciones?.length ?? 0;
   }
 
-  // ✅ ahora cuenta solo activas y NO vencidas
   get totalActivas(): number {
     if (!this.evaluaciones?.length) return 0;
     return this.evaluaciones.filter(e =>
@@ -89,7 +88,6 @@ export class ListaEvaluacionesComponent implements OnInit, OnDestroy {
 
     let rows = [...(this.evaluaciones || [])];
 
-    // texto
     if (q) {
       rows = rows.filter(r =>
         (r.titulo || '').toLowerCase().includes(q) ||
@@ -98,7 +96,6 @@ export class ListaEvaluacionesComponent implements OnInit, OnDestroy {
       );
     }
 
-    // estado
     if (this.estadoFilter !== 'all') {
       if (this.estadoFilter === 'activa') {
         rows = rows.filter(r => (r.estado || '').toLowerCase() === 'activa' && new Date(r.fecha_entrega).getTime() >= now);
@@ -107,7 +104,6 @@ export class ListaEvaluacionesComponent implements OnInit, OnDestroy {
       }
     }
 
-    // ordenar
     rows.sort((a, b) => {
       if (this.sortBy === 'creacion_desc') {
         return new Date(b.fecha_creacion).getTime() - new Date(a.fecha_creacion).getTime();
@@ -115,7 +111,6 @@ export class ListaEvaluacionesComponent implements OnInit, OnDestroy {
       if (this.sortBy === 'entrega_asc') {
         return new Date(a.fecha_entrega).getTime() - new Date(b.fecha_entrega).getTime();
       }
-      // preguntas_desc
       return (b.preguntas?.length ?? 0) - (a.preguntas?.length ?? 0);
     });
 
@@ -137,12 +132,21 @@ export class ListaEvaluacionesComponent implements OnInit, OnDestroy {
         next: (rows: any[]) => {
           this.evaluaciones = (rows || []) as EvaluacionItem[];
           this.applyFilters();
+
+          // ✅ Toast éxito al cargar
+          this.toast(
+            `Se cargaron ${this.evaluaciones.length} evaluaciones correctamente.`,
+            'success'
+          );
         },
         error: (err) => {
           console.error('Error listando evaluaciones', err);
           this.errorMsg = 'No se pudo obtener la lista. Inténtalo nuevamente.';
           this.evaluaciones = [];
           this.filtered = [];
+
+          // ❌ Toast error
+          this.toast('Error al cargar las evaluaciones.', 'error');
         },
       });
 
@@ -161,12 +165,10 @@ export class ListaEvaluacionesComponent implements OnInit, OnDestroy {
     return isNaN(d.getTime()) ? '—' : d.toLocaleString();
   }
 
-  // Se mantiene igual
   puedeIniciar(e: EvaluacionItem): boolean {
     const activa = (e.estado || '').toLowerCase() === 'activa';
     return activa && !this.isVencida(e);
   }
-
 
   labelEstado(e: EvaluacionItem): string {
     const vencida = new Date(e.fecha_entrega).getTime() < Date.now();
@@ -184,7 +186,6 @@ export class ListaEvaluacionesComponent implements OnInit, OnDestroy {
   }
 
   iniciarIntento(e: EvaluacionItem): void {
-    // 👇 Usa SIEMPRE el evaluacion_id (uuid público) para la API
     const evalId = (e as any).evaluacion_id ?? e._id;
     if (!evalId) return;
 
@@ -200,23 +201,24 @@ export class ListaEvaluacionesComponent implements OnInit, OnDestroy {
 
           this.router.navigate(['alumno/iniciar-intento'], {
             state: {
-              intentoId,                 // <-- intento_id correcto para el PUT
+              intentoId,
               intento: resp,
-              evaluacion_id: evalId,     // <-- pásalo por si necesitas recargar
-              evaluacion: e              // opcional: ya llevas la evaluación cargada
+              evaluacion_id: evalId,
+              evaluacion: e
             }
           });
         },
         error: (err) => {
           console.error('Error iniciando intento', err);
           this.errorMsg = 'No se pudo iniciar el intento. Inténtalo nuevamente.';
+
+          // ❌ Toast error
+          this.toast('Error al iniciar el intento.', 'error');
         },
       });
 
     this.subs.push(sub);
   }
-
-
 
   verDetalles(e: EvaluacionItem): void {
     this.selected = e;
@@ -232,5 +234,25 @@ export class ListaEvaluacionesComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subs.forEach(s => s.unsubscribe());
+  }
+
+  // 🔔 Método toast reutilizable
+  private toast(
+    msg: string,
+    icon: 'success' | 'error' | 'warning' | 'info' = 'success'
+  ): void {
+    const t = Swal.mixin({
+      toast: true,
+      position: 'top-end',
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true,
+      customClass: { popup: 'colored-toast' },
+      didOpen: (toastEl) => {
+        toastEl.addEventListener('mouseenter', Swal.stopTimer);
+        toastEl.addEventListener('mouseleave', Swal.resumeTimer);
+      },
+    });
+    t.fire({ icon, title: msg });
   }
 }

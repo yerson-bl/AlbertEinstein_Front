@@ -2,6 +2,8 @@ import { Component, OnInit, signal, computed, HostListener } from '@angular/core
 import { Subject, debounceTime, takeUntil } from 'rxjs';
 import { DocenteService } from 'src/app/service/docente.service';
 import { SeccionService } from 'src/app/service/seccion.service';
+import Swal from 'sweetalert2'; // 👈 Importar SweetAlert2
+
 
 type EstadoDocente = 'activo' | 'inactivo' | string;
 
@@ -160,14 +162,16 @@ export class ListDocentesComponent implements OnInit {
       .subscribe({
         next: (grados) => {
           grados.forEach(g => this.gradosMap.set(g._id, g.nombre || g.descripcion));
-          this.cargarSecciones(); // luego de grados, carga secciones
+          this.cargarSecciones();
         },
         error: (e) => {
           console.error('Error cargando grados', e);
-          this.fetch(); // continuar aunque falle
+          this.toast('Error al cargar grados.', 'error');
+          this.fetch();
         }
       });
   }
+
 
   private cargarSecciones(): void {
     this.seccionService.listarSecciones()
@@ -175,10 +179,11 @@ export class ListDocentesComponent implements OnInit {
       .subscribe({
         next: (secciones) => {
           secciones.forEach(s => this.seccionesMap.set(s._id, s.nombre));
-          this.fetch(); // ahora sí carga docentes
+          this.fetch();
         },
         error: (e) => {
           console.error('Error cargando secciones', e);
+          this.toast('Error al cargar secciones.', 'error');
           this.fetch();
         }
       });
@@ -202,17 +207,23 @@ export class ListDocentesComponent implements OnInit {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (res: Docente[]) => {
-          this.docentes.set(Array.isArray(res) ? res : []);
+          const list = Array.isArray(res) ? res : [];
+          this.docentes.set(list);
           this.loading.set(false);
+
+          // ✅ Toast de éxito
+          this.toast(`Se cargaron ${list.length} docentes correctamente.`, 'success');
         },
         error: (err) => {
           console.error(err);
           this.error.set('No se pudieron cargar los docentes.');
           this.loading.set(false);
+
+          // ❌ Toast de error
+          this.toast('Error al cargar los docentes.', 'error');
         }
       });
   }
-
   // filtros / búsqueda
   onSearch(v: string) { this.search$.next(v); }
 
@@ -329,12 +340,15 @@ export class ListDocentesComponent implements OnInit {
       .filter(Boolean);
   }
 
+  // === Acciones ===
   saveEdit() {
     const row = this.actionRow();
-    if (!row?.usuario_id) { alert('Falta usuario_id'); return; }
+    if (!row?.usuario_id) {
+      this.toast('Falta usuario_id.', 'warning');
+      return;
+    }
 
     const id = String(row.usuario_id);
-
     const body: DocenteUpdatePayload = {
       ...this.editModel(),
       grado: this.csvToArray(this.gradoCsv),
@@ -343,15 +357,29 @@ export class ListDocentesComponent implements OnInit {
     if (!body['contraseña'] || !String(body['contraseña']).trim()) delete body['contraseña'];
 
     this.saving.set(true);
-    this.docenteService.updateDocente(id, body).subscribe({
-      next: () => { this.saving.set(false); this.showEdit.set(false); this.fetch(); },
-      error: (e) => { this.saving.set(false); console.error(e); alert('No se pudo actualizar.'); }
-    });
+    this.docenteService.updateDocente(id, body)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.saving.set(false);
+          this.showEdit.set(false);
+          this.fetch();
+          this.toast('Docente actualizado correctamente.', 'success');
+        },
+        error: (e) => {
+          this.saving.set(false);
+          console.error(e);
+          this.toast('No se pudo actualizar el docente.', 'error');
+        },
+      });
   }
 
   confirmDelete() {
     const row = this.actionRow();
-    if (!row?.usuario_id) { alert('Falta usuario_id'); return; }
+    if (!row?.usuario_id) {
+      this.toast('Falta usuario_id.', 'warning');
+      return;
+    }
 
     const id = String(row.usuario_id);
     this.deleting.set(true);
@@ -362,9 +390,38 @@ export class ListDocentesComponent implements OnInit {
           this.deleting.set(false);
           this.showDelete.set(false);
           this.docentes.set(this.docentes().filter(x => x.usuario_id !== row.usuario_id));
+
+          // ✅ Toast éxito
+          this.toast('Docente eliminado correctamente.', 'success');
         },
-        error: (e) => { this.deleting.set(false); console.error(e); alert('No se pudo eliminar.'); }
+        error: (e) => {
+          this.deleting.set(false);
+          console.error(e);
+
+          // ❌ Toast error
+          this.toast('No se pudo eliminar el docente.', 'error');
+        },
       });
+  }
+
+  // === Toast reutilizable ===
+  private toast(
+    msg: string,
+    icon: 'success' | 'error' | 'warning' | 'info' = 'success'
+  ): void {
+    const t = Swal.mixin({
+      toast: true,
+      position: 'top-end',
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true,
+      customClass: { popup: 'colored-toast' },
+      didOpen: (toastEl) => {
+        toastEl.addEventListener('mouseenter', Swal.stopTimer);
+        toastEl.addEventListener('mouseleave', Swal.resumeTimer);
+      },
+    });
+    t.fire({ icon, title: msg });
   }
 
   // Menú kebab por fila

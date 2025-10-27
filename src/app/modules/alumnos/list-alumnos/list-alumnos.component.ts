@@ -2,6 +2,8 @@ import { Component, OnInit, signal, computed, HostListener } from '@angular/core
 import { debounceTime, Subject, takeUntil, forkJoin } from 'rxjs';
 import { AlumnoService } from 'src/app/service/alumno.service';
 import { SeccionService } from 'src/app/service/seccion.service';
+import Swal from 'sweetalert2'; // 👈 Importar SweetAlert2
+
 
 type EstadoAlumno = 'activo' | 'inactivo' | string;
 
@@ -129,6 +131,7 @@ export class ListAlumnosComponent implements OnInit {
           console.error('Error cargando grados o secciones', e);
           this.error.set('No se pudieron cargar los grados o secciones.');
           this.loading.set(false);
+          this.toast('Error al cargar grados o secciones.', 'error');
         },
       });
   }
@@ -137,6 +140,7 @@ export class ListAlumnosComponent implements OnInit {
   fetch(): void {
     this.loading.set(true);
     this.error.set(null);
+
     this.alumnoService
       .getAllAlumnos()
       .pipe(takeUntil(this.destroy$))
@@ -149,11 +153,17 @@ export class ListAlumnosComponent implements OnInit {
           }));
           this.alumnos.set(list);
           this.loading.set(false);
+
+          // ✅ Toast éxito
+          this.toast(`Se cargaron ${list.length} alumnos correctamente.`, 'success');
         },
         error: (err) => {
           this.error.set('No se pudieron cargar los alumnos.');
           console.error(err);
           this.loading.set(false);
+
+          // ❌ Toast error
+          this.toast('Error al cargar los alumnos.', 'error');
         },
       });
   }
@@ -314,11 +324,11 @@ export class ListAlumnosComponent implements OnInit {
     this.actionRow.set(null);
   }
 
-  // === Guardar edición ===
+  // === Editar ===
   saveEdit() {
     const row = this.actionRow();
     if (!row?.usuario_id) {
-      alert('Falta usuario_id');
+      this.toast('Falta usuario_id', 'warning');
       return;
     }
 
@@ -334,11 +344,12 @@ export class ListAlumnosComponent implements OnInit {
           this.saving.set(false);
           this.showEdit.set(false);
           this.fetch();
+          this.toast('Alumno actualizado correctamente.', 'success');
         },
         error: (e) => {
           this.saving.set(false);
           console.error(e);
-          alert('No se pudo actualizar.');
+          this.toast('No se pudo actualizar el alumno.', 'error');
         },
       });
   }
@@ -356,13 +367,34 @@ export class ListAlumnosComponent implements OnInit {
           this.deleting.set(false);
           this.showDelete.set(false);
           this.alumnos.set(this.alumnos().filter(x => x.usuario_id !== row.usuario_id));
+          this.toast('Alumno eliminado correctamente.', 'success');
         },
         error: (e) => {
           this.deleting.set(false);
           console.error(e);
-          alert('No se pudo eliminar.');
+          this.toast('No se pudo eliminar el alumno.', 'error');
         },
       });
+  }
+
+  // === Toast reutilizable ===
+  private toast(
+    msg: string,
+    icon: 'success' | 'error' | 'warning' | 'info' = 'success'
+  ): void {
+    const t = Swal.mixin({
+      toast: true,
+      position: 'top-end',
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true,
+      customClass: { popup: 'colored-toast' },
+      didOpen: (toastEl) => {
+        toastEl.addEventListener('mouseenter', Swal.stopTimer);
+        toastEl.addEventListener('mouseleave', Swal.resumeTimer);
+      },
+    });
+    t.fire({ icon, title: msg });
   }
 
   // === Menú ===

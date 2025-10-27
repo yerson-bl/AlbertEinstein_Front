@@ -1,6 +1,7 @@
 import { Component, OnInit, signal, computed, HostListener } from '@angular/core';
 import { Subject, debounceTime, takeUntil } from 'rxjs';
 import { AdminService } from 'src/app/service/admin.service';
+import Swal from 'sweetalert2'; // 👈 Importamos SweetAlert2
 
 type Estado = 'activo' | 'inactivo' | string;
 
@@ -20,7 +21,7 @@ export type AdminUpdatePayload = {
   nombre?: string;
   apellido?: string;
   correo?: string;
-  ['contraseña']?: string;  // opcional
+  ['contraseña']?: string;
 };
 
 type SortDir = 'asc' | 'desc';
@@ -75,7 +76,6 @@ export class ListAdminComponent implements OnInit {
         this.hay(`${a.apellido}, ${a.nombre}`, q);
 
       const matchE = !e || a.estado === e;
-
       return matchQ && matchE;
     });
 
@@ -118,6 +118,7 @@ export class ListAdminComponent implements OnInit {
     this.fetch();
   }
 
+  // 🚀 Aquí añadimos los toasts en la carga
   fetch(): void {
     this.loading.set(true);
     this.error.set(null);
@@ -128,11 +129,17 @@ export class ListAdminComponent implements OnInit {
         next: (res: Admin[]) => {
           this.admins.set(Array.isArray(res) ? res : []);
           this.loading.set(false);
+
+          // ✅ Toast éxito
+          this.toast(`Se cargaron ${res.length} administradores correctamente.`, 'success');
         },
         error: (err) => {
           console.error(err);
           this.error.set('No se pudieron cargar los administradores.');
           this.loading.set(false);
+
+          // ❌ Toast error
+          this.toast('Error al cargar los administradores.', 'error');
         }
       });
   }
@@ -154,6 +161,7 @@ export class ListAdminComponent implements OnInit {
     const p = Math.min(Math.max(1, this.page() + delta), this.totalPages());
     this.page.set(p);
   }
+
   goto(p: number) {
     const safe = Math.min(Math.max(1, p), this.totalPages());
     this.page.set(safe);
@@ -162,7 +170,9 @@ export class ListAdminComponent implements OnInit {
   formatDate(gmt: string): string {
     const d = new Date(gmt);
     if (isNaN(d.getTime())) return '-';
-    return d.toLocaleString(undefined, { year: 'numeric', month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit' });
+    return d.toLocaleString(undefined, {
+      year: 'numeric', month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit'
+    });
   }
 
   estadoPill(e: Estado) {
@@ -180,6 +190,7 @@ export class ListAdminComponent implements OnInit {
       .replace(/\s+/g, ' ')
       .trim();
   }
+
   private hay(texto: string | number | null | undefined, q: string): boolean {
     return this.norm(texto).includes(this.norm(q));
   }
@@ -224,11 +235,20 @@ export class ListAdminComponent implements OnInit {
     if (!body['contraseña'] || !String(body['contraseña']).trim()) delete body['contraseña'];
 
     this.saving.set(true);
-    this.adminService.updateAdmin(id, body as any) // el service acepta Admin payload (ver ajuste abajo)
+    this.adminService.updateAdmin(id, body as any)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: () => { this.saving.set(false); this.showEdit.set(false); this.fetch(); },
-        error: (e) => { this.saving.set(false); console.error(e); alert('No se pudo actualizar.'); }
+        next: () => {
+          this.saving.set(false);
+          this.showEdit.set(false);
+          this.fetch();
+          this.toast('Administrador actualizado correctamente.', 'success');
+        },
+        error: (e) => {
+          this.saving.set(false);
+          console.error(e);
+          this.toast('No se pudo actualizar el administrador.', 'error');
+        }
       });
   }
 
@@ -242,26 +262,49 @@ export class ListAdminComponent implements OnInit {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
-          this.deleting.set(false); this.showDelete.set(false);
+          this.deleting.set(false);
+          this.showDelete.set(false);
           this.admins.set(this.admins().filter(x => x.usuario_id !== row.usuario_id));
+          this.toast('Administrador eliminado correctamente.', 'success');
         },
-        error: (e) => { this.deleting.set(false); console.error(e); alert('No se pudo eliminar.'); }
+        error: (e) => {
+          this.deleting.set(false);
+          console.error(e);
+          this.toast('No se pudo eliminar el administrador.', 'error');
+        }
       });
   }
 
-  // menú kebab
   openedId = signal<string | null>(null);
   toggleMenu(id: string, ev?: MouseEvent) {
     ev?.stopPropagation();
     this.openedId.set(this.openedId() === id ? null : id);
   }
+
   @HostListener('document:click')
   onDocClick() { if (this.openedId()) this.openedId.set(null); }
 
   ngOnDestroy(): void { this.destroy$.next(); this.destroy$.complete(); }
 
-  // Dentro de ListAdminComponent
-  trackById(_i: number, a: Admin) {
-    return a._id;
+  trackById(_i: number, a: Admin) { return a._id; }
+
+  // 🔔 Método Toast SweetAlert2 (reutilizable)
+  private toast(
+    msg: string,
+    icon: 'success' | 'error' | 'warning' | 'info' = 'success'
+  ): void {
+    const t = Swal.mixin({
+      toast: true,
+      position: 'top-end',
+      showConfirmButton: false,
+      timer: 3000,
+      timerProgressBar: true,
+      customClass: { popup: 'colored-toast' },
+      didOpen: (toastEl) => {
+        toastEl.addEventListener('mouseenter', Swal.stopTimer);
+        toastEl.addEventListener('mouseleave', Swal.resumeTimer);
+      },
+    });
+    t.fire({ icon, title: msg });
   }
 }
