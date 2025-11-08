@@ -1,214 +1,158 @@
-<!-- Dashboard Admin - Colegio -->
+<!-- Dashboard - Colegio -->
 <div class="min-h-screen bg-gray-50 dark:bg-[#060818]">
-
   <main class="mx-auto max-w-7xl p-4 md:p-6 space-y-6">
 
-    <!-- KPIs -->
-    <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
-      <!-- Matriculados -->
-      <div class="bg-white dark:bg-[#1b2e4b] rounded-xl p-4 shadow-sm">
-        <p class="text-xs uppercase tracking-wide text-gray-500 dark:text-white-dark">Estudiantes</p>
-        <div class="flex items-end justify-between">
-          <p class="mt-1 text-2xl font-bold text-gray-900 dark:text-white">{{ kpi.students }}</p>
-          <div class="h-10 w-16">
-            <apx-chart [series]="spark.students.series" [chart]="spark.chart" [stroke]="spark.stroke" [fill]="spark.fill" [colors]="['#3b82f6']"></apx-chart>
-          </div>
-        </div>
-        <p class="text-xs mt-1" [ngClass]="kpi.studentsDelta >= 0 ? 'text-emerald-500' : 'text-red-400'">
-          {{ kpi.studentsDelta >= 0 ? '▲' : '▼' }} {{ kpi.studentsDelta }}% vs. año anterior
-        </p>
-      </div>
-
-      <!-- Docentes -->
-      <div class="bg-white dark:bg-[#1b2e4b] rounded-xl p-4 shadow-sm">
-        <p class="text-xs uppercase tracking-wide text-gray-500 dark:text-white-dark">Docentes</p>
-        <div class="flex items-end justify-between">
-          <p class="mt-1 text-2xl font-bold text-gray-900 dark:text-white">{{ kpi.teachers }}</p>
-          <div class="h-10 w-16">
-            <apx-chart [series]="spark.teachers.series" [chart]="spark.chart" [stroke]="spark.stroke" [fill]="spark.fill" [colors]="['#22c55e']"></apx-chart>
-          </div>
-        </div>
-        <p class="text-xs mt-1 text-emerald-500">▲ {{ kpi.teachersDelta }}%</p>
-      </div>
-
-      <!-- Cursos activos -->
-      <div class="bg-white dark:bg-[#1b2e4b] rounded-xl p-4 shadow-sm">
-        <p class="text-xs uppercase tracking-wide text-gray-500 dark:text-white-dark">Cursos activos</p>
-        <div class="flex items-end justify-between">
-          <p class="mt-1 text-2xl font-bold text-gray-900 dark:text-white">{{ kpi.activeCourses }}</p>
-          <div class="h-10 w-16">
-            <apx-chart [series]="spark.courses.series" [chart]="spark.chart" [stroke]="spark.stroke" [fill]="spark.fill" [colors]="['#a855f7']"></apx-chart>
-          </div>
-        </div>
-        <p class="text-xs mt-1 text-emerald-500">▲ {{ kpi.coursesDelta }}%</p>
-      </div>
-
-      <!-- Asistencia de hoy -->
-      <div class="bg-white dark:bg-[#1b2e4b] rounded-xl p-4 shadow-sm">
-        <p class="text-xs uppercase tracking-wide text-gray-500 dark:text-white-dark">Asistencia (hoy)</p>
-        <div class="flex items-end justify-between">
-          <p class="mt-1 text-2xl font-bold text-gray-900 dark:text-white">{{ kpi.attendanceToday }}%</p>
-          <div class="h-10 w-16">
-            <apx-chart [series]="spark.att.series" [chart]="spark.chart" [stroke]="spark.stroke" [fill]="spark.fill" [colors]="['#0ea5e9']"></apx-chart>
-          </div>
-        </div>
-        <p class="text-xs mt-1" [ngClass]="kpi.attendanceDelta >= 0 ? 'text-emerald-500' : 'text-red-400'">
-          {{ kpi.attendanceDelta >= 0 ? '▲' : '▼' }} {{ kpi.attendanceDelta }}%
-        </p>
-      </div>
-
-      <!-- Pagos pendientes -->
-      <div class="bg-white dark:bg-[#1b2e4b] rounded-xl p-4 shadow-sm">
-        <p class="text-xs uppercase tracking-wide text-gray-500 dark:text-white-dark">Pagos pendientes</p>
-        <div class="flex items-end justify-between">
-          <p class="mt-1 text-2xl font-bold text-gray-900 dark:text-white">S/{{ kpi.pendingPayments | number:'1.0-0' }}</p>
-          <div class="h-10 w-16">
-            <apx-chart [series]="spark.pay.series" [chart]="spark.chart" [stroke]="spark.stroke" [fill]="spark.fill" [colors]="['#f59e0b']"></apx-chart>
-          </div>
-        </div>
-        <p class="text-xs mt-1 text-red-400">▼ {{ kpi.pendingDelta }}%</p>
-      </div>
-
-      <!-- Incidencias -->
-      <div class="bg-white dark:bg-[#1b2e4b] rounded-xl p-4 shadow-sm">
-        <p class="text-xs uppercase tracking-wide text-gray-500 dark:text-white-dark">Incidencias</p>
-        <div class="flex items-end justify-between">
-          <p class="mt-1 text-2xl font-bold text-gray-900 dark:text-white">{{ kpi.incidents }}</p>
-          <div class="h-10 w-16">
-            <apx-chart [series]="spark.inc.series" [chart]="spark.chart" [stroke]="spark.stroke" [fill]="spark.fill" [colors]="['#ef4444']"></apx-chart>
-          </div>
-        </div>
-        <p class="text-xs mt-1 text-emerald-500">▲ {{ kpi.incidentsSolved }} resueltas</p>
+    <!-- 📊 KPIs generales -->
+    <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+      <div *ngFor="let kpi of resumenKeys" class="bg-white dark:bg-[#1b2e4b] rounded-xl p-5 shadow-sm text-center">
+        <p class="text-sm uppercase tracking-wide text-gray-500 dark:text-white-dark">{{ kpi.label }}</p>
+        <p class="mt-2 text-3xl font-bold text-gray-900 dark:text-white">{{ resumen[kpi.key] || 0 }}</p>
       </div>
     </section>
 
-    <!-- Gráficos principales -->
-    <section class="grid grid-cols-1 xl:grid-cols-3 gap-6">
-      <!-- Asistencia -->
-      <div class="xl:col-span-2 bg-white dark:bg-[#1b2e4b] rounded-xl shadow-sm p-5">
-        <div class="flex items-center justify-between mb-3">
-          <h3 class="text-lg font-semibold text-gray-800 dark:text-white-light">Asistencia últimos días</h3>
-          <span class="text-xs text-gray-500 dark:text-white-dark">Promedio: {{ attendanceAvg }}%</span>
+    <!-- 📈 Rendimiento académico por salón -->
+    <section class="bg-white dark:bg-[#1b2e4b] rounded-xl shadow-sm p-5">
+      <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between mb-3 gap-3">
+        <h3 class="text-lg font-semibold text-gray-800 dark:text-white-light">
+          Rendimiento académico por salón
+        </h3>
+
+        <div class="flex flex-wrap gap-2">
+          <!-- Grado independiente -->
+          <select [(ngModel)]="filtrosSalon.grado" class="border rounded-md px-3 py-1 text-sm"
+            (change)="cargarSeccionesSalonPorGrado(filtrosSalon.grado)">
+            <option *ngFor="let g of gradosSalon" [value]="g._id">{{ g.nombre }}</option>
+          </select>
+
+          <!-- Sección independiente -->
+          <select [(ngModel)]="filtrosSalon.seccion" class="border rounded-md px-3 py-1 text-sm"
+            (change)="cargarRendimientoSalon()">
+            <option *ngFor="let s of seccionesSalon" [value]="s._id">{{ s.nombre }}</option>
+          </select>
+
+          <!-- Fechas -->
+          <input type="date" [(ngModel)]="filtrosSalon.fechaInicio" class="border rounded-md px-2 py-1 text-sm"
+            (change)="cargarRendimientoSalon()" />
+          <input type="date" [(ngModel)]="filtrosSalon.fechaFin" class="border rounded-md px-2 py-1 text-sm"
+            (change)="cargarRendimientoSalon()" />
         </div>
-        <apx-chart [series]="attendance.series" [chart]="attendance.chart" [xaxis]="attendance.xaxis" [yaxis]="attendance.yaxis"
-                   [stroke]="attendance.stroke" [colors]="attendance.colors" [fill]="attendance.fill"
-                   [dataLabels]="attendance.dataLabels" [tooltip]="attendance.tooltip" [grid]="attendance.grid"></apx-chart>
       </div>
 
-      <!-- Matrículas por nivel -->
-      <div class="bg-white dark:bg-[#1b2e4b] rounded-xl shadow-sm p-5">
-        <div class="flex items-center justify-between mb-3">
-          <h3 class="text-lg font-semibold text-gray-800 dark:text-white-light">Matrículas por nivel</h3>
-          <span class="text-xs text-gray-500 dark:text-white-dark">Año actual</span>
-        </div>
-        <apx-chart [series]="enrollment.series" [chart]="enrollment.chart" [labels]="enrollment.labels"
-                   [colors]="enrollment.colors" [legend]="enrollment.legend" [responsive]="enrollment.responsive"></apx-chart>
-        <ul class="mt-4 space-y-1 text-sm">
-          <li *ngFor="let n of enrollmentSummary" class="flex justify-between text-gray-700 dark:text-white-light">
-            <span>{{ n.label }}</span><span class="font-medium">{{ n.value | number }}</span>
-          </li>
-        </ul>
-      </div>
+      <!-- 📊 Gráfico de rendimiento académico -->
+      <apx-chart [series]="attendance.series" [chart]="attendance.chart" [xaxis]="attendance.xaxis"
+        [yaxis]="attendance.yaxis" [stroke]="attendance.stroke" [colors]="attendance.colors" [fill]="attendance.fill"
+        [dataLabels]="attendance.dataLabels" [tooltip]="attendance.tooltip" [grid]="attendance.grid">
+      </apx-chart>
+
+      <p class="text-xs mt-2 text-gray-500 dark:text-white-dark">
+        Promedio general: {{ attendanceAvg || 0 }} / 20
+      </p>
     </section>
 
-    <!-- Notas + Pagos -->
-    <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <!-- Distribución de notas -->
-      <div class="lg:col-span-2 bg-white dark:bg-[#1b2e4b] rounded-xl shadow-sm p-5">
-        <div class="flex items-center justify-between mb-3">
-          <h3 class="text-lg font-semibold text-gray-800 dark:text-white-light">Distribución de notas (último bimestre)</h3>
-          <span class="text-xs text-gray-500 dark:text-white-dark">Rango 0–20</span>
+    <!-- 📘 Rendimiento por materia -->
+    <section class="bg-white dark:bg-[#1b2e4b] rounded-xl shadow-sm p-5">
+      <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between mb-3 gap-3">
+        <h3 class="text-lg font-semibold text-gray-800 dark:text-white-light">
+          Rendimiento de materias por grado/sección
+        </h3>
+
+        <div class="flex flex-wrap gap-2">
+          <!-- Grado independiente -->
+          <select [(ngModel)]="filtrosMateria.grado" class="border rounded-md px-3 py-1 text-sm"
+            (change)="cargarSeccionesMateriaPorGrado(filtrosMateria.grado)">
+            <option *ngFor="let g of gradosMateria" [value]="g._id">{{ g.nombre }}</option>
+          </select>
+
+          <!-- Sección independiente -->
+          <select [(ngModel)]="filtrosMateria.seccion" class="border rounded-md px-3 py-1 text-sm"
+            (change)="cargarRendimientoPorMateria()">
+            <option *ngFor="let s of seccionesMateria" [value]="s._id">{{ s.nombre }}</option>
+          </select>
         </div>
-        <apx-chart [series]="grades.series" [chart]="grades.chart" [xaxis]="grades.xaxis" [yaxis]="grades.yaxis"
-                   [plotOptions]="grades.plotOptions" [dataLabels]="grades.dataLabels" [colors]="grades.colors"
-                   [grid]="grades.grid"></apx-chart>
       </div>
 
-      <!-- Pagos y cobranzas -->
-      <div class="bg-white dark:bg-[#1b2e4b] rounded-xl shadow-sm p-5">
-        <div class="flex items-center justify-between mb-3">
-          <h3 class="text-lg font-semibold text-gray-800 dark:text-white-light">Pagos y cobranzas</h3>
-          <span class="text-xs text-gray-500 dark:text-white-dark">Estado actual</span>
-        </div>
-        <apx-chart [series]="payments.series" [chart]="payments.chart" [labels]="payments.labels"
-                   [colors]="payments.colors" [legend]="payments.legend"></apx-chart>
-        <ul class="mt-4 space-y-1 text-sm">
-          <li *ngFor="let p of paymentsSummary" class="flex justify-between text-gray-700 dark:text-white-light">
-            <span>{{ p.label }}</span><span class="font-medium">S/{{ p.value | number:'1.0-0' }}</span>
-          </li>
-        </ul>
-      </div>
+      <!-- 📊 Gráfico de rendimiento por materia -->
+      <apx-chart [series]="grades.series" [chart]="grades.chart" [xaxis]="grades.xaxis" [yaxis]="grades.yaxis"
+        [plotOptions]="grades.plotOptions" [dataLabels]="grades.dataLabels" [colors]="grades.colors"
+        [grid]="grades.grid">
+      </apx-chart>
     </section>
 
-    <!-- Docentes + Eventos + Incidencias -->
-    <section class="grid grid-cols-1 2xl:grid-cols-3 gap-6">
-      <!-- Docentes destacados -->
-      <div class="bg-white dark:bg-[#1b2e4b] rounded-xl shadow-sm p-5">
-        <h3 class="text-lg font-semibold text-gray-800 dark:text-white-light mb-3">Docentes destacados</h3>
-        <div class="divide-y divide-gray-100 dark:divide-white/10">
-          <div *ngFor="let t of topTeachers; index as i" class="flex items-center gap-3 py-3">
-            <span class="w-6 text-xs text-gray-400 dark:text-white-dark">#{{ i+1 }}</span>
-            <div class="h-10 w-10 rounded-full bg-gray-200 dark:bg-white/10 overflow-hidden">
-              <img [src]="t.avatar" [alt]="t.name" class="h-full w-full object-cover"
-                   onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIGZpbGw9IiNFNUU3RUIiLz48L3N2Zz4=';">
-            </div>
-            <div class="flex-1 min-w-0">
-              <p class="truncate font-medium text-gray-800 dark:text-white-light">{{ t.name }}</p>
-              <p class="text-xs text-gray-500 dark:text-white-dark">{{ t.course }}</p>
-            </div>
-            <span class="text-sm font-semibold text-gray-800 dark:text-white-light">⭐ {{ t.rating }}</span>
-          </div>
+    <!-- 🧮 Comparación de alumnos -->
+    <section class="bg-white dark:bg-[#1b2e4b] rounded-xl shadow-sm p-5">
+      <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between mb-3 gap-3">
+        <h3 class="text-lg font-semibold text-gray-800 dark:text-white-light">
+          Comparar rendimiento de alumnos
+        </h3>
+        <div class="flex flex-wrap gap-2">
+          <input type="text" placeholder="IDs alumnos (1,2,3)" [(ngModel)]="filtrosComparacion.alumno_ids"
+            class="border rounded-md px-2 py-1 text-sm w-32" />
+          <input type="text" placeholder="Materia" [(ngModel)]="filtrosComparacion.materia"
+            class="border rounded-md px-2 py-1 text-sm w-40" />
+          <button class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-md text-sm"
+            (click)="cargarComparacionAlumnos()">
+            Aplicar
+          </button>
         </div>
       </div>
 
-      <!-- Eventos próximos -->
-      <div class="bg-white dark:bg-[#1b2e4b] rounded-xl shadow-sm p-5">
-        <h3 class="text-lg font-semibold text-gray-800 dark:text-white-light mb-3">Eventos próximos</h3>
-        <ol class="space-y-3">
-          <li *ngFor="let e of events" class="flex items-start justify-between gap-4">
-            <div>
-              <p class="font-medium text-gray-800 dark:text-white-light">{{ e.title }}</p>
-              <p class="text-xs text-gray-500 dark:text-white-dark">{{ e.date }} • {{ e.place }}</p>
-            </div>
-            <span class="text-xs rounded-full px-2 py-0.5"
-                  [ngClass]="e.type==='Académico' ? 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300' : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300'">
-              {{ e.type }}
-            </span>
-          </li>
-        </ol>
+      <apx-chart [series]="comparacion.series" [chart]="comparacion.chart" [xaxis]="comparacion.xaxis"
+        [dataLabels]="comparacion.dataLabels" [colors]="comparacion.colors" [grid]="comparacion.grid">
+      </apx-chart>
+    </section>
+
+    <!-- 🏅 Top estudiantes -->
+    <section class="bg-white dark:bg-[#1b2e4b] rounded-xl shadow-sm p-5">
+      <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between mb-3 gap-3">
+        <h3 class="text-lg font-semibold text-gray-800 dark:text-white-light">Mejores estudiantes</h3>
+        <div class="flex flex-wrap gap-2">
+          <select [(ngModel)]="filtrosTop.grado" (change)="cargarTopEstudiantes()"
+            class="border rounded-md px-3 py-1 text-sm">
+            <option value="">Todos</option>
+            <option *ngFor="let g of gradosMateria" [value]="g._id">{{ g.nombre }}</option>
+          </select>
+
+          <input type="number" min="1" [(ngModel)]="filtrosTop.limit" class="border rounded-md px-2 py-1 text-sm w-20"
+            (change)="cargarTopEstudiantes()" />
+        </div>
       </div>
 
-      <!-- Incidencias -->
-      <div class="bg-white dark:bg-[#1b2e4b] rounded-xl shadow-sm p-5 overflow-hidden">
-        <div class="flex items-center justify-between mb-3">
-          <h3 class="text-lg font-semibold text-gray-800 dark:text-white-light">Incidencias recientes</h3>
-          <button class="text-xs px-3 py-1 rounded-md border border-gray-300 dark:border-white/10 text-gray-700 dark:text-white-light">Ver todas</button>
-        </div>
-        <div class="overflow-x-auto">
-          <table class="w-full text-sm">
-            <thead>
-              <tr class="text-left border-b border-gray-200 dark:border-white/10">
-                <th class="py-2 pr-4 text-gray-600 dark:text-white-dark">ID</th>
-                <th class="py-2 pr-4 text-gray-600 dark:text-white-dark">Estudiante</th>
-                <th class="py-2 pr-4 text-gray-600 dark:text-white-dark">Tipo</th>
-                <th class="py-2 pr-4 text-gray-600 dark:text-white-dark">Fecha</th>
-                <th class="py-2 text-right text-gray-600 dark:text-white-dark">Estado</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let i of incidents" class="border-b border-gray-100 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/5">
-                <td class="py-2 pr-4 text-gray-800 dark:text-white-light">#{{ i.id }}</td>
-                <td class="py-2 pr-4 text-gray-800 dark:text-white-light">{{ i.student }}</td>
-                <td class="py-2 pr-4 text-gray-800 dark:text-white-light">{{ i.type }}</td>
-                <td class="py-2 pr-4 text-gray-800 dark:text-white-light">{{ i.date }}</td>
-                <td class="py-2 text-right">
-                  <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium" [ngClass]="statusPill(i.status)">
-                    {{ i.status }}
-                  </span>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="border-b border-gray-200 dark:border-white/10 text-gray-600 dark:text-white-dark">
+            <th class="py-2 text-left">#</th>
+            <th class="py-2 text-left">Nombre</th>
+            <th class="py-2 text-center">Grado</th>
+            <th class="py-2 text-center">Promedio</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let e of topEstudiantes; let i = index"
+            class="border-b border-gray-100 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/5">
+            <td class="py-2 text-gray-800 dark:text-white-light">{{ i + 1 }}</td>
+            <td class="py-2 text-gray-800 dark:text-white-light">{{ e.nombre }}</td>
+            <td class="py-2 text-center text-gray-800 dark:text-white-light">{{ e.grado }}</td>
+            <td class="py-2 text-center font-semibold text-emerald-500">{{ e.promedio | number: '1.1-1' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- 🕒 Actividades recientes -->
+    <section class="bg-white dark:bg-[#1b2e4b] rounded-xl shadow-sm p-5 overflow-hidden">
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="text-lg font-semibold text-gray-800 dark:text-white-light">Actividades recientes</h3>
+        <button
+          class="text-xs px-3 py-1 rounded-md border border-gray-300 dark:border-white/10 text-gray-700 dark:text-white-light"
+          (click)="cargarActividadesRecientes()">
+          Actualizar
+        </button>
+      </div>
+
+      <div class="overflow-y-auto max-h-[420px] divide-y divide-gray-100 dark:divide-white/10">
+        <div *ngFor="let act of actividades" class="py-3">
+          <p class="text-sm text-gray-800 dark:text-white-light">{{ act.descripcion || act.description }}</p>
+          <p class="text-xs text-gray-500 dark:text-white-dark">{{ act.fecha | date: 'short' }} • {{ act.tipo }}</p>
         </div>
       </div>
     </section>

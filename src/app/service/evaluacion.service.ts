@@ -47,11 +47,12 @@ export class EvaluacionService {
   }
   // ----------------- Intentos -----------------
 
-  iniciarIntento(payload: { evaluacion_id: string; alumno_id: string }) {
+  iniciarIntento(payload: { evaluacion_id: string; alumno_id: number }) {
     return this.http.post<any>(`${this.intentosUrl}`, payload, {
       headers: this.headers(),
     });
   }
+
 
 
   /** GET /intentos/:id  (si necesitas consultar el intento) */

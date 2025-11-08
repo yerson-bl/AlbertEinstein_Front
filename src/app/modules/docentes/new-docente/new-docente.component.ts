@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subject, takeUntil } from 'rxjs';
 import { DocenteService } from 'src/app/service/docente.service';
 import { SeccionService, Grado, Seccion } from 'src/app/service/seccion.service';
-import Swal from 'sweetalert2'; // 👈 Importamos SweetAlert2
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-new-docente',
@@ -38,8 +38,10 @@ export class NewDocenteComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    // Cargar grados iniciales
     this.cargarGrados();
 
+    // Cuando cambia el grado → cargar secciones relacionadas
     this.form.get('grado')?.valueChanges
       .pipe(takeUntil(this.destroy$))
       .subscribe((gradoId) => {
@@ -52,31 +54,38 @@ export class NewDocenteComponent implements OnInit, OnDestroy {
       });
   }
 
+  // === Cargar grados desde el servicio ===
   cargarGrados(): void {
-    this.seccionService.listarGrados()
+    this.seccionService
+      .listarGrados()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (data) => this.grados = data,
-        error: (err) => console.error('Error cargando grados:', err)
+        next: (data) => (this.grados = data || []),
+        error: (err) => console.error('Error cargando grados:', err),
       });
   }
 
+  // === Cargar secciones según grado seleccionado ===
   cargarSeccionesPorGrado(gradoId: string): void {
-    this.seccionService.seccionPorGrado(gradoId)
+    this.seccionService
+      .seccionPorGrado(gradoId)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (data) => this.secciones = data,
-        error: (err) => console.error('Error cargando secciones:', err)
+        next: (data) => (this.secciones = data || []),
+        error: (err) => console.error('Error cargando secciones:', err),
       });
   }
 
-  get f() { return this.form.controls; }
+  get f() {
+    return this.form.controls;
+  }
 
   isInvalid(ctrl: string) {
     const c = this.f[ctrl];
     return c.invalid && (c.touched || c.dirty);
   }
 
+  // === Enviar formulario ===
   submit(): void {
     this.apiError = null;
     this.apiOk = false;
@@ -88,34 +97,49 @@ export class NewDocenteComponent implements OnInit, OnDestroy {
     }
 
     const raw = this.form.value;
+
+    // Buscar los objetos completos seleccionados
+    const gradoSel = this.grados.find((g) => g._id === raw.grado);
+    const seccionSel = this.secciones.find((s) => s._id === raw.seccion);
+
+    // Crear payload con id + nombre (igual que en alumnos)
     const payload = {
       nombre: raw.nombre,
       apellido: raw.apellido,
       correo: raw.correo,
-      ['contraseña']: raw.contraseña,
-      grado: [raw.grado],       // API espera string[]
-      seccion: [raw.seccion],   // API espera string[]
+      contraseña: raw.contraseña,
+      grado: [
+        {
+          id: gradoSel?._id || raw.grado,
+          nombre: gradoSel?.nombre || gradoSel?.descripcion || '',
+        },
+      ],
+      seccion: [
+        {
+          id: seccionSel?._id || raw.seccion,
+          nombre: seccionSel?.nombre || '',
+        },
+      ],
     };
 
     this.saving = true;
 
-    this.docenteService['http'].post('/usuarios/crear/docente', payload)
+    this.docenteService['http']
+      .post('/usuarios/crear/docente', payload)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
           this.saving = false;
           this.apiOk = true;
           this.form.reset();
-          // ✅ Toast éxito
           this.toast('Docente creado correctamente', 'success');
         },
         error: (err) => {
           this.saving = false;
           this.apiError = 'No se pudo crear el docente. Intenta nuevamente.';
           console.error(err);
-          // ❌ Toast error
           this.toast('No se pudo crear el docente', 'error');
-        }
+        },
       });
   }
 
@@ -125,7 +149,7 @@ export class NewDocenteComponent implements OnInit, OnDestroy {
     this.apiOk = false;
   }
 
-  // 👇 Método toast igual que en los otros componentes
+  // === Toast reutilizable ===
   private toast(
     msg: string,
     icon: 'success' | 'error' | 'warning' | 'info' = 'success'

@@ -8,6 +8,7 @@ import {
 } from '@angular/forms';
 import { Subscription, finalize } from 'rxjs';
 import { EvaluacionService } from 'src/app/service/evaluacion.service';
+import { SeccionService, Grado, Seccion } from 'src/app/service/seccion.service';
 import Swal from 'sweetalert2';
 
 type TipoPregunta = 'OM' | 'VF';
@@ -39,11 +40,14 @@ export class NewEvaluacionComponent implements OnInit, OnDestroy {
   form!: FormGroup;
   cargando = false;
   private subs: Subscription[] = [];
+  grados: Grado[] = [];
+  secciones: Seccion[] = [];
 
   constructor(
     private fb: FormBuilder,
-    private evaluacionSrv: EvaluacionService
-  ) {}
+    private evaluacionSrv: EvaluacionService,
+    private seccionSrv: SeccionService // 👈 agregado
+  ) { }
 
   ngOnInit(): void {
     this.form = this.fb.group({
@@ -59,6 +63,15 @@ export class NewEvaluacionComponent implements OnInit, OnDestroy {
 
     // pregunta inicial
     this.agregarPregunta('OM');
+
+    // cargar grados
+    this.cargarGrados();
+
+    // cargar secciones según grado
+    this.form.get('grado')?.valueChanges.subscribe((gradoId) => {
+      if (gradoId) this.cargarSeccionesPorGrado(gradoId);
+      else this.secciones = [];
+    });
   }
 
   // === Getters visibles desde el template ===
@@ -80,6 +93,27 @@ export class NewEvaluacionComponent implements OnInit, OnDestroy {
     const c = (this.preguntasFA.at(i) as FormGroup).get(controlName);
     return !!(c && c.touched && c.invalid);
   }
+
+  // ==== NUEVOS MÉTODOS ====
+
+  cargarGrados(): void {
+    this.seccionSrv.listarGrados().subscribe({
+      next: (data) => {
+        this.grados = data.filter((g) => g.estado);
+      },
+      error: () => this.toast('Error al cargar los grados', 'error'),
+    });
+  }
+
+  cargarSeccionesPorGrado(gradoId: string): void {
+    this.seccionSrv.seccionPorGrado(gradoId).subscribe({
+      next: (data) => {
+        this.secciones = data.filter((s) => s.estado);
+      },
+      error: () => this.toast('Error al cargar las secciones', 'error'),
+    });
+  }
+
 
   // ---- builders ----
   private buildOpcion(valor = ''): FormGroup {
@@ -231,14 +265,25 @@ export class NewEvaluacionComponent implements OnInit, OnDestroy {
     return {
       titulo: String(v.titulo),
       materia: String(v.materia),
-      grado: String(v.grado),
-      seccion: String(v.seccion),
+      grado: this.obtenerNombreGrado(v.grado),
+      seccion: this.obtenerNombreSeccion(v.seccion),
       docente_id: String(v.docente_id),
       fecha_entrega: d.toISOString(),
       intentos_permitidos: Number(v.intentos_permitidos) || 1,
       preguntas,
     };
   }
+
+  private obtenerNombreGrado(id: string): string {
+    const g = this.grados.find((x) => x._id === id);
+    return g ? g.nombre : id; // si no encuentra, deja el id (fallback)
+  }
+
+  private obtenerNombreSeccion(id: string): string {
+    const s = this.secciones.find((x) => x._id === id);
+    return s ? s.nombre : id;
+  }
+
 
   // === Toast idéntico al del login ===
   private toast(

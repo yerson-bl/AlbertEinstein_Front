@@ -90,13 +90,25 @@ export class NewAlumnoComponent implements OnInit, OnDestroy {
     }
 
     const raw = this.form.value;
+
+    // ✅ Buscar los objetos completos del grado y la sección seleccionados
+    const gradoSel = this.grados.find(g => g._id === raw.grado);
+    const seccionSel = this.secciones.find(s => s._id === raw.seccion);
+
+    // ✅ Crear payload combinando ID y nombre
     const payload = {
       nombre: raw.nombre,
       apellido: raw.apellido,
       correo: raw.correo,
-      ['contraseña']: raw.contraseña,
-      grado: [raw.grado],
-      seccion: [raw.seccion],
+      contraseña: raw.contraseña,
+      grado: {
+        id: gradoSel?._id || raw.grado,
+        nombre: gradoSel?.nombre || ''
+      },
+      seccion: {
+        id: seccionSel?._id || raw.seccion,
+        nombre: seccionSel?.nombre || ''
+      }
     };
 
     this.saving = true;
@@ -107,20 +119,18 @@ export class NewAlumnoComponent implements OnInit, OnDestroy {
           this.saving = false;
           this.apiOk = true;
           this.form.reset();
-
-          // ✅ Toast de éxito
           this.toast(`Alumno ${raw.nombre} ${raw.apellido} creado correctamente`, 'success');
         },
         error: (err) => {
           this.saving = false;
           this.apiError = 'No se pudo crear el alumno. Intenta nuevamente.';
           console.error(err);
-
-          // ❌ Toast de error
           this.toast('No se pudo crear el alumno', 'error');
         }
       });
   }
+
+
 
   reset(): void {
     this.form.reset();

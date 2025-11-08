@@ -10,13 +10,15 @@ export interface LoginPayload {
 export interface LoginResponse {
   rol: 'Admin' | 'Docente' | 'Alumno';
   token: string;
+  usuario_id: number;
+
 }
 
 @Injectable({ providedIn: 'root' })
 export class LoginService {
   private baseUrl = `${environment.apiUrl}/usuarios`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   private headers() {
     return new HttpHeaders({ 'Content-Type': 'application/json' });

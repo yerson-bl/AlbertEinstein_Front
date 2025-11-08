@@ -30,7 +30,13 @@ export class SeccionService {
     private apiUrl = environment.apiUrl;
 
     constructor(private http: HttpClient) { }
+    gradoPorId(gradoId: string): Observable<Grado> {
+        return this.http.get<Grado>(`${this.apiUrl}/grados/${gradoId}`);
+    }
 
+    seccionPorId(seccionId: string): Observable<Seccion> {
+        return this.http.get<Seccion>(`${this.apiUrl}/secciones/${seccionId}`);
+    }
 
     //SECCIONES
     listarSecciones(): Observable<Seccion[]> {
@@ -45,11 +51,11 @@ export class SeccionService {
     eliminarSeccion(id: string): Observable<any> {
         return this.http.delete(`${this.apiUrl}/secciones/${id}`);
     }
-    
+
     seccionPorGrado(gradoId: string): Observable<Seccion[]> {
         return this.http.get<Seccion[]>(`${this.apiUrl}/secciones/grado/${gradoId}`);
     }
-    
+
 
 
     //GRADOS
@@ -57,9 +63,9 @@ export class SeccionService {
         return this.http.get<Grado[]>(`${this.apiUrl}/grados`);
     }
 
-    
 
-    
 
-    
+
+
+
 }

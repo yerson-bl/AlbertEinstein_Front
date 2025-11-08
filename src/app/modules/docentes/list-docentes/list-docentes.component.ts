@@ -14,10 +14,9 @@ export interface Docente {
   correo: string;
   estado: EstadoDocente;
   fecha_creacion: string;       // GMT string
-  grado: string[];              // ej. ["4","5"]
-  nombre: string;
+  grado: (string | { id: string; nombre: string })[];
+  seccion: (string | { id: string; nombre: string })[]; nombre: string;
   rol: string;                  // "Docente"
-  seccion: string[];            // ej. ["A","B"]
   usuario_id: string | number;  // id para PUT/DELETE
 }
 
@@ -90,17 +89,37 @@ export class ListDocentesComponent implements OnInit {
         this.hay(d.correo, q) ||
         this.hay(d.usuario_id, q) ||
         this.hay(`${d.apellido}, ${d.nombre}`, q) ||
-        d.grado?.some(xx => this.hay(`grado ${xx}`, q)) ||
-        d.seccion?.some(xx => this.hay(`seccion ${xx}`, q)) ||
-        d.grado?.some(xx => this.hay(xx, q)) ||
-        d.seccion?.some(xx => this.hay(xx, q));
+        // 🔹 Buscamos dentro de grado (string o { id, nombre })
+        d.grado?.some(xx => {
+          if (typeof xx === 'object') {
+            return this.hay(xx.nombre, q) || this.hay(xx.id, q);
+          }
+          return this.hay(xx, q);
+        }) ||
+        // 🔹 Buscamos dentro de seccion (string o { id, nombre })
+        d.seccion?.some(xx => {
+          if (typeof xx === 'object') {
+            return this.hay(xx.nombre, q) || this.hay(xx.id, q);
+          }
+          return this.hay(xx, q);
+        });
 
-      const matchG = !g || (Array.isArray(d.grado) && d.grado.includes(g));
-      const matchS = !s || (Array.isArray(d.seccion) && d.seccion.includes(s));
+      // 🔹 Filtros adicionales
+      const matchG = !g || (Array.isArray(d.grado) && d.grado.some(xx => {
+        const val = typeof xx === 'object' ? xx.id : xx;
+        return val === g;
+      }));
+
+      const matchS = !s || (Array.isArray(d.seccion) && d.seccion.some(xx => {
+        const val = typeof xx === 'object' ? xx.id : xx;
+        return val === s;
+      }));
+
       const matchE = !e || d.estado === e;
 
       return matchQ && matchG && matchS && matchE;
     });
+
 
     // ordenación (grado: por primer número; seccion: por primer valor)
     const key = this.sortKey();
@@ -189,13 +208,22 @@ export class ListDocentesComponent implements OnInit {
       });
   }
 
-  getNombreGrado(id: string): string {
-    return this.gradosMap.get(id) || id;
+  getNombreGrado(g: string | { id: string; nombre: string }): string {
+    if (!g) return '';
+    if (typeof g === 'object') {
+      return g.nombre || this.gradosMap.get(g.id) || g.id;
+    }
+    return this.gradosMap.get(g) || g;
   }
 
-  getNombreSeccion(id: string): string {
-    return this.seccionesMap.get(id) || id;
+  getNombreSeccion(s: string | { id: string; nombre: string }): string {
+    if (!s) return '';
+    if (typeof s === 'object') {
+      return s.nombre || this.seccionesMap.get(s.id) || s.id;
+    }
+    return this.seccionesMap.get(s) || s;
   }
+
 
 
 

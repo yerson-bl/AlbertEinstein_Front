@@ -44,6 +44,7 @@ import { ListaEvaluacionesComponent } from './modules/rol-alumno/evaluaciones/li
 import { IniciarIntentoComponent } from './modules/rol-alumno/evaluaciones/iniciar-intento/iniciar-intento.component';
 import { NewSeccionComponent } from './modules/secciones/new-seccion/new-seccion.component';
 import { ListSeccionComponent } from './modules/secciones/list-seccion/list-seccion.component';
+import { ReporteAlumnoComponent } from './modules/rol-alumno/reportes/reporte-alumno/reporte-alumno.component';
 
 
 export const routes: Routes = [
@@ -86,6 +87,9 @@ export const routes: Routes = [
             { path: 'alumno/lista-evaluaciones', component: ListaEvaluacionesComponent, data: { title: 'Lista de Evaluaciones | Albert Einstein' } },
             { path: 'alumno/iniciar-intento', component: IniciarIntentoComponent, data: { title: 'Nuevo Intento | Albert Einstein' } },
 
+            //reportes
+            { path: 'alumno/reporte-alumno', component: ReporteAlumnoComponent, data: { title: 'Reporte de Alumno | Albert Einstein' } },
+            
             //secciones
             { path: 'secciones/list-seccion', component: ListSeccionComponent, data: { title: 'Lista de Secciones | Albert Einstein' } },
             { path: 'secciones/new-seccion', component: NewSeccionComponent, data: { title: 'Nueva Sección | Albert Einstein' } },

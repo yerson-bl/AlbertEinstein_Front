@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subscription, finalize } from 'rxjs';
 import { EvaluacionService } from 'src/app/service/evaluacion.service';
 import Swal from 'sweetalert2'; // 👈 Importamos SweetAlert2
+import { SeccionService, Grado, Seccion } from 'src/app/service/seccion.service';
 
 type EstadoEval = 'activa' | 'inactiva' | string;
 
@@ -40,6 +41,9 @@ export class ListEvaluacionComponent implements OnInit, OnDestroy {
   errorMsg: string | null = null;
 
   evaluaciones: EvaluacionItem[] = [];
+  // 🔹 Nuevos arrays para selects
+  grados: Grado[] = [];
+  secciones: Seccion[] = [];
 
   // Modales
   showView = false;
@@ -48,14 +52,37 @@ export class ListEvaluacionComponent implements OnInit, OnDestroy {
 
   private subs: Subscription[] = [];
 
-  constructor(private fb: FormBuilder, private evaluacionSrv: EvaluacionService) { }
+  constructor(private fb: FormBuilder, private evaluacionSrv: EvaluacionService, private seccionSrv: SeccionService // 👈 servicio para grados/secciones
+  ) { }
 
   ngOnInit(): void {
     this.filtros = this.fb.group({
-      grado: ['5', Validators.required],
-      seccion: ['A', Validators.required],
+      grado: ['', Validators.required],
+      seccion: ['', Validators.required],
     });
-    this.buscar();
+
+    // 🔹 Cargar grados al iniciar
+    this.cargarGrados();
+
+    // 🔹 Cuando cambie el grado, cargar secciones
+    this.filtros.get('grado')?.valueChanges.subscribe((gradoId) => {
+      if (gradoId) this.cargarSeccionesPorGrado(gradoId);
+      else this.secciones = [];
+    });
+  }
+
+  // 🔹 Cargar grados
+  cargarGrados(): void {
+    this.seccionSrv.listarGrados().subscribe({
+      next: (data) => {
+        this.grados = data.filter((g) => g.estado); // solo activos
+        console.log('[DEBUG] Grados cargados:', this.grados);
+      },
+      error: (err) => {
+        console.error('Error al cargar grados', err);
+        this.toast('Error al cargar grados', 'error');
+      },
+    });
   }
 
   get totalEvaluaciones(): number { return this.evaluaciones?.length ?? 0; }
@@ -71,6 +98,20 @@ export class ListEvaluacionComponent implements OnInit, OnDestroy {
     return suma / this.evaluaciones.length;
   }
 
+  // 🔹 Cargar secciones según grado
+  cargarSeccionesPorGrado(gradoId: string): void {
+    this.seccionSrv.seccionPorGrado(gradoId).subscribe({
+      next: (data) => {
+        this.secciones = data.filter((s) => s.estado);
+        console.log('[DEBUG] Secciones cargadas:', this.secciones);
+      },
+      error: (err) => {
+        console.error('Error al cargar secciones', err);
+        this.toast('Error al cargar secciones', 'error');
+      },
+    });
+  }
+
   get f() { return this.filtros.controls as any; }
 
   buscar(): void {
@@ -80,14 +121,26 @@ export class ListEvaluacionComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const grado = this.f.grado.value;
-    const seccion = this.f.seccion.value;
+    const gradoId = this.f.grado.value;
+    const seccionId = this.f.seccion.value;
+
+    // 🔹 Buscar el nombre real según el id seleccionado
+    const gradoObj = this.grados.find(g => g._id === gradoId);
+    const seccionObj = this.secciones.find(s => s._id === seccionId);
+
+    const gradoNombre = gradoObj?.nombre || '';
+    const seccionNombre = seccionObj?.nombre || '';
+
+    if (!gradoNombre || !seccionNombre) {
+      this.toast('Error: no se encontró el nombre del grado o sección.', 'error');
+      return;
+    }
 
     this.cargando = true;
     this.errorMsg = null;
 
     const sub = this.evaluacionSrv
-      .listarPorGradoSeccion(grado, seccion)
+      .listarPorGradoSeccion(gradoNombre, seccionNombre)
       .pipe(finalize(() => (this.cargando = false)))
       .subscribe({
         next: (rows: any[]) => {
@@ -98,21 +151,19 @@ export class ListEvaluacionComponent implements OnInit, OnDestroy {
             return db - da;
           });
 
-          // ✅ Toast de éxito
           this.toast(`Se cargaron ${this.evaluaciones.length} evaluaciones correctamente.`, 'success');
         },
         error: (err) => {
           console.error('Error listando evaluaciones', err);
           this.errorMsg = 'No se pudo obtener la lista. Inténtalo nuevamente.';
           this.evaluaciones = [];
-
-          // ❌ Toast de error
           this.toast('Error al cargar las evaluaciones.', 'error');
         },
       });
 
     this.subs.push(sub);
   }
+
 
   refrescar(): void {
     this.buscar();

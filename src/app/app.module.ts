@@ -77,6 +77,7 @@ import { ListaEvaluacionesComponent } from './modules/rol-alumno/evaluaciones/li
 import { IniciarIntentoComponent } from './modules/rol-alumno/evaluaciones/iniciar-intento/iniciar-intento.component';
 import { ListSeccionComponent } from './modules/secciones/list-seccion/list-seccion.component';
 import { NewSeccionComponent } from './modules/secciones/new-seccion/new-seccion.component';
+import { ReporteAlumnoComponent } from './modules/rol-alumno/reportes/reporte-alumno/reporte-alumno.component';
 
 @NgModule({
     imports: [
@@ -138,6 +139,8 @@ import { NewSeccionComponent } from './modules/secciones/new-seccion/new-seccion
 
         ListSeccionComponent,
         NewSeccionComponent,
+
+        ReporteAlumnoComponent
 
 
     ],

@@ -9,6 +9,8 @@ import Swal from 'sweetalert2';
 import { Subject, timer } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { LoginService } from 'src/app/service/login.service';
+import { UserStorage } from '../utils/user.storage.util';
+import { UsuarioService } from '../service/usuario.service';
 
 
 type Lang = { code: string; label: string; name?: string };
@@ -46,8 +48,10 @@ export class BoxedSigninComponent implements OnInit, OnDestroy {
     private readonly router: Router,
     private readonly appSetting: AppService,
     private readonly fb: FormBuilder,
-    private readonly loginSrv: LoginService
+    private readonly loginSrv: LoginService,
+    private readonly usuarioSrv: UsuarioService // 👈 agregado
   ) { }
+
 
   // Getters de control (evita acceder por string en template)
   get emailCtrl() { return this.loginForm.get('email')!; }
@@ -111,31 +115,49 @@ export class BoxedSigninComponent implements OnInit, OnDestroy {
         this.loginSrv.guardarSesion(resp.rol, resp.token);
         this.toast('Inicio de sesión exitoso', 'success');
 
-        // Redirige según el rol
-        switch (resp.rol) {
-          case 'Admin':
-            this.router.navigate(['/dashboard']);
-            break;
-          case 'Docente':
-            this.router.navigate(['/evaluaciones/new-evaluacion']);
-            break;
-          case 'Alumno':
-            this.router.navigate(['/alumno/lista-evaluaciones']);
-            break;
-          
-        }
+        console.log('[DEBUG] Login exitoso:', resp);
 
-        this.isSubmitting = false;
-        this.loginForm.enable();
+        // 🔹 Paso 1: obtener el usuario desde la API
+        this.usuarioSrv.getUsuarioById(String(resp.usuario_id)).subscribe({
+          next: (usuario) => {
+            console.log('[DEBUG] Datos del usuario desde API:', usuario);
+
+            // 🔹 Paso 2: guardar usuario en localStorage
+            UserStorage.setUser(usuario);
+
+            // 🔹 Paso 3: redirigir según el rol
+            switch (resp.rol) {
+              case 'Admin':
+                this.router.navigate(['/dashboard']);
+                break;
+              case 'Docente':
+                this.router.navigate(['/evaluaciones/new-evaluacion']);
+                break;
+              case 'Alumno':
+                this.router.navigate(['/alumno/lista-evaluaciones']);
+                break;
+            }
+
+            this.isSubmitting = false;
+            this.loginForm.enable();
+          },
+          error: (err) => {
+            console.error('[ERROR] Al obtener usuario por ID:', err);
+            this.toast('Error al obtener datos del usuario', 'error');
+            this.isSubmitting = false;
+            this.loginForm.enable();
+          }
+        });
       },
       error: (err) => {
-        console.error(err);
+        console.error('[ERROR] Login fallido:', err);
         this.toast('Credenciales inválidas', 'error');
         this.isSubmitting = false;
         this.loginForm.enable();
       },
     });
   }
+
 
   private toast(msg: string, icon: 'success' | 'error' | 'warning' | 'info' = 'success'): void {
     const t = Swal.mixin({

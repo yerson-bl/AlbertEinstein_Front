@@ -60,23 +60,31 @@
             </div>
 
             <div class="grid grid-cols-2 gap-3">
+              <!-- SELECT GRADO -->
               <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-white">Grado <span
                     class="text-red-500">*</span></label>
-                <input type="text" formControlName="grado"
-                  class="mt-1 w-full rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-white/5 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  placeholder="Grado del Alumno" />
+                <select formControlName="grado"
+                  class="mt-1 w-full rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#0b1220] px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                  <option value="" disabled selected>Seleccione un grado</option>
+                  <option *ngFor="let g of grados" [value]="g._id">{{ g.nombre }}</option>
+                </select>
                 <p *ngIf="f.grado.touched && f.grado.invalid" class="mt-1 text-xs text-red-500">Requerido.</p>
               </div>
+
+              <!-- SELECT SECCIÓN -->
               <div>
                 <label class="block text-sm font-medium text-gray-700 dark:text-white">Sección <span
                     class="text-red-500">*</span></label>
-                <input type="text" formControlName="seccion"
-                  class="mt-1 w-full rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-white/5 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  placeholder="Seccion del Alumno" />
+                <select formControlName="seccion" [disabled]="!form.get('grado')?.value"
+                  class="mt-1 w-full rounded-xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#0b1220] px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                  <option value="" disabled selected>Seleccione una sección</option>
+                  <option *ngFor="let s of secciones" [value]="s._id">{{ s.nombre }}</option>
+                </select>
                 <p *ngIf="f.seccion.touched && f.seccion.invalid" class="mt-1 text-xs text-red-500">Requerido.</p>
               </div>
             </div>
+
 
             <div>
               <label class="block text-sm font-medium text-gray-700 dark:text-white">Docente<span

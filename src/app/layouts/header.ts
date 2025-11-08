@@ -5,6 +5,7 @@ import { Router, NavigationEnd } from '@angular/router';
 import { AppService } from '../service/app.service';
 import { DomSanitizer } from '@angular/platform-browser';
 import { TranslateService } from '@ngx-translate/core';
+import { UserStorage } from '../utils/user.storage.util';
 
 @Component({
     selector: 'header',
@@ -14,6 +15,7 @@ import { TranslateService } from '@ngx-translate/core';
 export class HeaderComponent {
     store: any;
     search = false;
+    usuario: any = null;
     notifications = [
         {
             id: 1,
@@ -97,6 +99,17 @@ export class HeaderComponent {
                 this.setActiveDropdown();
             }
         });
+        this.usuario = UserStorage.getUser();
+        console.log('[DEBUG] Usuario cargado en HeaderComponent:', this.usuario);
+
+    }
+
+    logout() {
+        UserStorage.removeUser();
+
+        localStorage.clear();
+
+        this.router.navigate(['/auth/login']);
     }
 
     setActiveDropdown() {

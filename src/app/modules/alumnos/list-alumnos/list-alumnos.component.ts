@@ -14,12 +14,13 @@ export interface Alumno {
   correo: string;
   estado: EstadoAlumno;
   fecha_creacion: string;
-  grado: string;
+  grado: string | { id: string; nombre: string };
   nombre: string;
   rol: string;
-  seccion: string;
+  seccion: string | { id: string; nombre: string };
   usuario_id: string | number;
 }
+
 
 export interface Grado {
   _id: string;
@@ -136,7 +137,6 @@ export class ListAlumnosComponent implements OnInit {
       });
   }
 
-  // === Obtener alumnos ===
   fetch(): void {
     this.loading.set(true);
     this.error.set(null);
@@ -148,36 +148,45 @@ export class ListAlumnosComponent implements OnInit {
         next: (res: Alumno[]) => {
           const list = (Array.isArray(res) ? res : []).map(a => ({
             ...a,
-            grado: String(a.grado).trim(),
-            seccion: String(a.seccion).trim(),
+            grado:
+              typeof a.grado === 'object' && a.grado !== null
+                ? a.grado.nombre
+                : a.grado,
+            seccion:
+              typeof a.seccion === 'object' && a.seccion !== null
+                ? a.seccion.nombre
+                : a.seccion,
           }));
+
           this.alumnos.set(list);
           this.loading.set(false);
 
-          // ✅ Toast éxito
           this.toast(`Se cargaron ${list.length} alumnos correctamente.`, 'success');
         },
         error: (err) => {
           this.error.set('No se pudieron cargar los alumnos.');
           console.error(err);
           this.loading.set(false);
-
-          // ❌ Toast error
           this.toast('Error al cargar los alumnos.', 'error');
         },
       });
   }
 
-  // === Traducción de ID a nombre ===
-  getNombreGrado(id?: string): string {
-    if (!id) return '';
-    return this.gradosMap.get(id) || id;
+
+  getNombreGrado(grado: string | { id: string; nombre: string } | undefined): string {
+    if (!grado) return '';
+    if (typeof grado === 'object') return grado.nombre;
+    // Si tienes un mapa con nombres, úsalo:
+    return this.gradosMap.get(grado) || grado;
   }
 
-  getNombreSeccion(id?: string): string {
-    if (!id) return '';
-    return this.seccionesMap.get(id) || id;
+  getNombreSeccion(seccion: string | { id: string; nombre: string } | undefined): string {
+    if (!seccion) return '';
+    if (typeof seccion === 'object') return seccion.nombre;
+    // Si tienes un mapa con nombres, úsalo:
+    return this.seccionesMap.get(seccion) || seccion;
   }
+
 
   // === Filtros ===
   onSearch(v: string) {
@@ -301,19 +310,27 @@ export class ListAlumnosComponent implements OnInit {
   openActions(a: Alumno, kind: 'view' | 'edit' | 'delete') {
     this.actionRow.set(a);
     this.openedId.set(null);
-    if (kind === 'view') this.showView.set(true);
+
     if (kind === 'edit') {
       this.editModel.set({
         nombre: a.nombre,
         apellido: a.apellido,
         correo: a.correo,
-        grado: a.grado,
-        seccion: a.seccion,
-      });
-      this.cargarSeccionesPorGrado(a.grado);
-      this.showEdit.set(true);
 
+        // ✅ extraemos id si viene como objeto
+        grado: typeof a.grado === 'object' ? a.grado.id : a.grado,
+        seccion: typeof a.seccion === 'object' ? a.seccion.id : a.seccion,
+      });
+
+      // ✅ igual aquí, pasar solo el id
+      this.cargarSeccionesPorGrado(
+        typeof a.grado === 'object' ? a.grado.id : a.grado
+      );
+
+      this.showEdit.set(true);
     }
+
+    if (kind === 'view') this.showView.set(true);
     if (kind === 'delete') this.showDelete.set(true);
   }
 
