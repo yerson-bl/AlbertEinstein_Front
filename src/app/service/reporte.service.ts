@@ -9,8 +9,20 @@ export class ReporteService {
   constructor(private http: HttpClient) {}
 
   private headers() {
-    return new HttpHeaders({ 'Content-Type': 'application/json' });
+    return new HttpHeaders({
+      'Accept': 'application/pdf',
+    });
   }
+
+  // ✅ CORREGIDO: especificar que devuelve un blob (PDF)
+  obtenerReporteAlumnoSemanal(alumnoId: number) {
+    return this.http.get(`${this.baseUrl}/semanal/alumno/${alumnoId}`, {
+      headers: this.headers(),
+      responseType: 'blob' as 'json', // 👈 clave: devuelve binario
+    });
+  }
+
+
 
   crearReporte(intentoId: string) {
     return this.http.post<any>(`${this.baseUrl}/`, { intento_id: intentoId }, { headers: this.headers() });

@@ -2,131 +2,70 @@
     class="min-h-screen bg-gradient-to-b from-indigo-50/60 via-white to-white dark:from-[#0b1020] dark:via-[#0b1020] dark:to-[#0b1020]">
     <main class="mx-auto max-w-6xl px-4 py-6 md:py-8 space-y-6">
         <!-- Header + Filtros -->
-      <section
-  class="rounded-3xl p-6 md:p-8 shadow-sm 
-  text-white
-  bg-gradient-to-r from-[#0b1f3a] via-[#1a3a78] to-[#254a9a]
-  backdrop-blur">
+        <section class="rounded-3xl p-6 md:p-8 shadow-sm
+        text-white
+        bg-gradient-to-r from-[#0b1f3a] via-[#1a3a78] to-[#254a9a]">
 
-  <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+            <div class="flex items-start justify-between gap-6">
 
-    <!-- Título -->
-    <div class="flex items-center gap-4">
-      <span
-        class="inline-flex h-11 w-11 items-center justify-center rounded-2xl
-        bg-white/15 backdrop-blur">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6"
-            viewBox="0 0 24 24" fill="currentColor">
-          <path d="M3 5h18v2H3zm0 6h12v2H3zm0 6h18v2H3z" />
-        </svg>
-      </span>
+                <!-- Título + Aula -->
+                <div class="min-w-0">
 
-      <div>
-        <h1 class="text-xl md:text-2xl font-extrabold">
-          Filtrar evaluaciones
-        </h1>
-        <p class="mt-1 text-xs text-white/80">
-          Selecciona un grado y sección para buscar evaluaciones.
-        </p>
-      </div>
-    </div>
+                    <div class="flex items-center gap-3">
+                        <span
+                            class="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/15 backdrop-blur">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24"
+                                fill="currentColor">
+                                <path d="M3 5h18v2H3zm0 6h12v2H3zm0 6h18v2H3z" />
+                            </svg>
+                        </span>
 
-    <!-- FORMULARIO DE FILTROS (misma lógica, solo cambia el diseño) -->
-    <form [formGroup]="filtros" 
-          class="grid grid-cols-1 sm:grid-cols-4 gap-4 w-full lg:w-auto">
+                        <div class="pl-2">
+                            <h1 class="text-xl md:text-2xl font-extrabold">
+                                Listado de Evaluaciones </h1>
 
-      <!-- SELECT GRADO -->
-      <div>
-        <label class="block text-xs font-medium text-white/90">Grado</label>
-        <select
-          formControlName="grado"
-          class="mt-1 w-full rounded-xl border border-white/20
-          bg-white/10 backdrop-blur px-3 py-2 text-sm
-          text-white placeholder-white/60
-          focus:outline-none focus:ring-2 focus:ring-white/40
-          dark:[color-scheme:dark]">
+                            <div class="mt-1">
+                                <span class="text-lg md:text-2xl font-bold tracking-wide">
+                                    Aula asignada: {{ gradoNombre }} {{ seccionNombre }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
 
-          <option value="" disabled selected class="text-gray-800">
-            Seleccione un grado
-          </option>
+                </div>
 
-          <option *ngFor="let g of grados" [value]="g._id" class="text-gray-900">
-            {{ g.nombre }}
-          </option>
-        </select>
-      </div>
+                <!-- KPIs -->
+                <div class="shrink-0">
+                    <div class="px-4 py-3 md:px-6 md:py-4 flex items-center gap-6
+                bg-white/10 border border-white/20 rounded-2xl backdrop-blur">
 
-      <!-- SELECT SECCIÓN -->
-      <div>
-        <label class="block text-xs font-medium text-white/90">Sección</label>
+                        <div class="text-center">
+                            <div class="text-[11px] uppercase tracking-wide text-white/80">Total</div>
+                            <div class="text-2xl font-semibold">{{ totalEvaluaciones }}</div>
+                        </div>
 
-        <select
-          formControlName="seccion"
-          [disabled]="!filtros.get('grado')?.value"
-          class="mt-1 w-full rounded-xl border border-white/20
-          bg-white/10 backdrop-blur px-3 py-2 text-sm
-          text-white placeholder-white/60
-          focus:outline-none focus:ring-2 focus:ring-white/40
-          dark:[color-scheme:dark]">
+                        <div class="w-px h-10 bg-white/25"></div>
 
-          <option value="" disabled selected class="text-gray-800">
-            Seleccione una sección
-          </option>
+                        <div class="text-center">
+                            <div class="text-[11px] uppercase tracking-wide text-white/80">Activas</div>
+                            <div class="text-2xl font-semibold">{{ totalActivas }}</div>
+                        </div>
 
-          <option *ngFor="let s of secciones" [value]="s._id" class="text-gray-900">
-            {{ s.nombre }}
-          </option>
-        </select>
-      </div>
+                        <div class="w-px h-10 bg-white/25"></div>
 
-      <!-- BOTÓN BUSCAR -->
-      <div class="flex items-end">
-        <button
-          type="button"
-          (click)="buscar()"
-          class="w-full inline-flex items-center justify-center gap-2 
-          rounded-xl px-4 py-2 text-sm font-medium
-          bg-white/20 hover:bg-white/30 border border-white/20
-          backdrop-blur text-white
-          transition disabled:opacity-50"
-          [disabled]="cargando || filtros.invalid">
+                        <div class="text-center">
+                            <div class="text-[11px] uppercase tracking-wide text-white/80">Prom. preguntas</div>
+                            <div class="text-2xl font-semibold">
+                                {{ promedioPreguntas | number:'1.0-1' }}
+                            </div>
+                        </div>
 
-          <svg *ngIf="!cargando" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4"
-            viewBox="0 0 24 24" fill="currentColor">
-            <path d="M10 18l6-6-6-6v12z" />
-          </svg>
+                    </div>
+                </div>
 
-          <svg *ngIf="cargando" class="h-4 w-4 animate-spin" 
-            viewBox="0 0 24 24" fill="none">
-            <circle cx="12" cy="12" r="10" 
-              stroke="currentColor" class="opacity-25" stroke-width="4" />
-            <path d="M4 12a8 8 0 0 1 8-8" 
-              stroke="currentColor" stroke-width="4"
-              class="opacity-75" />
-          </svg>
+            </div>
+        </section>
 
-          {{ cargando ? 'Buscando...' : 'Buscar' }}
-        </button>
-      </div>
-
-      <!-- BOTÓN REFRESCAR -->
-      <div class="flex items-end">
-        <button
-          type="button"
-          (click)="refrescar()"
-          class="w-full rounded-xl px-4 py-2 text-sm font-medium
-          bg-white/10 hover:bg-white/20 border border-white/20
-          backdrop-blur text-white
-          transition">
-
-          Refrescar
-        </button>
-      </div>
-
-    </form>
-
-  </div>
-</section>
 
 
         <!-- Resumen -->

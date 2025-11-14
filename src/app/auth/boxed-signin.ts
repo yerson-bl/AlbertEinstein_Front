@@ -131,7 +131,7 @@ export class BoxedSigninComponent implements OnInit, OnDestroy {
                 this.router.navigate(['/dashboard']);
                 break;
               case 'Docente':
-                this.router.navigate(['/evaluaciones/new-evaluacion']);
+                this.router.navigate(['/evaluaciones/list-evaluacion-docente']);
                 break;
               case 'Alumno':
                 this.router.navigate(['/alumno/lista-evaluaciones']);

@@ -2,6 +2,9 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { DashboardService } from 'src/app/service/dashboard.service';
 import { SeccionService, Grado, Seccion } from 'src/app/service/seccion.service';
 import { Subject, takeUntil } from 'rxjs';
+import { Materia, MateriaService } from 'src/app/service/materia.service';
+import { AlumnoService } from 'src/app/service/alumno.service';
+
 import {
   ApexAxisChartSeries, ApexChart, ApexXAxis, ApexYAxis, ApexStroke, ApexDataLabels,
   ApexFill, ApexTooltip, ApexGrid, ApexPlotOptions
@@ -59,7 +62,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   filtrosSalon = { grado: '', seccion: '', fechaInicio: '2025-10-01', fechaFin: '2025-10-31' };
   filtrosMateria = { grado: '', seccion: '' };
 
-  filtrosComparacion = { alumno_ids: '1,2,3', materia: 'Matemáticas' };
+  filtrosComparacion = { alumno_ids: '1,3', materia: 'Matemáticas' };
   filtrosTop = { limit: 10, grado: '' };
 
   // ---- Data de gráficos ----
@@ -100,9 +103,21 @@ export class DashboardComponent implements OnInit, OnDestroy {
     grid: { borderColor: '#e5e7eb' },
   };
 
+  materiasActivas: Materia[] = [];
+  showMateriaModalComparacion = false;
+
+  // ==== ALUMNOS ====
+  alumnosLista: any[] = [];
+  alumnosSeleccionados: any[] = [];
+  showAlumnosModal = false;
+
+
+
   constructor(
     private dashboardSrv: DashboardService,
-    private seccionService: SeccionService
+    private seccionService: SeccionService,
+    private materiaSrv: MateriaService,
+    private alumnoSrv: AlumnoService
   ) { }
 
   ngOnInit(): void {
@@ -112,7 +127,85 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.cargarComparacionAlumnos();
     this.cargarTopEstudiantes();
     this.cargarActividadesRecientes();
+    this.cargarMateriasActivas();
+    this.cargarAlumnos();
   }
+
+  cargarAlumnos() {
+    this.alumnoSrv.getAllAlumnos()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (data) => {
+          // Filtrar activos (rol = Alumno, estado = activo)
+          this.alumnosLista = data.filter((a: any) =>
+            a.rol === 'Alumno' && a.estado === 'activo'
+          );
+        },
+        error: (err) => console.error('❌ Error cargando alumnos:', err),
+      });
+  }
+
+  abrirModalAlumnos() {
+    this.showAlumnosModal = true;
+  }
+
+  cerrarModalAlumnos() {
+    this.showAlumnosModal = false;
+  }
+
+  toggleSeleccionAlumno(alumno: any) {
+    const existe = this.alumnosSeleccionados.find(a => a.usuario_id === alumno.usuario_id);
+
+    if (existe) {
+      // quitar
+      this.alumnosSeleccionados = this.alumnosSeleccionados.filter(
+        a => a.usuario_id !== alumno.usuario_id
+      );
+    } else {
+      // agregar
+      this.alumnosSeleccionados.push(alumno);
+    }
+
+    // Actualizar el string final "1,2,3"
+    this.filtrosComparacion.alumno_ids =
+      this.alumnosSeleccionados.map(a => a.usuario_id).join(',');
+  }
+
+  // Devuelve lista de nombres seleccionados
+get nombresAlumnosSeleccionados(): string {
+  return this.alumnosSeleccionados.map(a => a.nombre + ' ' + a.apellido).join(', ');
+}
+
+// Verifica si el alumno está seleccionado
+estaSeleccionado(a: any): boolean {
+  return this.alumnosSeleccionados.some(x => x.usuario_id === a.usuario_id);
+}
+
+
+
+
+  cargarMateriasActivas() {
+    this.materiaSrv.listarMateria().pipe(takeUntil(this.destroy$)).subscribe({
+      next: (data) => {
+        this.materiasActivas = data.filter(m => m.estado === 'activo');
+      },
+      error: (err) => console.error('❌ Error cargando materias:', err),
+    });
+  }
+  abrirModalMateriaComparacion() {
+    this.showMateriaModalComparacion = true;
+  }
+
+  cerrarModalMateriaComparacion() {
+    this.showMateriaModalComparacion = false;
+  }
+
+  seleccionarMateriaComparacion(nombre: string) {
+    this.filtrosComparacion.materia = nombre;
+    this.showMateriaModalComparacion = false;
+    this.cargarComparacionAlumnos();
+  }
+
 
 
   cargarGradosSalon(): void {

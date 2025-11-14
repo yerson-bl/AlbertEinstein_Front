@@ -45,6 +45,11 @@ import { IniciarIntentoComponent } from './modules/rol-alumno/evaluaciones/inici
 import { NewSeccionComponent } from './modules/secciones/new-seccion/new-seccion.component';
 import { ListSeccionComponent } from './modules/secciones/list-seccion/list-seccion.component';
 import { ReporteAlumnoComponent } from './modules/rol-alumno/reportes/reporte-alumno/reporte-alumno.component';
+import { ListAlumnoDocenteComponent } from './modules/alumnos-docente/list-alumno-docente/list-alumno-docente.component';
+import { NewAlumnoDocenteComponent } from './modules/alumnos-docente/new-alumno-docente/new-alumno-docente.component';
+import { NewEvaluacionDocenteComponent } from './modules/evaluaciones-docente/new-evaluacion-docente/new-evaluacion-docente.component';
+import { ListEvaluacionDocenteComponent } from './modules/evaluaciones-docente/list-evaluacion-docente/list-evaluacion-docente.component';
+import { ListMateriasComponent } from './modules/materias/list-materias/list-materias.component';
 
 
 export const routes: Routes = [
@@ -69,7 +74,7 @@ export const routes: Routes = [
             { path: 'usuarios/new-usuario', component: NewUsuarioComponent, data: { title: 'Nuevo Usuario | Albert Einstein' } },
             //evaluaciones
             { path: 'evaluaciones/list-evaluacion', component: ListEvaluacionComponent, data: { title: 'Lista de Evaluaciones | Albert Einstein' } },
-            { path: 'evaluaciones/new-evaluacion', component: NewEvaluacionComponent, data: { title: 'Nuevo Evaluación | Albert Einstein' } },
+            { path: 'evaluaciones/new-evaluacion', component: NewEvaluacionComponent, data: { title: 'Nueva Evaluación | Albert Einstein' } },
 
             //alumnos
             { path: 'alumnos/list-alumno', component: ListAlumnosComponent, data: { title: 'Lista de Alumnos | Albert Einstein' } },
@@ -78,11 +83,15 @@ export const routes: Routes = [
             //docentes
             { path: 'docentes/list-docentes', component: ListDocentesComponent, data: { title: 'Lista de Docentes | Albert Einstein' } },
             { path: 'docentes/new-docente', component: NewDocenteComponent, data: { title: 'Nuevo Docente | Albert Einstein' } },
+            {path: 'alumnos/list-alumno-docente', component: ListAlumnoDocenteComponent, data: { title: 'Lista de Alumnos Docente | Albert Einstein' } },
+            {path: 'alumnos/new-alumno-docente', component: NewAlumnoDocenteComponent, data: { title: 'Nuevo Alumno Docente | Albert Einstein' } },
+            {path: 'evaluaciones/new-evaluacion-docente', component: NewEvaluacionDocenteComponent, data: { title: 'Nueva Evaluación Docente | Albert Einstein' } },    
+            {path: 'evaluaciones/list-evaluacion-docente', component: ListEvaluacionDocenteComponent, data: { title: 'Lista de Evaluaciones Docente | Albert Einstein' } },
 
             //admin
             { path: 'admin/list-admin', component: ListAdminComponent, data: { title: 'Lista de Admins | Albert Einstein' } },
             { path: 'admin/new-admin', component: NewAdminComponent, data: { title: 'Nuevo Admin | Albert Einstein' } },
-
+            {path: 'materias/list-materias', component: ListMateriasComponent, data: { title: 'Lista de Materias | Albert Einstein' } },
             //intentos
             { path: 'alumno/lista-evaluaciones', component: ListaEvaluacionesComponent, data: { title: 'Lista de Evaluaciones | Albert Einstein' } },
             { path: 'alumno/iniciar-intento', component: IniciarIntentoComponent, data: { title: 'Nuevo Intento | Albert Einstein' } },

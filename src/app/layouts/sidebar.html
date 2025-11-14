@@ -160,7 +160,7 @@
                                 [ngClass]="{ active: activeDropdown.includes('secciones') }"
                                 (click)="toggleAccordion('secciones')">
                                 <div class="flex items-center">
-                                    <icon-menu-users class="shrink-0" />
+                                    <icon-menu-widgets class="shrink-0" />
                                     <span class="text-black dark:text-[#506690] ltr:pl-3 rtl:pr-3">Secciones</span>
                                 </div>
                                 <div [ngClass]="{ 'rtl:rotate-90 -rotate-90': !activeDropdown.includes('secciones') }">
@@ -174,6 +174,33 @@
                                             (click)="toggleMobileMenu()"
                                             class="flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-white/10">
                                             <i-lucide name="list" [size]="22"></i-lucide> Listado Secciones
+                                        </a>
+                                    </li>
+                                    
+                                </ul>
+                            </div>
+                        </li>
+
+                        <!-- Materias -->
+                        <li class="accordion menu nav-item">
+                            <button type="button" class="nav-link group w-full"
+                                [ngClass]="{ active: activeDropdown.includes('materias') }"
+                                (click)="toggleAccordion('materias')">
+                                <div class="flex items-center">
+                                    <icon-menu-documentation class="shrink-0" />
+                                    <span class="text-black dark:text-[#506690] ltr:pl-3 rtl:pr-3">Materias</span>
+                                </div>
+                                <div [ngClass]="{ 'rtl:rotate-90 -rotate-90': !activeDropdown.includes('materias') }">
+                                    <icon-caret-down />
+                                </div>
+                            </button>
+                            <div [@slideDownUp]="!activeDropdown.includes('materias')" class="accordion-content">
+                                <ul class="sub-menu text-gray-500">
+                                    <li>
+                                        <a routerLink="/materias/list-materias" routerLinkActive="active"
+                                            (click)="toggleMobileMenu()"
+                                            class="flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-white/10">
+                                            <i-lucide name="list" [size]="22"></i-lucide> Listado Materias
                                         </a>
                                     </li>
                                     
@@ -236,7 +263,7 @@
                             <div [@slideDownUp]="!activeDropdown.includes('evaluaciones')" class="accordion-content">
                                 <ul class="sub-menu text-gray-500">
                                     <li>
-                                        <a routerLink="/evaluaciones/list-evaluacion" routerLinkActive="active"
+                                        <a routerLink="/evaluaciones/list-evaluacion-docente" routerLinkActive="active"
                                             (click)="toggleMobileMenu()"
                                             class="flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-white/10">
                                             <i-lucide name="clipboard-list" [size]="22"></i-lucide> Listado Evaluaciones
@@ -244,7 +271,7 @@
                                     </li>
 
                                     <li>
-                                        <a routerLink="/evaluaciones/new-evaluacion" routerLinkActive="active"
+                                        <a routerLink="/evaluaciones/new-evaluacion-docente" routerLinkActive="active"
                                             (click)="toggleMobileMenu()"
                                             class="flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-white/10">
                                             <i-lucide name="file-plus-2" [size]="22"></i-lucide> Crear Evaluación
@@ -268,7 +295,7 @@
                             <div [@slideDownUp]="!activeDropdown.includes('alumnos')" class="accordion-content">
                                 <ul class="sub-menu text-gray-500">
                                     <li>
-                                        <a routerLink="/alumnos/list-alumno" routerLinkActive="active"
+                                        <a routerLink="/alumnos/list-alumno-docente" routerLinkActive="active"
                                             (click)="toggleMobileMenu()"
                                             class="flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-white/10">
                                             <i-lucide name="list" [size]="22"></i-lucide> Listado Alumnos
@@ -276,7 +303,7 @@
                                     </li>
 
                                     <li>
-                                        <a routerLink="/alumnos/new-alumno" routerLinkActive="active"
+                                        <a routerLink="/alumnos/new-alumno-docente" routerLinkActive="active"
                                             (click)="toggleMobileMenu()"
                                             class="flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-100 dark:hover:bg-white/10">
                                             <i-lucide name="user-plus" [size]="22"></i-lucide> Registrar Alumno

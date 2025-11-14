@@ -18,7 +18,7 @@
 
     <!-- Filtros -->
     <section class="bg-white dark:bg-[#1b2e4b] rounded-xl shadow-sm p-4">
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+      <div class="grid grid-cols-1 md:grid-cols-1 gap-3">
         <!-- Búsqueda -->
         <div class="md:col-span-3">
           <div class="relative">
@@ -34,14 +34,14 @@
         </div>
 
         <!-- Estado -->
-        <select class="form-select w-full rounded-lg border border-gray-300 dark:border-white/10
+        <!-- <select class="form-select w-full rounded-lg border border-gray-300 dark:border-white/10
                        bg-white dark:bg-[#0b1220] text-gray-800 dark:text-white
                        px-3 py-2 text-sm dark:[color-scheme:dark]"
                 [ngModel]="filtroEstado()"
                 (ngModelChange)="setFilterEstado($event)">
           <option [ngValue]="''">Todos los estados</option>
           <option *ngFor="let e of estados()" [ngValue]="e">{{ e | titlecase }}</option>
-        </select>
+        </select> -->
       </div>
 
       <!-- Resumen / limpiar -->

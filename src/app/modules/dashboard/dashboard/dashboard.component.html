@@ -85,10 +85,21 @@
           Comparar rendimiento de alumnos
         </h3>
         <div class="flex flex-wrap gap-2">
-          <input type="text" placeholder="IDs alumnos (1,2,3)" [(ngModel)]="filtrosComparacion.alumno_ids"
-            class="border rounded-md px-2 py-1 text-sm w-32" />
-          <input type="text" placeholder="Materia" [(ngModel)]="filtrosComparacion.materia"
-            class="border rounded-md px-2 py-1 text-sm w-40" />
+          <!-- Selector de alumnos -->
+          <div class="flex items-center gap-1">
+            <input type="text" readonly placeholder="Seleccionar alumnos" [value]="nombresAlumnosSeleccionados"
+              (click)="abrirModalAlumnos()" class="cursor-pointer border rounded-md px-2 py-1 text-sm w-48
+              bg-white dark:bg-[#0b1220] dark:text-white" />
+          </div>
+          
+
+
+          <div class="flex">
+            <input type="text" readonly placeholder="Seleccionar materia" [value]="filtrosComparacion.materia"
+              (click)="abrirModalMateriaComparacion()"
+              class="cursor-pointer border rounded-md px-2 py-1 text-sm w-40 bg-white dark:bg-[#0b1220] dark:text-white" />
+          </div>
+
           <button class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-md text-sm"
             (click)="cargarComparacionAlumnos()">
             Aplicar
@@ -157,4 +168,98 @@
       </div>
     </section>
   </main>
+</div>
+
+<!-- === MODAL MATERIAS COMPARACIÓN === -->
+<div *ngIf="showMateriaModalComparacion" class="fixed inset-0 z-50 flex items-center justify-center">
+
+  <!-- Fondo oscuro -->
+  <div class="absolute inset-0 bg-black/50" (click)="cerrarModalMateriaComparacion()"></div>
+
+  <!-- Contenedor -->
+  <div class="relative z-50 w-full max-w-md bg-white dark:bg-[#1b2e4b] rounded-xl p-5 shadow-xl">
+
+    <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">
+      Seleccionar materia
+    </h3>
+
+    <!-- Lista -->
+    <div class="max-h-80 overflow-y-auto space-y-2 pr-1">
+
+      <button *ngFor="let m of materiasActivas" (click)="seleccionarMateriaComparacion(m.nombre)" class="w-full text-left px-4 py-3 rounded-lg border border-gray-200 dark:border-white/10
+               bg-white dark:bg-[#0b1220] text-gray-700 dark:text-white
+               hover:bg-gray-50 dark:hover:bg-white/10 transition">
+
+        <div class="font-medium">{{ m.nombre }}</div>
+
+      </button>
+
+    </div>
+
+    <div class="mt-4 flex justify-end">
+      <button (click)="cerrarModalMateriaComparacion()"
+        class="px-4 py-2 rounded-md border border-gray-300 dark:border-white/10 text-gray-600 dark:text-white hover:bg-gray-100 dark:hover:bg-white/10">
+        Cerrar
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- === MODAL SELECCIONAR ALUMNOS === -->
+<div *ngIf="showAlumnosModal" class="fixed inset-0 z-50 flex items-center justify-center">
+
+  <!-- Fondo oscuro -->
+  <div class="absolute inset-0 bg-black/50" (click)="cerrarModalAlumnos()"></div>
+
+  <!-- Tarjeta -->
+  <div class="relative z-50 w-full max-w-lg bg-white dark:bg-[#1b2e4b] rounded-xl p-5 shadow-xl">
+
+    <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">
+      Seleccionar alumnos
+    </h3>
+
+    <!-- Lista -->
+    <div class="max-h-96 overflow-y-auto space-y-2 pr-1">
+
+      <div *ngFor="let a of alumnosLista" (click)="toggleSeleccionAlumno(a)" class="flex items-center justify-between cursor-pointer px-4 py-3 rounded-lg border border-gray-200 dark:border-white/10
+               bg-white dark:bg-[#0b1220] text-gray-700 dark:text-white
+               hover:bg-gray-50 dark:hover:bg-white/10 transition">
+
+        <div>
+          <div class="font-medium">{{ a.nombre }} {{ a.apellido }}</div>
+          <div class="text-xs text-gray-500 dark:text-white/50">
+            {{ a.grado?.nombre }} • {{ a.seccion?.nombre }}
+          </div>
+        </div>
+
+        <div>
+          <!-- Check seleccionado -->
+          <span *ngIf="estaSeleccionado(a)" class="h-4 w-4 rounded-full bg-emerald-500 inline-block"></span>
+
+          <!-- Check vacío -->
+          <span *ngIf="!estaSeleccionado(a)"
+            class="h-4 w-4 rounded-full border border-gray-300 dark:border-white/40 inline-block"></span>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="mt-4 flex justify-end gap-2">
+
+      <button (click)="cerrarModalAlumnos()"
+        class="px-4 py-2 rounded-md border border-gray-300 dark:border-white/10 text-gray-600 dark:text-white hover:bg-gray-100 dark:hover:bg-white/10">
+        Cerrar
+      </button>
+
+      <button (click)="cargarComparacionAlumnos(); cerrarModalAlumnos()"
+        class="px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700">
+        Aplicar
+      </button>
+
+    </div>
+
+  </div>
+
 </div>

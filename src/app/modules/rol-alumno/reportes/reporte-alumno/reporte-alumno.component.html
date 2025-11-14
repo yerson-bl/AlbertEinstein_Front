@@ -12,9 +12,10 @@
     </div>
 
     <!-- HEADER -->
+    <!-- HEADER -->
     <section class="max-w-6xl mx-auto rounded-3xl p-6 md:p-8 shadow-lg border transition-all duration-500
-           bg-white/70 backdrop-blur-md border-gray-200
-           dark:bg-white/10 dark:border-white/10">
+  bg-white/70 backdrop-blur-md border-gray-200
+  dark:bg-white/10 dark:border-white/10">
         <div class="flex flex-col md:flex-row items-center justify-between gap-6">
             <div>
                 <h1 class="text-3xl font-extrabold tracking-wide text-gray-900 dark:text-white">
@@ -25,34 +26,48 @@
                 </p>
             </div>
 
-            <div class="flex gap-6">
-                <div class="text-center">
-                    <p class="uppercase text-xs text-indigo-600 dark:text-indigo-200">Promedio general</p>
-                    <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
-                        {{ estadisticas?.promedio_general | number: '1.1-1' }}
-                    </h2>
-                </div>
-                <div class="text-center">
-                    <p class="uppercase text-xs text-indigo-600 dark:text-indigo-200">Tasa de aprobación</p>
-                    <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
-                        {{ estadisticas?.tasa_aprobacion | number: '1.0-0' }}%
-                    </h2>
-                </div>
-                <div class="text-center">
-                    <p class="uppercase text-xs text-indigo-600 dark:text-indigo-200">Aprobadas</p>
-                    <h2 class="text-2xl font-bold text-emerald-500 dark:text-emerald-400">
-                        {{ estadisticas?.evaluaciones_aprobadas }}
-                    </h2>
-                </div>
-                <div class="text-center">
-                    <p class="uppercase text-xs text-indigo-600 dark:text-indigo-200">Reprobadas</p>
-                    <h2 class="text-2xl font-bold text-red-500 dark:text-red-400">
-                        {{ estadisticas?.evaluaciones_reprobadas }}
-                    </h2>
-                </div>
+            <!-- 🔘 BOTÓN DE REPORTES -->
+            <div class="flex flex-wrap gap-3 items-center justify-end">
+                <button (click)="descargarReporteSemanal()"
+                    class="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg shadow transition-all duration-300 text-sm font-medium">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v12m0 0l-4-4m4 4l4-4m-8 8h8" />
+                    </svg>
+                    Descargar reporte semanal
+                </button>
+            </div>
+        </div>
+
+        <!-- Métricas -->
+        <div class="flex gap-6 mt-6">
+            <div class="text-center">
+                <p class="uppercase text-xs text-indigo-600 dark:text-indigo-200">Promedio general</p>
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
+                    {{ estadisticas?.promedio_general | number: '1.1-1' }}
+                </h2>
+            </div>
+            <div class="text-center">
+                <p class="uppercase text-xs text-indigo-600 dark:text-indigo-200">Tasa de aprobación</p>
+                <h2 class="text-2xl font-bold text-gray-900 dark:text-white">
+                    {{ estadisticas?.tasa_aprobacion | number: '1.0-0' }}%
+                </h2>
+            </div>
+            <div class="text-center">
+                <p class="uppercase text-xs text-indigo-600 dark:text-indigo-200">Aprobadas</p>
+                <h2 class="text-2xl font-bold text-emerald-500 dark:text-emerald-400">
+                    {{ estadisticas?.evaluaciones_aprobadas }}
+                </h2>
+            </div>
+            <div class="text-center">
+                <p class="uppercase text-xs text-indigo-600 dark:text-indigo-200">Reprobadas</p>
+                <h2 class="text-2xl font-bold text-red-500 dark:text-red-400">
+                    {{ estadisticas?.evaluaciones_reprobadas }}
+                </h2>
             </div>
         </div>
     </section>
+
 
     <!-- CHART -->
     <section *ngIf="evaluaciones.length" class="max-w-6xl mx-auto mt-10 rounded-3xl p-6 border shadow-lg transition-all duration-500
