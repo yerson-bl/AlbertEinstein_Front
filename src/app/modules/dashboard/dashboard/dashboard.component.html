@@ -1,265 +1,356 @@
-<!-- Dashboard - Colegio -->
-<div class="min-h-screen bg-gray-50 dark:bg-[#060818]">
-  <main class="mx-auto max-w-7xl p-4 md:p-6 space-y-6">
+<!-- DASHBOARD – PREMIUM BLUE GLASS -->
+<div class="min-h-screen 
+     bg-gradient-to-b from-[#f3f6ff] via-white to-white 
+     dark:bg-gradient-to-b dark:from-[#070b16] dark:via-[#0b1020] dark:to-[#0b1020]">
 
-    <!-- 📊 KPIs generales -->
+  <main class="mx-auto max-w-7xl px-4 py-10 space-y-10">
+
+    <!-- 📊 KPIs GENERALES – CARDS GLASS -->
     <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-      <div *ngFor="let kpi of resumenKeys" class="bg-white dark:bg-[#1b2e4b] rounded-xl p-5 shadow-sm text-center">
-        <p class="text-sm uppercase tracking-wide text-gray-500 dark:text-white-dark">{{ kpi.label }}</p>
-        <p class="mt-2 text-3xl font-bold text-gray-900 dark:text-white">{{ resumen[kpi.key] || 0 }}</p>
+      <div *ngFor="let kpi of resumenKeys"
+        class="rounded-2xl p-5 
+               bg-white/70 dark:bg-white/10 
+               border border-white/40 dark:border-white/10
+               backdrop-blur shadow-lg text-center">
+
+        <p class="text-sm uppercase tracking-wide text-gray-600 dark:text-white/60">
+          {{ kpi.label }}
+        </p>
+
+        <p class="mt-2 text-3xl font-extrabold text-gray-900 dark:text-white">
+          {{ resumen[kpi.key] || 0 }}
+        </p>
+
       </div>
     </section>
 
-    <!-- 📈 Rendimiento académico por salón -->
-    <section class="bg-white dark:bg-[#1b2e4b] rounded-xl shadow-sm p-5">
-      <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between mb-3 gap-3">
-        <h3 class="text-lg font-semibold text-gray-800 dark:text-white-light">
+    <!-- 📈 RENDIMIENTO POR SALÓN – GLASS CARD -->
+    <section
+      class="rounded-3xl p-6 bg-white/70 dark:bg-white/10 
+             border border-white/40 dark:border-white/10 
+             backdrop-blur shadow-lg">
+
+      <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between mb-4 gap-4">
+        <h3 class="text-xl font-bold text-gray-800 dark:text-white">
           Rendimiento académico por salón
         </h3>
 
-        <div class="flex flex-wrap gap-2">
-          <!-- Grado independiente -->
-          <select [(ngModel)]="filtrosSalon.grado" class="border rounded-md px-3 py-1 text-sm"
+        <!-- FILTROS -->
+        <div class="flex flex-wrap gap-3">
+
+          <!-- GRADO -->
+          <select [(ngModel)]="filtrosSalon.grado"
+            class="rounded-xl px-3 py-2 text-sm
+                   bg-white/70 dark:bg-white/10 border border-white/40 dark:border-white/20
+                   text-gray-900 dark:text-white backdrop-blur"
             (change)="cargarSeccionesSalonPorGrado(filtrosSalon.grado)">
             <option *ngFor="let g of gradosSalon" [value]="g._id">{{ g.nombre }}</option>
           </select>
 
-          <!-- Sección independiente -->
-          <select [(ngModel)]="filtrosSalon.seccion" class="border rounded-md px-3 py-1 text-sm"
+          <!-- SECCIÓN -->
+          <select [(ngModel)]="filtrosSalon.seccion"
+            class="rounded-xl px-3 py-2 text-sm
+                   bg-white/70 dark:bg-white/10 border border-white/40 dark:border-white/20 
+                   text-gray-900 dark:text-white backdrop-blur"
             (change)="cargarRendimientoSalon()">
             <option *ngFor="let s of seccionesSalon" [value]="s._id">{{ s.nombre }}</option>
           </select>
 
-          <!-- Fechas -->
-          <input type="date" [(ngModel)]="filtrosSalon.fechaInicio" class="border rounded-md px-2 py-1 text-sm"
-            (change)="cargarRendimientoSalon()" />
-          <input type="date" [(ngModel)]="filtrosSalon.fechaFin" class="border rounded-md px-2 py-1 text-sm"
-            (change)="cargarRendimientoSalon()" />
+          <!-- FECHAS -->
+          <input type="date" [(ngModel)]="filtrosSalon.fechaInicio"
+            class="rounded-xl px-3 py-2 text-sm
+                   bg-white/70 dark:bg-white/10 border border-white/40 dark:border-white/20 
+                   text-gray-900 dark:text-white backdrop-blur"
+            (change)="cargarRendimientoSalon()">
+
+          <input type="date" [(ngModel)]="filtrosSalon.fechaFin"
+            class="rounded-xl px-3 py-2 text-sm
+                   bg-white/70 dark:bg-white/10 border border-white/40 dark:border-white/20
+                   text-gray-900 dark:text-white backdrop-blur"
+            (change)="cargarRendimientoSalon()">
+
         </div>
       </div>
 
-      <!-- 📊 Gráfico de rendimiento académico -->
-      <apx-chart [series]="attendance.series" [chart]="attendance.chart" [xaxis]="attendance.xaxis"
-        [yaxis]="attendance.yaxis" [stroke]="attendance.stroke" [colors]="attendance.colors" [fill]="attendance.fill"
-        [dataLabels]="attendance.dataLabels" [tooltip]="attendance.tooltip" [grid]="attendance.grid">
+      <!-- GRÁFICO -->
+      <apx-chart [series]="attendance.series" [chart]="attendance.chart"
+        [xaxis]="attendance.xaxis" [yaxis]="attendance.yaxis"
+        [stroke]="attendance.stroke" [colors]="attendance.colors"
+        [fill]="attendance.fill" [dataLabels]="attendance.dataLabels"
+        [tooltip]="attendance.tooltip" [grid]="attendance.grid">
       </apx-chart>
 
-      <p class="text-xs mt-2 text-gray-500 dark:text-white-dark">
-        Promedio general: {{ attendanceAvg || 0 }} / 20
+      <p class="text-xs mt-3 text-gray-600 dark:text-white/70">
+        Promedio general: {{ attendanceAvg || 0 }}/20
       </p>
+
     </section>
 
-    <!-- 📘 Rendimiento por materia -->
-    <section class="bg-white dark:bg-[#1b2e4b] rounded-xl shadow-sm p-5">
-      <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between mb-3 gap-3">
-        <h3 class="text-lg font-semibold text-gray-800 dark:text-white-light">
-          Rendimiento de materias por grado/sección
-        </h3>
+    <!-- 📘 RENDIMIENTO POR MATERIA -->
+    <section
+      class="rounded-3xl p-6 bg-white/70 dark:bg-white/10 
+             border border-white/40 dark:border-white/10 backdrop-blur shadow-lg">
 
-        <div class="flex flex-wrap gap-2">
-          <!-- Grado independiente -->
-          <select [(ngModel)]="filtrosMateria.grado" class="border rounded-md px-3 py-1 text-sm"
+      <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between mb-4 gap-3">
+        <h3 class="text-xl font-bold text-gray-800 dark:text-white">Rendimiento por materia</h3>
+
+        <div class="flex flex-wrap gap-3">
+
+          <select [(ngModel)]="filtrosMateria.grado"
+            class="rounded-xl px-3 py-2 text-sm
+                   bg-white/70 dark:bg-white/10 border border-white/40 dark:border-white/20
+                   text-gray-900 dark:text-white backdrop-blur"
             (change)="cargarSeccionesMateriaPorGrado(filtrosMateria.grado)">
             <option *ngFor="let g of gradosMateria" [value]="g._id">{{ g.nombre }}</option>
           </select>
 
-          <!-- Sección independiente -->
-          <select [(ngModel)]="filtrosMateria.seccion" class="border rounded-md px-3 py-1 text-sm"
+          <select [(ngModel)]="filtrosMateria.seccion"
+            class="rounded-xl px-3 py-2 text-sm
+                   bg-white/70 dark:bg-white/10 border border-white/40 dark:border-white/20 
+                   text-gray-900 dark:text-white backdrop-blur"
             (change)="cargarRendimientoPorMateria()">
             <option *ngFor="let s of seccionesMateria" [value]="s._id">{{ s.nombre }}</option>
           </select>
+
         </div>
       </div>
 
-      <!-- 📊 Gráfico de rendimiento por materia -->
-      <apx-chart [series]="grades.series" [chart]="grades.chart" [xaxis]="grades.xaxis" [yaxis]="grades.yaxis"
-        [plotOptions]="grades.plotOptions" [dataLabels]="grades.dataLabels" [colors]="grades.colors"
-        [grid]="grades.grid">
+      <apx-chart [series]="grades.series" [chart]="grades.chart"
+        [xaxis]="grades.xaxis" [yaxis]="grades.yaxis" [plotOptions]="grades.plotOptions"
+        [dataLabels]="grades.dataLabels" [colors]="grades.colors" [grid]="grades.grid">
       </apx-chart>
+
     </section>
 
-    <!-- 🧮 Comparación de alumnos -->
-    <section class="bg-white dark:bg-[#1b2e4b] rounded-xl shadow-sm p-5">
-      <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between mb-3 gap-3">
-        <h3 class="text-lg font-semibold text-gray-800 dark:text-white-light">
-          Comparar rendimiento de alumnos
-        </h3>
-        <div class="flex flex-wrap gap-2">
-          <!-- Selector de alumnos -->
-          <div class="flex items-center gap-1">
-            <input type="text" readonly placeholder="Seleccionar alumnos" [value]="nombresAlumnosSeleccionados"
-              (click)="abrirModalAlumnos()" class="cursor-pointer border rounded-md px-2 py-1 text-sm w-48
-              bg-white dark:bg-[#0b1220] dark:text-white" />
-          </div>
-          
+    <!-- 🧮 COMPARACIÓN DE ALUMNOS -->
+    <section
+      class="rounded-3xl p-6 bg-white/70 dark:bg-white/10 
+             border border-white/40 dark:border-white/10 backdrop-blur shadow-lg">
 
+      <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between mb-4 gap-3">
+        <h3 class="text-xl font-bold text-gray-800 dark:text-white">Comparar rendimiento</h3>
 
-          <div class="flex">
-            <input type="text" readonly placeholder="Seleccionar materia" [value]="filtrosComparacion.materia"
-              (click)="abrirModalMateriaComparacion()"
-              class="cursor-pointer border rounded-md px-2 py-1 text-sm w-40 bg-white dark:bg-[#0b1220] dark:text-white" />
-          </div>
+        <div class="flex flex-wrap gap-3">
 
-          <button class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-md text-sm"
+          <!-- Selección alumnos -->
+          <input type="text" readonly placeholder="Seleccionar alumnos"
+            [value]="nombresAlumnosSeleccionados"
+            (click)="abrirModalAlumnos()"
+            class="cursor-pointer rounded-xl px-3 py-2 text-sm w-48
+                   bg-white/70 dark:bg-white/10 border border-white/40 dark:border-white/20 
+                   text-gray-900 dark:text-white backdrop-blur">
+
+          <!-- Selección materia -->
+          <input type="text" readonly placeholder="Seleccionar materia"
+            [value]="filtrosComparacion.materia"
+            (click)="abrirModalMateriaComparacion()"
+            class="cursor-pointer rounded-xl px-3 py-2 text-sm w-40
+                   bg-white/70 dark:bg-white/10 border border-white/40 dark:border-white/20 
+                   text-gray-900 dark:text-white backdrop-blur">
+
+          <button class="rounded-xl px-4 py-2 bg-indigo-600 text-white hover:bg-indigo-500"
             (click)="cargarComparacionAlumnos()">
             Aplicar
           </button>
+
         </div>
       </div>
 
-      <apx-chart [series]="comparacion.series" [chart]="comparacion.chart" [xaxis]="comparacion.xaxis"
-        [dataLabels]="comparacion.dataLabels" [colors]="comparacion.colors" [grid]="comparacion.grid">
+      <apx-chart [series]="comparacion.series" [chart]="comparacion.chart"
+        [xaxis]="comparacion.xaxis" [dataLabels]="comparacion.dataLabels"
+        [colors]="comparacion.colors" [grid]="comparacion.grid">
       </apx-chart>
+
     </section>
 
-    <!-- 🏅 Top estudiantes -->
-    <section class="bg-white dark:bg-[#1b2e4b] rounded-xl shadow-sm p-5">
-      <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between mb-3 gap-3">
-        <h3 class="text-lg font-semibold text-gray-800 dark:text-white-light">Mejores estudiantes</h3>
-        <div class="flex flex-wrap gap-2">
-          <select [(ngModel)]="filtrosTop.grado" (change)="cargarTopEstudiantes()"
-            class="border rounded-md px-3 py-1 text-sm">
+    <!-- TOP ESTUDIANTES -->
+    <section
+      class="rounded-3xl p-6 bg-white/70 dark:bg-white/10 
+             border border-white/40 dark:border-white/10 backdrop-blur shadow-lg">
+
+      <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between mb-4 gap-3">
+        <h3 class="text-xl font-bold text-gray-800 dark:text-white">Mejores estudiantes</h3>
+
+        <div class="flex gap-2">
+
+          <select [(ngModel)]="filtrosTop.grado"
+            class="rounded-xl px-3 py-2 text-sm
+                   bg-white/70 dark:bg-white/10 border border-white/40 dark:border-white/20 
+                   text-gray-900 dark:text-white backdrop-blur"
+            (change)="cargarTopEstudiantes()">
             <option value="">Todos</option>
-            <option *ngFor="let g of gradosMateria" [value]="g._id">{{ g.nombre }}</option>
+            <option *ngFor="let g of gradosMateria" [value]="g._id">
+              {{ g.nombre }}
+            </option>
           </select>
 
-          <input type="number" min="1" [(ngModel)]="filtrosTop.limit" class="border rounded-md px-2 py-1 text-sm w-20"
-            (change)="cargarTopEstudiantes()" />
+          <input type="number" min="1" [(ngModel)]="filtrosTop.limit"
+            class="rounded-xl px-3 py-2 text-sm w-20
+                   bg-white/70 dark:bg-white/10 border border-white/40 dark:border-white/20 
+                   text-gray-900 dark:text-white backdrop-blur"
+            (change)="cargarTopEstudiantes()">
+
         </div>
       </div>
 
       <table class="w-full text-sm">
         <thead>
-          <tr class="border-b border-gray-200 dark:border-white/10 text-gray-600 dark:text-white-dark">
+          <tr class="border-b border-white/30 dark:border-white/10 text-gray-700 dark:text-white/70">
             <th class="py-2 text-left">#</th>
             <th class="py-2 text-left">Nombre</th>
             <th class="py-2 text-center">Grado</th>
             <th class="py-2 text-center">Promedio</th>
           </tr>
         </thead>
+
         <tbody>
           <tr *ngFor="let e of topEstudiantes; let i = index"
-            class="border-b border-gray-100 dark:border-white/10 hover:bg-gray-50 dark:hover:bg-white/5">
-            <td class="py-2 text-gray-800 dark:text-white-light">{{ i + 1 }}</td>
-            <td class="py-2 text-gray-800 dark:text-white-light">{{ e.nombre }}</td>
-            <td class="py-2 text-center text-gray-800 dark:text-white-light">{{ e.grado }}</td>
-            <td class="py-2 text-center font-semibold text-emerald-500">{{ e.promedio | number: '1.1-1' }}</td>
+            class="border-b border-white/30 dark:border-white/10 hover:bg-white/40 dark:hover:bg-white/5 transition">
+
+            <td class="py-2 text-gray-800 dark:text-white">{{ i + 1 }}</td>
+            <td class="py-2 text-gray-800 dark:text-white">{{ e.nombre }}</td>
+            <td class="py-2 text-center text-gray-800 dark:text-white">{{ e.grado }}</td>
+            <td class="py-2 text-center font-semibold text-emerald-500">{{ e.promedio | number:'1.1-1' }}</td>
+
           </tr>
         </tbody>
+
       </table>
+
     </section>
 
-    <!-- 🕒 Actividades recientes -->
-    <section class="bg-white dark:bg-[#1b2e4b] rounded-xl shadow-sm p-5 overflow-hidden">
-      <div class="flex items-center justify-between mb-3">
-        <h3 class="text-lg font-semibold text-gray-800 dark:text-white-light">Actividades recientes</h3>
+    <!-- ACTIVIDADES RECIENTES – GLASS -->
+    <section
+      class="rounded-3xl p-6 bg-white/70 dark:bg-white/10 
+             border border-white/40 dark:border-white/10 backdrop-blur shadow-lg overflow-hidden">
+
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-xl font-bold text-gray-800 dark:text-white">Actividades recientes</h3>
+
         <button
-          class="text-xs px-3 py-1 rounded-md border border-gray-300 dark:border-white/10 text-gray-700 dark:text-white-light"
+          class="rounded-xl px-3 py-2 border border-white/40 dark:border-white/10
+                 bg-white/50 dark:bg-white/5 backdrop-blur
+                 text-gray-800 dark:text-white hover:bg-white/70 dark:hover:bg-white/10"
           (click)="cargarActividadesRecientes()">
           Actualizar
         </button>
       </div>
 
-      <div class="overflow-y-auto max-h-[420px] divide-y divide-gray-100 dark:divide-white/10">
+      <div class="max-h-[420px] overflow-y-auto divide-y divide-white/30 dark:divide-white/10">
+
         <div *ngFor="let act of actividades" class="py-3">
-          <p class="text-sm text-gray-800 dark:text-white-light">{{ act.descripcion || act.description }}</p>
-          <p class="text-xs text-gray-500 dark:text-white-dark">{{ act.fecha | date: 'short' }} • {{ act.tipo }}</p>
+          <p class="text-sm text-gray-900 dark:text-white">
+            {{ act.descripcion || act.description }}
+          </p>
+
+          <p class="text-xs text-gray-600 dark:text-white/70">
+            {{ act.fecha | date:'short' }} • {{ act.tipo }}
+          </p>
         </div>
+
       </div>
+
     </section>
+
   </main>
 </div>
 
-<!-- === MODAL MATERIAS COMPARACIÓN === -->
-<div *ngIf="showMateriaModalComparacion" class="fixed inset-0 z-50 flex items-center justify-center">
 
-  <!-- Fondo oscuro -->
+<!-- ================= MODAL MATERIA ================= -->
+<div *ngIf="showMateriaModalComparacion"
+  class="fixed inset-0 z-50 flex items-center justify-center">
+
   <div class="absolute inset-0 bg-black/50" (click)="cerrarModalMateriaComparacion()"></div>
 
-  <!-- Contenedor -->
-  <div class="relative z-50 w-full max-w-md bg-white dark:bg-[#1b2e4b] rounded-xl p-5 shadow-xl">
+  <div
+    class="relative z-50 w-full max-w-md rounded-2xl p-6 shadow-xl
+           bg-white/90 dark:bg-[#1b2e4b] backdrop-blur-xl border border-white/40 dark:border-white/10">
 
-    <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">
+    <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">
       Seleccionar materia
     </h3>
 
-    <!-- Lista -->
     <div class="max-h-80 overflow-y-auto space-y-2 pr-1">
 
-      <button *ngFor="let m of materiasActivas" (click)="seleccionarMateriaComparacion(m.nombre)" class="w-full text-left px-4 py-3 rounded-lg border border-gray-200 dark:border-white/10
-               bg-white dark:bg-[#0b1220] text-gray-700 dark:text-white
-               hover:bg-gray-50 dark:hover:bg-white/10 transition">
-
+      <button *ngFor="let m of materiasActivas"
+        (click)="seleccionarMateriaComparacion(m.nombre)"
+        class="w-full text-left px-4 py-3 rounded-xl border border-white/40 dark:border-white/20
+               bg-white/80 dark:bg-[#0b1220] backdrop-blur text-gray-900 dark:text-white
+               hover:bg-white/90 dark:hover:bg-white/10 transition">
         <div class="font-medium">{{ m.nombre }}</div>
-
       </button>
 
     </div>
 
-    <div class="mt-4 flex justify-end">
+    <div class="mt-4 text-right">
       <button (click)="cerrarModalMateriaComparacion()"
-        class="px-4 py-2 rounded-md border border-gray-300 dark:border-white/10 text-gray-600 dark:text-white hover:bg-gray-100 dark:hover:bg-white/10">
+        class="px-4 py-2 rounded-xl border border-white/40 dark:border-white/20
+               bg-white/70 dark:bg-white/5 backdrop-blur
+               text-gray-800 dark:text-white hover:bg-white/90 dark:hover:bg-white/10">
         Cerrar
       </button>
     </div>
+
   </div>
 </div>
 
-<!-- === MODAL SELECCIONAR ALUMNOS === -->
-<div *ngIf="showAlumnosModal" class="fixed inset-0 z-50 flex items-center justify-center">
 
-  <!-- Fondo oscuro -->
+<!-- ================= MODAL ALUMNOS ================= -->
+<div *ngIf="showAlumnosModal"
+  class="fixed inset-0 z-50 flex items-center justify-center">
+
   <div class="absolute inset-0 bg-black/50" (click)="cerrarModalAlumnos()"></div>
 
-  <!-- Tarjeta -->
-  <div class="relative z-50 w-full max-w-lg bg-white dark:bg-[#1b2e4b] rounded-xl p-5 shadow-xl">
+  <div
+    class="relative z-50 w-full max-w-lg rounded-2xl p-6 shadow-xl
+           bg-white/90 dark:bg-[#1b2e4b] backdrop-blur-xl border border-white/40 dark:border-white/10">
 
-    <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-4">
+    <h3 class="text-lg font-bold text-gray-800 dark:text-white mb-4">
       Seleccionar alumnos
     </h3>
 
-    <!-- Lista -->
     <div class="max-h-96 overflow-y-auto space-y-2 pr-1">
 
-      <div *ngFor="let a of alumnosLista" (click)="toggleSeleccionAlumno(a)" class="flex items-center justify-between cursor-pointer px-4 py-3 rounded-lg border border-gray-200 dark:border-white/10
-               bg-white dark:bg-[#0b1220] text-gray-700 dark:text-white
-               hover:bg-gray-50 dark:hover:bg-white/10 transition">
+      <div *ngFor="let a of alumnosLista"
+        (click)="toggleSeleccionAlumno(a)"
+        class="cursor-pointer px-4 py-3 rounded-xl border border-white/40 dark:border-white/20
+               bg-white/80 dark:bg-[#0b1220] backdrop-blur
+               text-gray-900 dark:text-white hover:bg-white/90 dark:hover:bg-white/10 flex justify-between">
 
         <div>
           <div class="font-medium">{{ a.nombre }} {{ a.apellido }}</div>
-          <div class="text-xs text-gray-500 dark:text-white/50">
+          <div class="text-xs text-gray-600 dark:text-white/60">
             {{ a.grado?.nombre }} • {{ a.seccion?.nombre }}
           </div>
         </div>
 
+        <!-- Check -->
         <div>
-          <!-- Check seleccionado -->
           <span *ngIf="estaSeleccionado(a)" class="h-4 w-4 rounded-full bg-emerald-500 inline-block"></span>
 
-          <!-- Check vacío -->
           <span *ngIf="!estaSeleccionado(a)"
-            class="h-4 w-4 rounded-full border border-gray-300 dark:border-white/40 inline-block"></span>
+            class="h-4 w-4 rounded-full border border-white/40 dark:border-white/30 inline-block"></span>
         </div>
 
       </div>
 
     </div>
 
-    <!-- Footer -->
-    <div class="mt-4 flex justify-end gap-2">
+    <div class="mt-4 text-right space-x-2">
 
       <button (click)="cerrarModalAlumnos()"
-        class="px-4 py-2 rounded-md border border-gray-300 dark:border-white/10 text-gray-600 dark:text-white hover:bg-gray-100 dark:hover:bg-white/10">
+        class="px-4 py-2 rounded-xl border border-white/40 dark:border-white/20
+               bg-white/70 dark:bg-white/5 backdrop-blur
+               text-gray-800 dark:text-white hover:bg-white/90 dark:hover:bg-white/10">
         Cerrar
       </button>
 
       <button (click)="cargarComparacionAlumnos(); cerrarModalAlumnos()"
-        class="px-4 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700">
+        class="px-4 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-500 shadow">
         Aplicar
       </button>
 
     </div>
 
   </div>
-
 </div>

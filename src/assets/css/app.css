@@ -9,3 +9,13 @@
 @import 'flatpickr/dist/flatpickr.min.css';
 @import 'nouislider/dist/nouislider.min.css';
 @import 'tailwind.css';
+/* === FIX SELECT OPTIONS DARK MODE === */
+.dark select option {
+  background-color: #0b1020 !important; /* Fondo oscuro */
+  color: white !important;              /* Texto blanco */
+}
+
+/* También para hover */
+.dark select option:hover {
+  background-color: #1a2a4a !important;
+}

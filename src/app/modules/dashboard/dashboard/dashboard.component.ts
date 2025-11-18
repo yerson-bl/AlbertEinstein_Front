@@ -59,10 +59,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
   gradosMateria: Grado[] = [];
   seccionesMateria: Seccion[] = [];
 
-  filtrosSalon = { grado: '', seccion: '', fechaInicio: '2025-10-01', fechaFin: '2025-10-31' };
+  filtrosSalon = { grado: '', seccion: '', fechaInicio: '2025-09-01', fechaFin: '2025-11-15' };
   filtrosMateria = { grado: '', seccion: '' };
 
-  filtrosComparacion = { alumno_ids: '1,3', materia: 'Matemáticas' };
+  filtrosComparacion = { alumno_ids: '', materia: 'Matematicas' };
   filtrosTop = { limit: 10, grado: '' };
 
   // ---- Data de gráficos ----

@@ -38,7 +38,7 @@ export interface UsuarioItem {
   correo: string;
   rol: string;
   estado: string;
-  usuario_id: number;
+  usuario_id: string;
   grado: string | { id: string; nombre: string };
   seccion: string | { id: string; nombre: string };
 }
@@ -359,8 +359,8 @@ export class ListaEvaluacionesComponent implements OnInit, OnDestroy {
     const evalId = (e as any).evaluacion_id ?? e._id;
     if (!evalId) return;
 
-    // ✅ Verificamos que el alumno esté definido y tenga ID
-    const alumnoId = this.alumno?.usuario_id;
+    const alumnoId = this.alumno?.usuario_id ? String(this.alumno.usuario_id) : null;
+
     if (!alumnoId) {
       this.toast('No se encontró el ID del alumno.', 'error');
       return;
@@ -395,6 +395,7 @@ export class ListaEvaluacionesComponent implements OnInit, OnDestroy {
 
     this.subs.push(sub);
   }
+
 
 
   verDetalles(e: EvaluacionItem): void {

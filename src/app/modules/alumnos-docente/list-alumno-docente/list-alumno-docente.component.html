@@ -1,77 +1,78 @@
-<!-- Listado de Alumnos -->
-<div class="min-h-screen bg-gray-50 dark:bg-[#060818]">
-    <main class="mx-auto max-w-7xl p-4 md:p-6 space-y-6">
+<!-- LISTADO DE ALUMNOS – PREMIUM BLUE GLASS -->
+<div class="min-h-screen 
+            bg-gradient-to-b from-[#f3f6ff] via-white to-white 
+            dark:bg-gradient-to-b dark:from-[#070b16] dark:via-[#0b1020] dark:to-[#0b1020]">
 
-        <!-- Header / acciones -->
-        <section class="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
-            <div>
-                <h1 class="text-xl md:text-2xl font-semibold text-gray-800 dark:text-white">Alumnos</h1>
-                <p class="text-sm text-gray-500 dark:text-white-dark">Gestión y consulta de estudiantes.</p>
+    <main class="mx-auto max-w-7xl px-4 py-10 space-y-10">
+
+        <!-- HEADER PREMIUM -->
+        <section class="rounded-3xl p-6 md:p-8 shadow-sm
+             bg-gradient-to-r from-[#0b1f3a] via-[#1a3a78] to-[#254a9a]
+             text-white flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+
+            <div class="flex items-center gap-3">
+                <span class="inline-flex h-10 w-10 items-center justify-center rounded-2xl
+                      bg-white/20 backdrop-blur">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M3 5h18v2H3zm0 6h12v2H3zm0 6h18v2H3z" />
+                    </svg>
+                </span>
+
+                <div>
+                    <h1 class="text-xl md:text-2xl font-extrabold">
+                        Alumnos
+                    </h1>
+                    <p class="text-white/80 text-sm">Gestión y consulta de estudiantes.</p>
+                </div>
             </div>
-            <div class="flex items-center gap-2">
-                <button (click)="fetch()"
-                    class="px-3 py-2 rounded-lg border border-gray-300 dark:border-white/10 text-gray-700 dark:text-white hover:bg-gray-50 dark:hover:bg-white/10">
-                    Refrescar
-                </button>
-            </div>
+
+            <button (click)="fetch()" class="px-4 py-2 rounded-xl bg-white/20 border border-white/20 text-white backdrop-blur
+               hover:bg-white/30 transition">
+                Refrescar
+            </button>
         </section>
 
-        <!-- Filtros -->
-        <section class="bg-white dark:bg-[#1b2e4b] rounded-xl shadow-sm p-4">
+
+        <!-- FILTROS PREMIUM (GLASS) -->
+        <section class="rounded-3xl p-5 bg-white/70 dark:bg-white/10 border border-white/40 dark:border-white/10 
+             backdrop-blur-xl shadow-lg">
+
             <div class="grid grid-cols-1 md:grid-cols-1 gap-3">
+
                 <!-- Búsqueda -->
-                <div class="md:col-span-2">
-                    <div class="relative">
-                        <!-- SIN [value] para no pisar lo que escribe el usuario -->
-                        <input type="text" (input)="onSearch($any($event.target).value)"
-                            placeholder="Buscar por nombre, apellido, correo, usuario, grado o sección…"
-                            class="w-full rounded-lg border border-gray-300 dark:border-white/10 bg-white dark:bg-transparent px-10 py-2 text-sm text-gray-800 dark:text-white placeholder-gray-400 dark:placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-blue-500/50" />
-                        <svg class="absolute left-3 top-2.5 h-5 w-5 text-gray-400 dark:text-white/50"
-                            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 105.5 5.5a7.5 7.5 0 0011.15 11.15z" />
-                        </svg>
-                    </div>
+                <div class="relative">
+                    <input type="text" (input)="onSearch($any($event.target).value)"
+                        placeholder="Buscar por nombre, apellido, correo, usuario, grado o sección…" class="w-full rounded-xl border border-white/40 dark:border-white/20
+                        bg-white/70 dark:bg-white/10 backdrop-blur px-10 py-2 text-sm
+                        text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-white/40
+                        focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+
+                    <svg class="absolute left-3 top-2.5 h-5 w-5 text-gray-400 dark:text-white/50"
+                        xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 105.5 5.5a7.5 7.5 0 0011.15 11.15z" />
+                    </svg>
                 </div>
 
-                <!-- Grado -->
-                <!-- <select class="form-select w-full rounded-lg border border-gray-300 dark:border-white/10
-         bg-white dark:bg-[#0b1220] text-gray-800 dark:text-white
-         px-3 py-2 text-sm dark:[color-scheme:dark]" [ngModel]="filtroGrado()"
-                    (ngModelChange)="setFilter('grado', $event)">
-                    <option [ngValue]="''">Todos los grados</option>
-                    <option *ngFor="let g of grados()" [ngValue]="g">Grado {{ g }}</option>
-                </select> -->
-
-                <!-- Sección -->
-                <!-- <select class="form-select w-full rounded-lg border border-gray-300 dark:border-white/10
-         bg-white dark:bg-[#0b1220] text-gray-800 dark:text-white
-         px-3 py-2 text-sm dark:[color-scheme:dark]" [ngModel]="filtroSeccion()"
-                    (ngModelChange)="setFilter('seccion', $event)">
-                    <option [ngValue]="''">Todas las secciones</option>
-                    <option *ngFor="let s of secciones()" [ngValue]="s">Sección {{ s }}</option>
-                </select> -->
-
-                <!-- Estado -->
-                <!-- <select class="form-select w-full rounded-lg border border-gray-300 dark:border-white/10
-         bg-white dark:bg-[#0b1220] text-gray-800 dark:text-white
-         px-3 py-2 text-sm dark:[color-scheme:dark]" [ngModel]="filtroEstado()"
-                    (ngModelChange)="setFilter('estado', $event)">
-                    <option [ngValue]="''">Todos los estados</option>
-                    <option *ngFor="let e of estados()" [ngValue]="e">{{ e | titlecase }}</option>
-                </select> -->
             </div>
 
-            <!-- Resumen / limpiar -->
-            <div class="mt-3 flex flex-wrap items-center gap-2">
-                <span class="text-xs text-gray-500 dark:text-white-dark">Mostrando {{ totalFiltered() }}
-                    resultado(s)</span>
-                <button (click)="clearFilters()"
-                    class="ml-auto text-xs px-2 py-1 rounded-md border border-gray-300 dark:border-white/10 text-gray-700 dark:text-white hover:bg-gray-50 dark:hover:bg-white/10">
+            <!-- Resumen -->
+            <div class="mt-3 flex items-center gap-2">
+                <span class="text-xs text-gray-600 dark:text-white/70">
+                    Mostrando {{ totalFiltered() }} resultado(s)
+                </span>
+
+                <button (click)="clearFilters()" class="ml-auto text-xs px-3 py-1 rounded-xl 
+                 border border-white/40 dark:border-white/10
+                 bg-white/50 dark:bg-white/5 backdrop-blur
+                 text-gray-800 dark:text-white
+                 hover:bg-white/70 dark:hover:bg-white/10 transition">
                     Limpiar filtros
                 </button>
             </div>
+
         </section>
+
 
         <!-- Tabla -->
         <section class="bg-white dark:bg-[#1b2e4b] rounded-xl shadow-sm overflow-hidden">
@@ -323,8 +324,7 @@
                     <div>
                         <label class="text-xs text-gray-500 dark:text-white-dark">Grado</label>
                         <select class="form-select w-full" [(ngModel)]="editModel().grado" name="grado" required
-                            (ngModelChange)="cargarSeccionesPorGrado($event)" 
-                            >
+                            (ngModelChange)="cargarSeccionesPorGrado($event)">
                             <option [ngValue]="''" disabled>Seleccione un grado</option>
                             <option *ngFor="let g of grados()" [ngValue]="g._id">{{ g.nombre }}</option>
                         </select>
@@ -333,11 +333,8 @@
                     <!-- Sección -->
                     <div>
                         <label class="text-xs text-gray-500 dark:text-white-dark">Sección</label>
-                        <select class="form-select w-full" [(ngModel)]="editModel().seccion" 
-                            name="seccion" 
-                            required
-                            [disabled]="loadingSeccionesEdit()" 
-                            >
+                        <select class="form-select w-full" [(ngModel)]="editModel().seccion" name="seccion" required
+                            [disabled]="loadingSeccionesEdit()">
                             <option [ngValue]="''" disabled>
                                 {{ loadingSeccionesEdit() ? 'Cargando secciones…' : 'Seleccione una sección' }}
                             </option>

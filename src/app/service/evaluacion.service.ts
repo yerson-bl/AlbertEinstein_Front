@@ -47,7 +47,7 @@ export class EvaluacionService {
   }
   // ----------------- Intentos -----------------
 
-  iniciarIntento(payload: { evaluacion_id: string; alumno_id: number }) {
+  iniciarIntento(payload: { evaluacion_id: string; alumno_id: string }) {
     return this.http.post<any>(`${this.intentosUrl}`, payload, {
       headers: this.headers(),
     });

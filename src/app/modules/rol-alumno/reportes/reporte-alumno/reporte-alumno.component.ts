@@ -11,6 +11,8 @@ import {
   ApexGrid,
   ApexTooltip,
 } from 'ng-apexcharts';
+import { UserStorage } from 'src/app/utils/user.storage.util';
+
 
 @Component({
   selector: 'app-reporte-alumno',
@@ -18,7 +20,7 @@ import {
   standalone: false,
 })
 export class ReporteAlumnoComponent implements OnInit {
-  alumnoId = 3;
+  alumnoId: string = '';
   materia = '';
   fechaInicio = '2025-10-07';
 
@@ -56,8 +58,18 @@ export class ReporteAlumnoComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    const user = UserStorage.getUser();
+
+    if (user && user.usuario_id) {
+      this.alumnoId = String(user.usuario_id);  // 👈 convertimos a string
+    } else {
+      this.errorMsg = 'No se pudo obtener el ID del alumno.';
+      return;
+    }
+
     this.cargarReporteAlumno();
   }
+
 
   cargarReporteAlumno(): void {
     this.cargando = true;
@@ -103,22 +115,23 @@ export class ReporteAlumnoComponent implements OnInit {
 
   descargarReporteSemanal(): void {
     this.cargando = true;
-    this.reporteSrv.obtenerReporteAlumnoSemanal(this.alumnoId).subscribe({
-      next: (res: any) => {
-        // 🔽 Crear blob y descargar el archivo PDF
-        const blob = new Blob([res], { type: 'application/pdf' });
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `reporte_semanal_alumno_${this.alumnoId}.pdf`;
-        a.click();
-        window.URL.revokeObjectURL(url);
-      },
-      error: (err) => {
-        console.error('❌ Error al generar el reporte semanal:', err);
-        this.errorMsg = 'No se pudo generar el reporte semanal del alumno.';
-      },
-      complete: () => (this.cargando = false),
-    });
+    this.reporteSrv.obtenerReporteAlumnoSemanal(Number(this.alumnoId))
+      .subscribe({
+        next: (res: any) => {
+          // 🔽 Crear blob y descargar el archivo PDF
+          const blob = new Blob([res], { type: 'application/pdf' });
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `reporte_semanal_alumno_${this.alumnoId}.pdf`;
+          a.click();
+          window.URL.revokeObjectURL(url);
+        },
+        error: (err) => {
+          console.error('❌ Error al generar el reporte semanal:', err);
+          this.errorMsg = 'No se pudo generar el reporte semanal del alumno.';
+        },
+        complete: () => (this.cargando = false),
+      });
   }
 }

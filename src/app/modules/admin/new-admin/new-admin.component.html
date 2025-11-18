@@ -1,17 +1,38 @@
-<!-- Crear Admin -->
-<div class="min-h-screen bg-gray-50 dark:bg-[#060818]">
-  <main class="mx-auto max-w-3xl p-4 md:p-6 space-y-6">
+<!-- CREAR ADMIN – PREMIUM BLUE GLASS -->
+<div class="min-h-screen 
+            bg-gradient-to-b from-[#f3f6ff] via-white to-white 
+            dark:bg-gradient-to-b dark:from-[#070b16] dark:via-[#0b1020] dark:to-[#0b1020]">
 
-    <!-- Header -->
-    <section class="flex items-center justify-between">
-      <div>
-        <h1 class="text-xl md:text-2xl font-semibold text-gray-800 dark:text-white">Nuevo admin</h1>
-        <p class="text-sm text-gray-500 dark:text-white-dark">Registra un administrador del sistema.</p>
+  <main class="mx-auto max-w-3xl p-4 md:p-8 space-y-10">
+
+
+    <!-- HEADER premium -->
+    <section
+      class="rounded-3xl p-6 md:p-8 shadow-sm
+             bg-gradient-to-r from-[#0b1f3a] via-[#1a3a78] to-[#254a9a]
+             text-white flex items-center justify-between">
+
+      <div class="flex items-center gap-3">
+        <span class="inline-flex h-10 w-10 items-center justify-center rounded-2xl
+                      bg-white/20 backdrop-blur">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5"
+            viewBox="0 0 24 24" fill="currentColor">
+            <path d="M3 5h18v2H3zm0 6h12v2H3zm0 6h18v2H3z" />
+          </svg>
+        </span>
+        <div>
+          <h1 class="text-xl md:text-2xl font-extrabold">Nuevo administrador</h1>
+          <p class="text-white/80 text-sm">Registra un administrador del sistema.</p>
+        </div>
       </div>
-      <!-- <a routerLink="/admins"
-         class="px-3 py-2 rounded-lg border border-gray-300 dark:border-white/10 text-gray-700 dark:text-white hover:bg-gray-50 dark:hover:bg-white/10">
+
+      <!-- Botón volver opcional -->
+      <!--
+      <a routerLink="/admins"
+         class="px-4 py-2 rounded-xl bg-white/20 text-white border border-white/20 backdrop-blur hover:bg-white/30 transition">
         Volver
-      </a> -->
+      </a>
+      -->
     </section>
 
     <!-- Tarjeta formulario -->

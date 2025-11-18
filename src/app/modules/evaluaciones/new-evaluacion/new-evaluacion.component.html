@@ -2,30 +2,86 @@
   class="min-h-screen bg-gradient-to-b from-indigo-50/60 via-white to-white dark:from-[#0b1020] dark:via-[#0b1020] dark:to-[#0b1020]">
 
   <main class="mx-auto max-w-6xl px-4 py-6 md:py-8 space-y-6">
-    <!-- Progress / Stats -->
+     <!-- HEADER Premium Azul -->
+    <section class="rounded-3xl p-6 md:p-8 shadow-sm
+                    bg-gradient-to-r from-[#0b1f3a] via-[#1a3a78] to-[#254a9a]
+                    text-white">
+      <div class="flex items-start justify-between gap-6">
+
+        <!-- Título -->
+        <div class="min-w-0">
+          <div class="flex items-center gap-3">
+            <span class="inline-flex h-10 w-10 items-center justify-center rounded-2xl
+                        bg-white/15 backdrop-blur">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5"
+                viewBox="0 0 24 24" fill="currentColor">
+                <path d="M3 5h18v2H3zm0 6h12v2H3zm0 6h18v2H3z" />
+              </svg>
+            </span>
+
+            <div class="pl-2">
+              <h1 class="text-xl md:text-2xl font-extrabold">
+                Crear nueva evaluación
+              </h1>
+
+              <p class="text-white/80 text-sm mt-1">
+                Completa la información general y agrega preguntas.
+              </p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- STATS Premium Glass -->
     <section class="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <div class="rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#0e1426] p-4">
-        <div class="text-xs text-gray-500 dark:text-white/60">Total de preguntas</div>
-        <div class="mt-1 text-2xl font-semibold text-gray-900 dark:text-white">
+
+      <!-- Total preguntas -->
+      <div class="rounded-2xl p-5 border border-white/40
+                  bg-white/30 backdrop-blur 
+                  text-gray-900 shadow-lg
+                  dark:bg-white/10 dark:text-white">
+        <div class="text-xs uppercase tracking-wide text-gray-600 dark:text-white/70">
+          Total de preguntas
+        </div>
+        <div class="mt-1 text-3xl font-semibold">
           {{ preguntasFA.length || 0 }}
         </div>
       </div>
 
-      <div class="rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#0e1426] p-4">
-        <div class="text-xs text-gray-500 dark:text-white/60">Intentos permitidos</div>
-        <div class="mt-1 text-2xl font-semibold text-gray-900 dark:text-white">
+      <!-- Intentos -->
+      <div class="rounded-2xl p-5 border border-white/40
+                  bg-white/30 backdrop-blur 
+                  text-gray-900 shadow-lg
+                  dark:bg-white/10 dark:text-white">
+        <div class="text-xs uppercase tracking-wide text-gray-600 dark:text-white/70">
+          Intentos permitidos
+        </div>
+        <div class="mt-1 text-3xl font-semibold">
           {{ form.get('intentos_permitidos')?.value || 1 }}
         </div>
-        <div class="mt-2 text-xs text-gray-500 dark:text-white/60">Configurable en “Información general”</div>
-      </div>
-
-      <div class="rounded-2xl border border-gray-200 dark:border-white/10 bg-white dark:bg-[#0e1426] p-4">
-        <div class="text-xs text-gray-500 dark:text-white/60">Estado</div>
-        <div
-          class="mt-1 inline-flex items-center gap-2 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 px-3 py-1 text-sm">
-          <span class="h-2 w-2 rounded-full bg-emerald-500"></span> Borrador
+        <div class="mt-2 text-xs text-gray-600 dark:text-white/70">
+          Configurable en Información general
         </div>
       </div>
+
+      <!-- Estado -->
+      <div class="rounded-2xl p-5 border border-white/40
+                  bg-white/30 backdrop-blur 
+                  text-gray-900 shadow-lg
+                  dark:bg-white/10 dark:text-white">
+        <div class="text-xs uppercase tracking-wide text-gray-600 dark:text-white/70">
+          Estado
+        </div>
+        <div class="mt-2 inline-flex items-center gap-2 rounded-full px-3 py-1 
+                    bg-emerald-500/20 text-emerald-700 dark:text-emerald-200 text-sm">
+          <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
+          Borrador
+        </div>
+      </div>
+
     </section>
 
     <!-- Form principallol -->
