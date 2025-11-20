@@ -7,8 +7,7 @@
 
     <!-- 📊 KPIs GENERALES – CARDS GLASS -->
     <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-      <div *ngFor="let kpi of resumenKeys"
-        class="rounded-2xl p-5 
+      <div *ngFor="let kpi of resumenKeys" class="rounded-2xl p-5 
                bg-white/70 dark:bg-white/10 
                border border-white/40 dark:border-white/10
                backdrop-blur shadow-lg text-center">
@@ -25,8 +24,7 @@
     </section>
 
     <!-- 📈 RENDIMIENTO POR SALÓN – GLASS CARD -->
-    <section
-      class="rounded-3xl p-6 bg-white/70 dark:bg-white/10 
+    <section class="rounded-3xl p-6 bg-white/70 dark:bg-white/10 
              border border-white/40 dark:border-white/10 
              backdrop-blur shadow-lg">
 
@@ -39,8 +37,7 @@
         <div class="flex flex-wrap gap-3">
 
           <!-- GRADO -->
-          <select [(ngModel)]="filtrosSalon.grado"
-            class="rounded-xl px-3 py-2 text-sm
+          <select [(ngModel)]="filtrosSalon.grado" class="rounded-xl px-3 py-2 text-sm
                    bg-white/70 dark:bg-white/10 border border-white/40 dark:border-white/20
                    text-gray-900 dark:text-white backdrop-blur"
             (change)="cargarSeccionesSalonPorGrado(filtrosSalon.grado)">
@@ -48,36 +45,28 @@
           </select>
 
           <!-- SECCIÓN -->
-          <select [(ngModel)]="filtrosSalon.seccion"
-            class="rounded-xl px-3 py-2 text-sm
+          <select [(ngModel)]="filtrosSalon.seccion" class="rounded-xl px-3 py-2 text-sm
                    bg-white/70 dark:bg-white/10 border border-white/40 dark:border-white/20 
-                   text-gray-900 dark:text-white backdrop-blur"
-            (change)="cargarRendimientoSalon()">
+                   text-gray-900 dark:text-white backdrop-blur" (change)="cargarRendimientoSalon()">
             <option *ngFor="let s of seccionesSalon" [value]="s._id">{{ s.nombre }}</option>
           </select>
 
           <!-- FECHAS -->
-          <input type="date" [(ngModel)]="filtrosSalon.fechaInicio"
-            class="rounded-xl px-3 py-2 text-sm
+          <input type="date" [(ngModel)]="filtrosSalon.fechaInicio" class="rounded-xl px-3 py-2 text-sm
                    bg-white/70 dark:bg-white/10 border border-white/40 dark:border-white/20 
-                   text-gray-900 dark:text-white backdrop-blur"
-            (change)="cargarRendimientoSalon()">
+                   text-gray-900 dark:text-white backdrop-blur" (change)="cargarRendimientoSalon()">
 
-          <input type="date" [(ngModel)]="filtrosSalon.fechaFin"
-            class="rounded-xl px-3 py-2 text-sm
+          <input type="date" [(ngModel)]="filtrosSalon.fechaFin" class="rounded-xl px-3 py-2 text-sm
                    bg-white/70 dark:bg-white/10 border border-white/40 dark:border-white/20
-                   text-gray-900 dark:text-white backdrop-blur"
-            (change)="cargarRendimientoSalon()">
+                   text-gray-900 dark:text-white backdrop-blur" (change)="cargarRendimientoSalon()">
 
         </div>
       </div>
 
       <!-- GRÁFICO -->
-      <apx-chart [series]="attendance.series" [chart]="attendance.chart"
-        [xaxis]="attendance.xaxis" [yaxis]="attendance.yaxis"
-        [stroke]="attendance.stroke" [colors]="attendance.colors"
-        [fill]="attendance.fill" [dataLabels]="attendance.dataLabels"
-        [tooltip]="attendance.tooltip" [grid]="attendance.grid">
+      <apx-chart [series]="attendance.series" [chart]="attendance.chart" [xaxis]="attendance.xaxis"
+        [yaxis]="attendance.yaxis" [stroke]="attendance.stroke" [colors]="attendance.colors" [fill]="attendance.fill"
+        [dataLabels]="attendance.dataLabels" [tooltip]="attendance.tooltip" [grid]="attendance.grid">
       </apx-chart>
 
       <p class="text-xs mt-3 text-gray-600 dark:text-white/70">
@@ -87,8 +76,7 @@
     </section>
 
     <!-- 📘 RENDIMIENTO POR MATERIA -->
-    <section
-      class="rounded-3xl p-6 bg-white/70 dark:bg-white/10 
+    <section class="rounded-3xl p-6 bg-white/70 dark:bg-white/10 
              border border-white/40 dark:border-white/10 backdrop-blur shadow-lg">
 
       <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between mb-4 gap-3">
@@ -96,35 +84,31 @@
 
         <div class="flex flex-wrap gap-3">
 
-          <select [(ngModel)]="filtrosMateria.grado"
-            class="rounded-xl px-3 py-2 text-sm
+          <select [(ngModel)]="filtrosMateria.grado" class="rounded-xl px-3 py-2 text-sm
                    bg-white/70 dark:bg-white/10 border border-white/40 dark:border-white/20
                    text-gray-900 dark:text-white backdrop-blur"
             (change)="cargarSeccionesMateriaPorGrado(filtrosMateria.grado)">
             <option *ngFor="let g of gradosMateria" [value]="g._id">{{ g.nombre }}</option>
           </select>
 
-          <select [(ngModel)]="filtrosMateria.seccion"
-            class="rounded-xl px-3 py-2 text-sm
+          <select [(ngModel)]="filtrosMateria.seccion" class="rounded-xl px-3 py-2 text-sm
                    bg-white/70 dark:bg-white/10 border border-white/40 dark:border-white/20 
-                   text-gray-900 dark:text-white backdrop-blur"
-            (change)="cargarRendimientoPorMateria()">
+                   text-gray-900 dark:text-white backdrop-blur" (change)="cargarRendimientoPorMateria()">
             <option *ngFor="let s of seccionesMateria" [value]="s._id">{{ s.nombre }}</option>
           </select>
 
         </div>
       </div>
 
-      <apx-chart [series]="grades.series" [chart]="grades.chart"
-        [xaxis]="grades.xaxis" [yaxis]="grades.yaxis" [plotOptions]="grades.plotOptions"
-        [dataLabels]="grades.dataLabels" [colors]="grades.colors" [grid]="grades.grid">
+      <apx-chart [series]="grades.series" [chart]="grades.chart" [xaxis]="grades.xaxis" [yaxis]="grades.yaxis"
+        [plotOptions]="grades.plotOptions" [dataLabels]="grades.dataLabels" [colors]="grades.colors"
+        [grid]="grades.grid">
       </apx-chart>
 
     </section>
 
     <!-- 🧮 COMPARACIÓN DE ALUMNOS -->
-    <section
-      class="rounded-3xl p-6 bg-white/70 dark:bg-white/10 
+    <section class="rounded-3xl p-6 bg-white/70 dark:bg-white/10 
              border border-white/40 dark:border-white/10 backdrop-blur shadow-lg">
 
       <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between mb-4 gap-3">
@@ -133,18 +117,14 @@
         <div class="flex flex-wrap gap-3">
 
           <!-- Selección alumnos -->
-          <input type="text" readonly placeholder="Seleccionar alumnos"
-            [value]="nombresAlumnosSeleccionados"
-            (click)="abrirModalAlumnos()"
-            class="cursor-pointer rounded-xl px-3 py-2 text-sm w-48
+          <input type="text" readonly placeholder="Seleccionar alumnos" [value]="nombresAlumnosSeleccionados"
+            (click)="abrirModalAlumnos()" class="cursor-pointer rounded-xl px-3 py-2 text-sm w-48
                    bg-white/70 dark:bg-white/10 border border-white/40 dark:border-white/20 
                    text-gray-900 dark:text-white backdrop-blur">
 
           <!-- Selección materia -->
-          <input type="text" readonly placeholder="Seleccionar materia"
-            [value]="filtrosComparacion.materia"
-            (click)="abrirModalMateriaComparacion()"
-            class="cursor-pointer rounded-xl px-3 py-2 text-sm w-40
+          <input type="text" readonly placeholder="Seleccionar materia" [value]="filtrosComparacion.materia"
+            (click)="abrirModalMateriaComparacion()" class="cursor-pointer rounded-xl px-3 py-2 text-sm w-40
                    bg-white/70 dark:bg-white/10 border border-white/40 dark:border-white/20 
                    text-gray-900 dark:text-white backdrop-blur">
 
@@ -156,16 +136,14 @@
         </div>
       </div>
 
-      <apx-chart [series]="comparacion.series" [chart]="comparacion.chart"
-        [xaxis]="comparacion.xaxis" [dataLabels]="comparacion.dataLabels"
-        [colors]="comparacion.colors" [grid]="comparacion.grid">
+      <apx-chart [series]="comparacion.series" [chart]="comparacion.chart" [xaxis]="comparacion.xaxis"
+        [dataLabels]="comparacion.dataLabels" [colors]="comparacion.colors" [grid]="comparacion.grid">
       </apx-chart>
 
     </section>
 
     <!-- TOP ESTUDIANTES -->
-    <section
-      class="rounded-3xl p-6 bg-white/70 dark:bg-white/10 
+    <section class="rounded-3xl p-6 bg-white/70 dark:bg-white/10 
              border border-white/40 dark:border-white/10 backdrop-blur shadow-lg">
 
       <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between mb-4 gap-3">
@@ -173,22 +151,18 @@
 
         <div class="flex gap-2">
 
-          <select [(ngModel)]="filtrosTop.grado"
-            class="rounded-xl px-3 py-2 text-sm
+          <select [(ngModel)]="filtrosTop.grado" class="rounded-xl px-3 py-2 text-sm
                    bg-white/70 dark:bg-white/10 border border-white/40 dark:border-white/20 
-                   text-gray-900 dark:text-white backdrop-blur"
-            (change)="cargarTopEstudiantes()">
+                   text-gray-900 dark:text-white backdrop-blur" (change)="cargarTopEstudiantes()">
             <option value="">Todos</option>
             <option *ngFor="let g of gradosMateria" [value]="g._id">
               {{ g.nombre }}
             </option>
           </select>
 
-          <input type="number" min="1" [(ngModel)]="filtrosTop.limit"
-            class="rounded-xl px-3 py-2 text-sm w-20
+          <input type="number" min="1" [(ngModel)]="filtrosTop.limit" class="rounded-xl px-3 py-2 text-sm w-20
                    bg-white/70 dark:bg-white/10 border border-white/40 dark:border-white/20 
-                   text-gray-900 dark:text-white backdrop-blur"
-            (change)="cargarTopEstudiantes()">
+                   text-gray-900 dark:text-white backdrop-blur" (change)="cargarTopEstudiantes()">
 
         </div>
       </div>
@@ -209,7 +183,9 @@
 
             <td class="py-2 text-gray-800 dark:text-white">{{ i + 1 }}</td>
             <td class="py-2 text-gray-800 dark:text-white">{{ e.nombre }}</td>
-            <td class="py-2 text-center text-gray-800 dark:text-white">{{ e.grado }}</td>
+            <td class="py-2 text-center text-gray-800 dark:text-white">
+              {{ getNombreGrado(e.grado) }}
+            </td>
             <td class="py-2 text-center font-semibold text-emerald-500">{{ e.promedio | number:'1.1-1' }}</td>
 
           </tr>
@@ -220,15 +196,13 @@
     </section>
 
     <!-- ACTIVIDADES RECIENTES – GLASS -->
-    <section
-      class="rounded-3xl p-6 bg-white/70 dark:bg-white/10 
+    <section class="rounded-3xl p-6 bg-white/70 dark:bg-white/10 
              border border-white/40 dark:border-white/10 backdrop-blur shadow-lg overflow-hidden">
 
       <div class="flex items-center justify-between mb-4">
         <h3 class="text-xl font-bold text-gray-800 dark:text-white">Actividades recientes</h3>
 
-        <button
-          class="rounded-xl px-3 py-2 border border-white/40 dark:border-white/10
+        <button class="rounded-xl px-3 py-2 border border-white/40 dark:border-white/10
                  bg-white/50 dark:bg-white/5 backdrop-blur
                  text-gray-800 dark:text-white hover:bg-white/70 dark:hover:bg-white/10"
           (click)="cargarActividadesRecientes()">
@@ -257,13 +231,11 @@
 
 
 <!-- ================= MODAL MATERIA ================= -->
-<div *ngIf="showMateriaModalComparacion"
-  class="fixed inset-0 z-50 flex items-center justify-center">
+<div *ngIf="showMateriaModalComparacion" class="fixed inset-0 z-50 flex items-center justify-center">
 
   <div class="absolute inset-0 bg-black/50" (click)="cerrarModalMateriaComparacion()"></div>
 
-  <div
-    class="relative z-50 w-full max-w-md rounded-2xl p-6 shadow-xl
+  <div class="relative z-50 w-full max-w-md rounded-2xl p-6 shadow-xl
            bg-white/90 dark:bg-[#1b2e4b] backdrop-blur-xl border border-white/40 dark:border-white/10">
 
     <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-4">
@@ -272,9 +244,7 @@
 
     <div class="max-h-80 overflow-y-auto space-y-2 pr-1">
 
-      <button *ngFor="let m of materiasActivas"
-        (click)="seleccionarMateriaComparacion(m.nombre)"
-        class="w-full text-left px-4 py-3 rounded-xl border border-white/40 dark:border-white/20
+      <button *ngFor="let m of materiasActivas" (click)="seleccionarMateriaComparacion(m.nombre)" class="w-full text-left px-4 py-3 rounded-xl border border-white/40 dark:border-white/20
                bg-white/80 dark:bg-[#0b1220] backdrop-blur text-gray-900 dark:text-white
                hover:bg-white/90 dark:hover:bg-white/10 transition">
         <div class="font-medium">{{ m.nombre }}</div>
@@ -283,8 +253,7 @@
     </div>
 
     <div class="mt-4 text-right">
-      <button (click)="cerrarModalMateriaComparacion()"
-        class="px-4 py-2 rounded-xl border border-white/40 dark:border-white/20
+      <button (click)="cerrarModalMateriaComparacion()" class="px-4 py-2 rounded-xl border border-white/40 dark:border-white/20
                bg-white/70 dark:bg-white/5 backdrop-blur
                text-gray-800 dark:text-white hover:bg-white/90 dark:hover:bg-white/10">
         Cerrar
@@ -296,13 +265,11 @@
 
 
 <!-- ================= MODAL ALUMNOS ================= -->
-<div *ngIf="showAlumnosModal"
-  class="fixed inset-0 z-50 flex items-center justify-center">
+<div *ngIf="showAlumnosModal" class="fixed inset-0 z-50 flex items-center justify-center">
 
   <div class="absolute inset-0 bg-black/50" (click)="cerrarModalAlumnos()"></div>
 
-  <div
-    class="relative z-50 w-full max-w-lg rounded-2xl p-6 shadow-xl
+  <div class="relative z-50 w-full max-w-lg rounded-2xl p-6 shadow-xl
            bg-white/90 dark:bg-[#1b2e4b] backdrop-blur-xl border border-white/40 dark:border-white/10">
 
     <h3 class="text-lg font-bold text-gray-800 dark:text-white mb-4">
@@ -311,9 +278,7 @@
 
     <div class="max-h-96 overflow-y-auto space-y-2 pr-1">
 
-      <div *ngFor="let a of alumnosLista"
-        (click)="toggleSeleccionAlumno(a)"
-        class="cursor-pointer px-4 py-3 rounded-xl border border-white/40 dark:border-white/20
+      <div *ngFor="let a of alumnosLista" (click)="toggleSeleccionAlumno(a)" class="cursor-pointer px-4 py-3 rounded-xl border border-white/40 dark:border-white/20
                bg-white/80 dark:bg-[#0b1220] backdrop-blur
                text-gray-900 dark:text-white hover:bg-white/90 dark:hover:bg-white/10 flex justify-between">
 
@@ -338,8 +303,7 @@
 
     <div class="mt-4 text-right space-x-2">
 
-      <button (click)="cerrarModalAlumnos()"
-        class="px-4 py-2 rounded-xl border border-white/40 dark:border-white/20
+      <button (click)="cerrarModalAlumnos()" class="px-4 py-2 rounded-xl border border-white/40 dark:border-white/20
                bg-white/70 dark:bg-white/5 backdrop-blur
                text-gray-800 dark:text-white hover:bg-white/90 dark:hover:bg-white/10">
         Cerrar

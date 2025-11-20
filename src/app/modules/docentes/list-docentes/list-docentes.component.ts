@@ -9,13 +9,14 @@ type EstadoDocente = 'activo' | 'inactivo' | string;
 
 export interface Docente {
   _id: string;
+  nombre: string;
   apellido: string;
   contraseña_hash: string;
   correo: string;
   estado: EstadoDocente;
   fecha_creacion: string;       // GMT string
-  grado: (string | { id: string; nombre: string })[];
-  seccion: (string | { id: string; nombre: string })[]; nombre: string;
+  grado: string | { id: string; nombre: string };
+  seccion: string | { id: string; nombre: string };
   rol: string;                  // "Docente"
   usuario_id: string | number;  // id para PUT/DELETE
 }
@@ -24,10 +25,22 @@ export type DocenteUpdatePayload = {
   nombre?: string;
   apellido?: string;
   correo?: string;
-  grado?: string[];       // se enviará como array
-  seccion?: string[];     // se enviará como array
+  grado?: string;       // se enviará como array
+  seccion?: string;
   ['contraseña']?: string;
 };
+
+export interface Grado {
+  _id: string;
+  nombre: string;
+  descripcion?: string;
+}
+
+export interface Seccion {
+  _id: string;
+  nombre: string;
+  grado_id?: string;
+}
 
 type SortDir = 'asc' | 'desc';
 type SortKey = keyof Pick<Docente, '_id' | 'apellido' | 'correo' | 'estado' | 'fecha_creacion' | 'grado' | 'nombre' | 'rol' | 'seccion' | 'usuario_id'>;
@@ -63,18 +76,15 @@ export class ListDocentesComponent implements OnInit {
 
   private destroy$ = new Subject<void>();
 
-  // opciones para filtros (desde arrays)
-  grados = computed(() => Array.from(
-    new Set(this.docentes().flatMap(d => d.grado || []))
-  ).sort((a, b) => Number(a) - Number(b)));
+  grados = signal<Grado[]>([]);
+  secciones = signal<Seccion[]>([]);
+  loadingSeccionesEdit = signal<boolean>(false);
+  seccionesEdit = signal<Seccion[]>([]);
 
-  secciones = computed(() => Array.from(
-    new Set(this.docentes().flatMap(d => d.seccion || []))
-  ).sort());
 
   estados = computed(() => Array.from(new Set(this.docentes().map(d => d.estado))).sort());
 
-  // lista filtrada + ordenada
+  // === Computed filtrados ===
   filteredSorted = computed<Docente[]>(() => {
     const q = this.search();
     const g = this.filtroGrado();
@@ -87,62 +97,28 @@ export class ListDocentesComponent implements OnInit {
         this.hay(d.nombre, q) ||
         this.hay(d.apellido, q) ||
         this.hay(d.correo, q) ||
-        this.hay(d.usuario_id, q) ||
-        this.hay(`${d.apellido}, ${d.nombre}`, q) ||
-        // 🔹 Buscamos dentro de grado (string o { id, nombre })
-        d.grado?.some(xx => {
-          if (typeof xx === 'object') {
-            return this.hay(xx.nombre, q) || this.hay(xx.id, q);
-          }
-          return this.hay(xx, q);
-        }) ||
-        // 🔹 Buscamos dentro de seccion (string o { id, nombre })
-        d.seccion?.some(xx => {
-          if (typeof xx === 'object') {
-            return this.hay(xx.nombre, q) || this.hay(xx.id, q);
-          }
-          return this.hay(xx, q);
-        });
+        this.hay(d.usuario_id, q);
 
-      // 🔹 Filtros adicionales
-      const matchG = !g || (Array.isArray(d.grado) && d.grado.some(xx => {
-        const val = typeof xx === 'object' ? xx.id : xx;
-        return val === g;
-      }));
-
-      const matchS = !s || (Array.isArray(d.seccion) && d.seccion.some(xx => {
-        const val = typeof xx === 'object' ? xx.id : xx;
-        return val === s;
-      }));
-
+      const matchG = !g || d.grado === g;
+      const matchS = !s || d.seccion === s;
       const matchE = !e || d.estado === e;
 
       return matchQ && matchG && matchS && matchE;
     });
 
-
-    // ordenación (grado: por primer número; seccion: por primer valor)
     const key = this.sortKey();
     const dir = this.sortDir();
 
     list = list.sort((a, b) => {
       let va: any = a[key], vb: any = b[key];
-
-      if (key === 'fecha_creacion') { va = new Date(va).getTime(); vb = new Date(vb).getTime(); }
-      if (key === 'grado') {
-        const aa = Array.isArray(a.grado) ? Number(a.grado[0] ?? 0) : 0;
-        const bb = Array.isArray(b.grado) ? Number(b.grado[0] ?? 0) : 0;
-        return dir === 'asc' ? aa - bb : bb - aa;
+      if (key === 'fecha_creacion') {
+        va = new Date(va).getTime();
+        vb = new Date(vb).getTime();
       }
-      if (Array.isArray(va)) va = (va as string[]).join(',');
-      if (Array.isArray(vb)) vb = (vb as string[]).join(',');
-
       if (typeof va === 'string' && typeof vb === 'string') {
-        const cmp = this.norm(va).localeCompare(this.norm(vb), undefined, { numeric: true, sensitivity: 'base' });
+        const cmp = this.norm(va).localeCompare(this.norm(vb), undefined, { numeric: true });
         return dir === 'asc' ? cmp : -cmp;
       }
-      if (va < vb) return dir === 'asc' ? -1 : 1;
-      if (va > vb) return dir === 'asc' ? 1 : -1;
       return 0;
     });
 
@@ -159,6 +135,8 @@ export class ListDocentesComponent implements OnInit {
 
   totalFiltered = computed(() => this.filteredSorted().length);
   totalPages = computed(() => Math.max(1, Math.ceil(this.totalFiltered() / this.pageSize())));
+
+
 
   constructor(private docenteService: DocenteService, private seccionService: SeccionService) { }
 
@@ -180,9 +158,11 @@ export class ListDocentesComponent implements OnInit {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (grados) => {
+          this.grados.set(grados); // ← FALTABA
           grados.forEach(g => this.gradosMap.set(g._id, g.nombre || g.descripcion));
           this.cargarSecciones();
         },
+
         error: (e) => {
           console.error('Error cargando grados', e);
           this.toast('Error al cargar grados.', 'error');
@@ -197,9 +177,11 @@ export class ListDocentesComponent implements OnInit {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (secciones) => {
+          this.secciones.set(secciones); // ← FALTABA
           secciones.forEach(s => this.seccionesMap.set(s._id, s.nombre));
           this.fetch();
         },
+
         error: (e) => {
           console.error('Error cargando secciones', e);
           this.toast('Error al cargar secciones.', 'error');
@@ -231,27 +213,34 @@ export class ListDocentesComponent implements OnInit {
   fetch(): void {
     this.loading.set(true);
     this.error.set(null);
+
     this.docenteService.getAllDocentes()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (res: Docente[]) => {
-          const list = Array.isArray(res) ? res : [];
+
+          const list = (Array.isArray(res) ? res : []).map(d => ({
+            ...d,
+
+            // 🟦 grado viene como array → tomar el primero
+            grado: Array.isArray(d.grado) ? d.grado[0] : d.grado,
+
+            // 🟩 seccion viene como array → tomar el primero
+            seccion: Array.isArray(d.seccion) ? d.seccion[0] : d.seccion,
+          }));
+
           this.docentes.set(list);
           this.loading.set(false);
 
-          // ✅ Toast de éxito
-          this.toast(`Se cargaron ${list.length} docentes correctamente.`, 'success');
         },
-        error: (err) => {
-          console.error(err);
+        error: () => {
           this.error.set('No se pudieron cargar los docentes.');
           this.loading.set(false);
-
-          // ❌ Toast de error
-          this.toast('Error al cargar los docentes.', 'error');
         }
       });
   }
+
+
   // filtros / búsqueda
   onSearch(v: string) { this.search$.next(v); }
 
@@ -334,25 +323,34 @@ export class ListDocentesComponent implements OnInit {
   gradoCsv = '';
   seccionCsv = '';
 
-  openActions(d: Docente, kind: 'view' | 'edit' | 'delete') {
-    this.actionRow.set(d);
+  openActions(a: Docente, kind: 'view' | 'edit' | 'delete') {
+    this.actionRow.set(a);
     this.openedId.set(null);
 
-    if (kind === 'view') this.showView.set(true);
-
     if (kind === 'edit') {
+
+      // 1️⃣ Guardamos valores iniciales
+      const gradoId = typeof a.grado === 'object' ? a.grado.id : a.grado;
+      const seccionId = typeof a.seccion === 'object' ? a.seccion.id : a.seccion;
+
       this.editModel.set({
-        nombre: d.nombre,
-        apellido: d.apellido,
-        correo: d.correo,
-      } as DocenteUpdatePayload);
-      this.gradoCsv = (d.grado || []).join(',');
-      this.seccionCsv = (d.seccion || []).join(',');
+        nombre: a.nombre,
+        apellido: a.apellido,
+        correo: a.correo,
+        grado: gradoId,
+        seccion: '',   // temporal
+      });
+
+      // 2️⃣ Cargamos secciones y PRESELECCIONAMOS al terminar
+      this.cargarSeccionesPorGrado(gradoId, true, seccionId);
+
       this.showEdit.set(true);
     }
 
+    if (kind === 'view') this.showView.set(true);
     if (kind === 'delete') this.showDelete.set(true);
   }
+
 
   closeModals() {
     this.showView.set(false);
@@ -369,19 +367,17 @@ export class ListDocentesComponent implements OnInit {
   }
 
   // === Acciones ===
+
+
   saveEdit() {
     const row = this.actionRow();
     if (!row?.usuario_id) {
-      this.toast('Falta usuario_id.', 'warning');
+      this.toast('Falta usuario_id', 'warning');
       return;
     }
 
     const id = String(row.usuario_id);
-    const body: DocenteUpdatePayload = {
-      ...this.editModel(),
-      grado: this.csvToArray(this.gradoCsv),
-      seccion: this.csvToArray(this.seccionCsv),
-    };
+    const body: DocenteUpdatePayload = { ...this.editModel() };
     if (!body['contraseña'] || !String(body['contraseña']).trim()) delete body['contraseña'];
 
     this.saving.set(true);
@@ -460,4 +456,41 @@ export class ListDocentesComponent implements OnInit {
   }
   @HostListener('document:click')
   onDocClick() { if (this.openedId()) this.openedId.set(null); }
+
+
+  cargarSeccionesPorGrado(gradoId: string, mantenerSeccion = false, seccionSeleccionada: string | null = null): void {
+
+    if (!gradoId) {
+      this.seccionesEdit.set([]);
+      return;
+    }
+
+    this.loadingSeccionesEdit.set(true);
+
+    this.seccionService.seccionPorGrado(gradoId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (data) => {
+          this.seccionesEdit.set(data || []);
+
+          // Si se pasó una seccionSeleccionada, asignarla
+          if (seccionSeleccionada) {
+            this.editModel.update(m => ({ ...m, seccion: seccionSeleccionada }));
+          }
+          // Si NO se desea mantener sección, limpiar
+          else if (!mantenerSeccion) {
+            this.editModel.update(m => ({ ...m, seccion: '' }));
+          }
+        },
+        error: () => {
+          this.seccionesEdit.set([]);
+        },
+        complete: () => this.loadingSeccionesEdit.set(false),
+      });
+  }
+
+
+
+
+
 }

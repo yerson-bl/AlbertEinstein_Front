@@ -69,7 +69,41 @@ export class ListEvaluacionComponent implements OnInit, OnDestroy {
       if (gradoId) this.cargarSeccionesPorGrado(gradoId);
       else this.secciones = [];
     });
+
+    this.cargarTodas();
+
   }
+
+  cargarTodas(): void {
+    this.cargando = true;
+
+    const sub = this.evaluacionSrv
+      .listarTodas()
+      .pipe(finalize(() => (this.cargando = false)))
+      .subscribe({
+        next: (rows: any[]) => {
+          const mapped = (rows || []) as EvaluacionItem[];
+
+          // Ordenar por fecha de creación (más recientes primero)
+          this.evaluaciones = [...mapped].sort((a, b) => {
+            const da = new Date(a.fecha_creacion).getTime();
+            const db = new Date(b.fecha_creacion).getTime();
+            return db - da;
+          });
+
+          this.toast(`Se cargaron ${this.evaluaciones.length} evaluaciones.`, 'success');
+        },
+        error: (err) => {
+          console.error('Error cargando evaluaciones', err);
+          this.toast('No se pudieron cargar las evaluaciones.', 'error');
+        },
+      });
+
+    this.subs.push(sub);
+  }
+
+
+
 
   // 🔹 Cargar grados
   cargarGrados(): void {

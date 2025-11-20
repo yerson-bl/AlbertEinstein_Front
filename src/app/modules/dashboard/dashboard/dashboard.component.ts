@@ -59,7 +59,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   gradosMateria: Grado[] = [];
   seccionesMateria: Seccion[] = [];
 
-  filtrosSalon = { grado: '', seccion: '', fechaInicio: '2025-09-01', fechaFin: '2025-11-15' };
+  filtrosSalon = { grado: '', seccion: '', fechaInicio: '2025-09-01', fechaFin: new Date().toISOString().split('T')[0] };
   filtrosMateria = { grado: '', seccion: '' };
 
   filtrosComparacion = { alumno_ids: '', materia: 'Matematicas' };
@@ -172,14 +172,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   // Devuelve lista de nombres seleccionados
-get nombresAlumnosSeleccionados(): string {
-  return this.alumnosSeleccionados.map(a => a.nombre + ' ' + a.apellido).join(', ');
-}
+  get nombresAlumnosSeleccionados(): string {
+    return this.alumnosSeleccionados.map(a => a.nombre + ' ' + a.apellido).join(', ');
+  }
 
-// Verifica si el alumno está seleccionado
-estaSeleccionado(a: any): boolean {
-  return this.alumnosSeleccionados.some(x => x.usuario_id === a.usuario_id);
-}
+  // Verifica si el alumno está seleccionado
+  estaSeleccionado(a: any): boolean {
+    return this.alumnosSeleccionados.some(x => x.usuario_id === a.usuario_id);
+  }
 
 
 
@@ -373,4 +373,10 @@ estaSeleccionado(a: any): boolean {
     this.destroy$.next();
     this.destroy$.complete();
   }
+
+  getNombreGrado(id: string): string {
+    const g = this.gradosMateria.find(x => x._id === id);
+    return g ? g.nombre : id; // si no lo encuentra, muestra el ID
+  }
+
 }

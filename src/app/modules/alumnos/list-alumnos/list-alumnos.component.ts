@@ -322,10 +322,11 @@ export class ListAlumnosComponent implements OnInit {
         seccion: typeof a.seccion === 'object' ? a.seccion.id : a.seccion,
       });
 
-      // ✅ igual aquí, pasar solo el id
       this.cargarSeccionesPorGrado(
-        typeof a.grado === 'object' ? a.grado.id : a.grado
+        typeof a.grado === 'object' ? a.grado.id : a.grado,
+        true // ← mantener la sección actual
       );
+
 
       this.showEdit.set(true);
     }
@@ -456,9 +457,7 @@ export class ListAlumnosComponent implements OnInit {
   loadingSeccionesEdit = signal<boolean>(false);
 
 
-  cargarSeccionesPorGrado(gradoId: string): void {
-    // al cambiar de grado, limpia la sección seleccionada
-    this.editModel.update(m => ({ ...m, seccion: '' }));
+  cargarSeccionesPorGrado(gradoId: string, mantenerSeccion = false): void {
 
     if (!gradoId) {
       this.seccionesEdit.set([]);
@@ -466,14 +465,26 @@ export class ListAlumnosComponent implements OnInit {
     }
 
     this.loadingSeccionesEdit.set(true);
+
     this.seccionService.seccionPorGrado(gradoId)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (data) => this.seccionesEdit.set(data || []),
-        error: (err) => { console.error('Error cargando secciones por grado:', err); this.seccionesEdit.set([]); },
-        complete: () => this.loadingSeccionesEdit.set(false)
+        next: (data) => {
+          this.seccionesEdit.set(data || []);
+
+          // Si NO queremos mantener la sección, la limpiamos
+          if (!mantenerSeccion) {
+            this.editModel.update(m => ({ ...m, seccion: '' }));
+          }
+        },
+        error: (err) => {
+          console.error('Error cargando secciones por grado:', err);
+          this.seccionesEdit.set([]);
+        },
+        complete: () => this.loadingSeccionesEdit.set(false),
       });
   }
+
 
 
 

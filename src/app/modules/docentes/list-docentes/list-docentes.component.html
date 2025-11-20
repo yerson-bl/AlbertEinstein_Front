@@ -7,16 +7,14 @@
 
 
     <!-- HEADER PREMIUM -->
-    <section
-      class="rounded-3xl p-6 md:p-8 shadow-sm
+    <section class="rounded-3xl p-6 md:p-8 shadow-sm
              bg-gradient-to-r from-[#0b1f3a] via-[#1a3a78] to-[#254a9a]
              text-white flex flex-col md:flex-row md:items-center md:justify-between gap-4">
 
       <div class="flex items-center gap-3">
         <span class="inline-flex h-10 w-10 items-center justify-center rounded-2xl
                       bg-white/20 backdrop-blur">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5"
-            viewBox="0 0 24 24" fill="currentColor">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
             <path d="M3 5h18v2H3zm0 6h12v2H3zm0 6h18v2H3z" />
           </svg>
         </span>
@@ -28,8 +26,7 @@
         </div>
       </div>
 
-      <button (click)="fetch()"
-        class="px-4 py-2 rounded-xl bg-white/20 border border-white/20 text-white backdrop-blur
+      <button (click)="fetch()" class="px-4 py-2 rounded-xl bg-white/20 border border-white/20 text-white backdrop-blur
                hover:bg-white/30 transition">
         Refrescar
       </button>
@@ -46,15 +43,13 @@
         <!-- Búsqueda -->
         <div class="relative">
           <input type="text" (input)="onSearch($any($event.target).value)"
-            placeholder="Buscar por nombre, apellido, correo, usuario, grado o sección…"
-            class="w-full rounded-xl border border-white/40 dark:border-white/20
+            placeholder="Buscar por nombre, apellido, correo, usuario, grado o sección…" class="w-full rounded-xl border border-white/40 dark:border-white/20
                    bg-white/70 dark:bg-white/10 backdrop-blur px-10 py-2 text-sm
                    text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-white/40
                    focus:outline-none focus:ring-2 focus:ring-indigo-500" />
 
           <svg class="absolute left-3 top-2.5 h-5 w-5 text-gray-400 dark:text-white/50"
-            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-            stroke="currentColor">
+            xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
               d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 105.5 5.5a7.5 7.5 0 0011.15 11.15z" />
           </svg>
@@ -67,8 +62,7 @@
         <span class="text-xs text-gray-600 dark:text-white/70">
           Mostrando {{ totalFiltered() }} resultado(s)
         </span>
-        <button (click)="clearFilters()"
-          class="ml-auto text-xs px-3 py-1 rounded-xl 
+        <button (click)="clearFilters()" class="ml-auto text-xs px-3 py-1 rounded-xl 
                  border border-white/40 dark:border-white/10
                  bg-white/50 dark:bg-white/5 backdrop-blur
                  text-gray-800 dark:text-white
@@ -138,22 +132,20 @@
                 </td>
                 <td class="px-4 py-3 text-gray-800 dark:text-white-light">
                   <div class="flex flex-wrap gap-1">
-                    <span class="text-xs text-gray-500 dark:text-white-dark">Grados:</span>
-                    <ng-container *ngFor="let g of d.grado">
-                      <span class="px-2 py-0.5 rounded-full bg-gray-100 dark:bg-white/10 text-xs">
-                        {{ getNombreGrado(g) }}
-                      </span>
-                    </ng-container>
+                    <span class="text-xs text-gray-500 dark:text-white-dark">Grado:</span>
+                    <span class="px-2 py-0.5 rounded-full bg-gray-100 dark:bg-white/10 text-xs">
+                      {{ getNombreGrado(d.grado) }}
+                    </span>
                   </div>
+
                   <div class="flex flex-wrap gap-1 mt-1">
-                    <span class="text-xs text-gray-500 dark:text-white-dark">Secciones:</span>
-                    <ng-container *ngFor="let s of d.seccion">
-                      <span class="px-2 py-0.5 rounded-full bg-gray-100 dark:bg-white/10 text-xs">
-                        {{ getNombreSeccion(s) }}
-                      </span>
-                    </ng-container>
+                    <span class="text-xs text-gray-500 dark:text-white-dark">Sección:</span>
+                    <span class="px-2 py-0.5 rounded-full bg-gray-100 dark:bg-white/10 text-xs">
+                      {{ getNombreSeccion(d.seccion) }}
+                    </span>
                   </div>
                 </td>
+
                 <td class="px-4 py-3 text-gray-800 dark:text-white-light">{{ d.usuario_id }}</td>
                 <td class="px-4 py-3">
                   <a class="text-blue-600 dark:text-blue-300 hover:underline" [href]="'mailto:'+d.correo">{{ d.correo
@@ -272,8 +264,9 @@
             <div><span class="font-medium">Usuario:</span> {{ r.usuario_id }}</div>
             <div><span class="font-medium">Nombre:</span> {{ r.nombre }} {{ r.apellido }}</div>
             <div><span class="font-medium">Correo:</span> {{ r.correo }}</div>
-            <div><span class="font-medium">Grados:</span> {{ r.grado.join(', ') }}</div>
-            <div><span class="font-medium">Secciones:</span> {{ r.seccion.join(', ') }}</div>
+            <div><span class="font-medium">Grado:</span> {{ getNombreGrado(r.grado) }}</div>
+            <div><span class="font-medium">Sección:</span> {{ getNombreSeccion(r.seccion) }}</div>
+
             <div><span class="font-medium">Estado:</span>
               <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium"
                 [ngClass]="estadoPill(r.estado)">{{ r.estado | titlecase }}</span>
@@ -314,15 +307,28 @@
             <input type="email" class="form-input w-full" [(ngModel)]="editModel().correo" name="correo" required />
           </div>
 
-          <!-- Grados / Secciones como CSV -->
+          <!-- Grado -->
           <div>
-            <label class="text-xs text-gray-500 dark:text-white-dark">Grados (coma-separados)</label>
-            <input class="form-input w-full" [(ngModel)]="gradoCsv" name="gradoCsv" placeholder="4,5" />
+            <label class="text-xs text-gray-500 dark:text-white-dark">Grado</label>
+            <select class="form-select w-full" [(ngModel)]="editModel().grado" name="grado" required
+              (ngModelChange)="cargarSeccionesPorGrado($event)">
+              <option [ngValue]="''" disabled>Seleccione un grado</option>
+              <option *ngFor="let g of grados()" [ngValue]="g._id">{{ g.nombre }}</option>
+            </select>
           </div>
+
+          <!-- Sección -->
           <div>
-            <label class="text-xs text-gray-500 dark:text-white-dark">Secciones (coma-separadas)</label>
-            <input class="form-input w-full" [(ngModel)]="seccionCsv" name="seccionCsv" placeholder="A,B" />
+            <label class="text-xs text-gray-500 dark:text-white-dark">Sección</label>
+            <select class="form-select w-full" [(ngModel)]="editModel().seccion" name="seccion" required
+              [disabled]="loadingSeccionesEdit()">
+              <option [ngValue]="''" disabled>
+                {{ loadingSeccionesEdit() ? 'Cargando secciones…' : 'Seleccione una sección' }}
+              </option>
+              <option *ngFor="let s of seccionesEdit()" [ngValue]="s._id">{{ s.nombre }}</option>
+            </select>
           </div>
+
 
           <!-- Contraseña (opcional) -->
           <div class="md:col-span-2">

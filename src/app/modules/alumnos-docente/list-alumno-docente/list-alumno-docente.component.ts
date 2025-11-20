@@ -314,20 +314,22 @@ export class ListAlumnoDocenteComponent implements OnInit {
     this.openedId.set(null);
 
     if (kind === 'edit') {
+
+      // 1️⃣ Extraemos los IDs reales
+      const gradoId = typeof a.grado === 'object' ? a.grado.id : a.grado;
+      const seccionId = typeof a.seccion === 'object' ? a.seccion.id : a.seccion;
+
+      // 2️⃣ Pre-cargar grado y seccion TEMPORAL
       this.editModel.set({
         nombre: a.nombre,
         apellido: a.apellido,
         correo: a.correo,
-
-        // ✅ extraemos id si viene como objeto
-        grado: typeof a.grado === 'object' ? a.grado.id : a.grado,
-        seccion: typeof a.seccion === 'object' ? a.seccion.id : a.seccion,
+        grado: gradoId,
+        seccion: '',     // SE CARGA LUEGO
       });
 
-      // ✅ igual aquí, pasar solo el id
-      this.cargarSeccionesPorGrado(
-        typeof a.grado === 'object' ? a.grado.id : a.grado
-      );
+      // 3️⃣ Cargar secciones y al terminar preseleccionar la sección original
+      this.cargarSeccionesPorGrado(gradoId, seccionId);
 
       this.showEdit.set(true);
     }
@@ -335,6 +337,7 @@ export class ListAlumnoDocenteComponent implements OnInit {
     if (kind === 'view') this.showView.set(true);
     if (kind === 'delete') this.showDelete.set(true);
   }
+
 
   closeModals() {
     this.showView.set(false);
@@ -458,9 +461,7 @@ export class ListAlumnoDocenteComponent implements OnInit {
   loadingSeccionesEdit = signal<boolean>(false);
 
 
-  cargarSeccionesPorGrado(gradoId: string): void {
-    // al cambiar de grado, limpia la sección seleccionada
-    this.editModel.update(m => ({ ...m, seccion: '' }));
+  cargarSeccionesPorGrado(gradoId: string, seccionSeleccionada: string | null = null): void {
 
     if (!gradoId) {
       this.seccionesEdit.set([]);
@@ -468,14 +469,31 @@ export class ListAlumnoDocenteComponent implements OnInit {
     }
 
     this.loadingSeccionesEdit.set(true);
+
     this.seccionService.seccionPorGrado(gradoId)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (data) => this.seccionesEdit.set(data || []),
-        error: (err) => { console.error('Error cargando secciones por grado:', err); this.seccionesEdit.set([]); },
-        complete: () => this.loadingSeccionesEdit.set(false)
+        next: (data) => {
+
+          this.seccionesEdit.set(data || []);
+
+          // 1️⃣ Si recibimos la sección original del alumno → seleccionarla
+          if (seccionSeleccionada) {
+            this.editModel.update(m => ({
+              ...m,
+              seccion: seccionSeleccionada
+            }));
+          }
+        },
+        error: (err) => {
+          console.error('Error cargando secciones por grado:', err);
+          this.seccionesEdit.set([]);
+        },
+        complete: () => this.loadingSeccionesEdit.set(false),
       });
   }
 
 }
+
+
 

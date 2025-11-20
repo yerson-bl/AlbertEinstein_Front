@@ -53,6 +53,10 @@ export class EvaluacionService {
     });
   }
 
+  listarTodas() {
+    return this.http.get<any[]>(`${this.baseUrl}/listado`, { headers: this.headers() });
+  }
+
 
 
   /** GET /intentos/:id  (si necesitas consultar el intento) */
