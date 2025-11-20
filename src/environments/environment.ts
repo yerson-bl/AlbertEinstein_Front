@@ -1,6 +1,6 @@
 // src/environments/environment.ts
 export const environment = {
   production: false,
-  apiUrl: 'http://127.0.0.1:5000',
+  apiUrl: 'https://simulacros-ia-backend.onrender.com',
   version: 'Dev 0.1.0'
 };
